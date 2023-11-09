@@ -1,0 +1,21 @@
+menu "Example Configuration"
+
+    config SNTP_TIME_SERVER
+        string "SNTP server name"
+        default "pool.ntp.org"
+        help
+            Hostname of the main SNTP server.
+
+	config EXAMPLE_WIFI_SSID
+        string "WiFi SSID"
+        default "Tenda_AF2E00"
+        help
+            SSID (network name) for the example to connect to.
+
+    config EXAMPLE_WIFI_PASSWORD
+        string "WiFi Password"
+        default "shamballa"
+        help
+            WiFi password (WPA or WPA2) for the example to use.
+            Can be left blank if the network has no security set.
+endmenu
