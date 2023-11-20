@@ -1,5 +1,7 @@
 #include "fb_state_initialized.hpp"
 
+#include "fb_globals.hpp"
+
 
 
 using namespace fb;
@@ -20,10 +22,10 @@ const char* StateInitialized::getName()
 
 void StateInitialized::enter()
 {
-
+	global::getEventManager()->attachListener(global::getPinManager());
 }
 
 void StateInitialized::exit()
 {
-
+	global::getEventManager()->detachListener(global::getPinManager());
 }

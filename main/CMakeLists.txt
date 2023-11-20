@@ -2,6 +2,9 @@ idf_component_register(
 	SRCS 
 		"main.cpp"
 		"fb_clock.cpp"
+		"fb_globals.cpp"
+		"fb_pins.cpp"
+		"fb_event_manager.cpp"
 		"fb_state_booted.cpp"
 		"fb_state_initialized.cpp"
 		"fb_state_manager.cpp"
