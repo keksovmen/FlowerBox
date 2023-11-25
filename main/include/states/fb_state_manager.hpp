@@ -5,6 +5,7 @@
 #include <string>
 
 #include "fb_debug.hpp"
+#include "fb_event_manager.hpp"
 
 
 
@@ -16,7 +17,7 @@ namespace fb
 
 
 
-		class State : public debug::Named
+		class State : public debug::Named, public event::EventListener
 		{
 			public:
 				State(StateManager& context);
@@ -33,12 +34,14 @@ namespace fb
 
 
 
-		class StateManager : public debug::Named
+		class StateManager : public debug::Named, public event::EventListener
 		{
 			public:
 				StateManager(const std::string& name);
 
 				virtual const char* getName() override;
+
+				virtual void handleEvent(const event::Event& event) override;
 				
 				/**
 				 * @brief вызовет на заданном состоянии enter

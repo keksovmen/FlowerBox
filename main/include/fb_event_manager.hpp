@@ -58,5 +58,9 @@ namespace fb
 			private:
 				QueueHandle_t _queue;
 		};
+
+
+
+		const char* eventGroupToStr(const EventGroup& group);
 	}
 }

@@ -38,6 +38,16 @@ const char* StateManager::getName()
 	return _name.c_str();
 }
 
+void StateManager::handleEvent(const event::Event& event)
+{
+	FB_DEBUG_ENTER();
+
+	FB_DEBUG_LOG("%s->handleEvent()", _currentState->getName());
+	_currentState->handleEvent(event);
+	
+	FB_DEBUG_EXIT();
+}
+
 void StateManager::init(std::unique_ptr<State>&& initialState)
 {
 	FB_DEBUG_ENTER();
@@ -45,7 +55,7 @@ void StateManager::init(std::unique_ptr<State>&& initialState)
 	assert(initialState);
 	_currentState = std::move(initialState);
 
-	ESP_LOGI(getName(), "%s->enter()", _currentState->getName());
+	FB_DEBUG_LOG("%s->enter()", _currentState->getName());
 	_currentState->enter();
 
 	FB_DEBUG_EXIT();
@@ -58,12 +68,12 @@ void StateManager::transition(std::unique_ptr<State>&& nextState)
 	assert(_currentState);
 	assert(nextState);
 
-	ESP_LOGI(getName(), "%s->exit()", _currentState->getName());
+	FB_DEBUG_LOG("%s->exit()", _currentState->getName());
 	_currentState->exit();
 
 	_currentState = std::move(nextState);
 
-	ESP_LOGI(getName(), "%s->enter()", _currentState->getName());
+	FB_DEBUG_LOG("%s->enter()", _currentState->getName());
 	_currentState->enter();
 
 	FB_DEBUG_EXIT();
@@ -75,7 +85,7 @@ void StateManager::deinit()
 
 	assert(_currentState);
 
-	ESP_LOGI(getName(), "%s->exit()", _currentState->getName());
+	FB_DEBUG_LOG("%s->exit()", _currentState->getName());
 	_currentState->exit();
 
 	FB_DEBUG_EXIT();

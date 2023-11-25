@@ -10,12 +10,15 @@ namespace fb
 {
 	namespace state
 	{
-		class StateBooted : public State
+		class StateWifiConnect : public State
 		{
 			public:
-				StateBooted(StateManager& context);
+				StateWifiConnect(StateManager& context);
 
 				virtual const char* getName() override;
+
+				virtual void handleEvent(const event::Event& event);
+
 				virtual void enter() override;
 				virtual void exit() override;
 		};

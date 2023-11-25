@@ -21,29 +21,36 @@
 #include "lwip/ip_addr.h"
 #include "nvs_flash.h"
 
-#include "fb_state_manager.hpp"
 #include "fb_state_booted.hpp"
-#include "fb_event_manager.hpp"
 #include "fb_globals.hpp"
 
 
 
 static const char *TAG = "main";
 
-RTC_DATA_ATTR static int _boot_count = 0;
+// RTC_DATA_ATTR static int _boot_count = 0;
 
 
 
 extern "C" void app_main(void)
 {
-	ESP_LOGI(TAG, "Booting times = %d", _boot_count);
-
-	
-	// auto manager = fb::global::getStateManager();
+	// ESP_LOGI(TAG, "Booting times = %d", _boot_count);
+	ESP_LOGI(TAG, "Booting");
+	//инициализируем все синглетоны
 	fb::global::init();
+
+	auto* stateManager = fb::global::getStateManager();
+	stateManager->init(std::make_unique<fb::state::StateBooted>(*stateManager));
+
 	fb::global::getEventManager()->attachListener(fb::global::getPinManager());
-	fb::global::getEventManager()->pushEvent({fb::event::EventGroup::BOOT, 0, (void*)(_boot_count % 5)});
-	fb::global::getEventManager()->dispatchEvent();
+	fb::global::getEventManager()->attachListener(stateManager);
+	fb::global::getEventManager()->pushEvent({fb::event::EventGroup::BOOT, 0, NULL});
+
+	for(;;){
+		fb::global::getEventManager()->dispatchEvent();
+	}
+	// fb::global::getEventManager()->pushEvent({fb::event::EventGroup::BOOT, 0, (void*)(_boot_count % 5)});
+	// fb::global::getEventManager()->dispatchEvent();
 
 	
 	// manager->init(std::make_unique<fb::state::StateBooted>(manager));
@@ -70,12 +77,12 @@ extern "C" void app_main(void)
 	// ESP_LOGI(TAG, "The current date/time in Moscow is: %s", strftime_buf);
 
 	
-	_boot_count++;
+	// _boot_count++;
 
 	// vTaskDelay(pdMS_TO_TICKS(1000));
 	// gpio_set_level(_led_pins[_boot_count % (sizeof(_led_pins) / sizeof(_led_pins[0]))], 0);
 
-	const int deep_sleep_sec = 1;
-	ESP_LOGI(TAG, "Entering deep sleep for %d seconds", deep_sleep_sec);
-	esp_deep_sleep(1000000LL * deep_sleep_sec);
+	// const int deep_sleep_sec = 1;
+	// ESP_LOGI(TAG, "Entering deep sleep for %d seconds", deep_sleep_sec);
+	// esp_deep_sleep(1000000LL * deep_sleep_sec);
 }

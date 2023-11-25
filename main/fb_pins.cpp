@@ -18,7 +18,6 @@ const char* PinManager::getName()
 void PinManager::handleEvent(const event::Event& event)
 {
 	FB_DEBUG_ENTER();
-	FB_DEBUG_LOG("event group %d, id %d, arg %d", (int) event.groupId, (int) event.eventId, (int) event.data);
 	if(event.groupId == event::EventGroup::BOOT){
 		_onBootEvent(event);
 	}

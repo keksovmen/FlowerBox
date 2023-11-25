@@ -10,12 +10,15 @@ namespace fb
 {
 	namespace state
 	{
-		class StateInitialized : public State
+		class StateBooted : public State
 		{
 			public:
-				StateInitialized(StateManager& context);
+				StateBooted(StateManager& context);
 
 				virtual const char* getName() override;
+
+				virtual void handleEvent(const event::Event& event) override;
+
 				virtual void enter() override;
 				virtual void exit() override;
 		};
