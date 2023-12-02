@@ -4,8 +4,13 @@
 
 
 
+#define FB_DEBUG_TAG_ENTER(){ESP_LOGI(TAG, "Entered: %s", __FUNCTION__);}
+#define FB_DEBUG_TAG_EXIT(){ESP_LOGI(TAG, "Exited: %s", __FUNCTION__);}
+
 #define FB_DEBUG_ENTER(){ESP_LOGI(getName(), "Entered: %s", __FUNCTION__);}
 #define FB_DEBUG_EXIT(){ESP_LOGI(getName(), "Exited: %s", __FUNCTION__);}
+
+#define FB_DEBUG_TAG_LOG(format, ...){ESP_LOGI(TAG, format, ##__VA_ARGS__);}
 #define FB_DEBUG_LOG(format, ...){ESP_LOGI(getName(), format, ##__VA_ARGS__);}
 
 

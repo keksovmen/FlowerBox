@@ -58,7 +58,9 @@ const char* event::eventGroupToStr(const EventGroup& group)
 		"WIFI",
 		"STATE",
 		"TIMERS",
+		"CLOCK",
 	};
+	assert(static_cast<int>(group) < sizeof(names) / sizeof(names[0]));
 
 	return names[static_cast<int>(group)];
 }

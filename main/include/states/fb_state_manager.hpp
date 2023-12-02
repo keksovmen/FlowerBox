@@ -38,6 +38,7 @@ namespace fb
 		{
 			public:
 				StateManager(const std::string& name);
+				~StateManager();
 
 				virtual const char* getName() override;
 
@@ -58,7 +59,7 @@ namespace fb
 				void transition(std::unique_ptr<State>&& nextState);
 
 				/**
-				 * @brief вызовет на старом exit
+				 * @brief вызовет на старом exit и удалит его
 				 */
 
 				void deinit();

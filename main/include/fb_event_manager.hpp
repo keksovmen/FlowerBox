@@ -17,12 +17,13 @@ namespace fb
 {
 	namespace event
 	{
-		enum class EventGroup
+		enum class EventGroup : int
 		{
 			BOOT,
 			WIFI,
 			STATE,
 			TIMERS,
+			CLOCK,
 		};
 
 

@@ -33,6 +33,11 @@ StateManager::StateManager(const std::string& name)
 
 }
 
+StateManager::~StateManager()
+{
+	deinit();
+}
+
 const char* StateManager::getName()
 {
 	return _name.c_str();
@@ -83,10 +88,11 @@ void StateManager::deinit()
 {
 	FB_DEBUG_ENTER();
 
-	assert(_currentState);
-
-	FB_DEBUG_LOG("%s->exit()", _currentState->getName());
-	_currentState->exit();
-
+	if(_currentState){
+		FB_DEBUG_LOG("%s->exit()", _currentState->getName());
+		_currentState->exit();
+		_currentState.reset(nullptr);
+	}
+	
 	FB_DEBUG_EXIT();
 }

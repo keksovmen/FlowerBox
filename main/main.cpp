@@ -47,6 +47,9 @@ extern "C" void app_main(void)
 	fb::global::getEventManager()->pushEvent({fb::event::EventGroup::BOOT, 0, NULL});
 
 	for(;;){
+		ESP_LOGW(TAG, "Free memory %d", xPortGetFreeHeapSize());
+		ESP_LOGW(TAG, "Minimum heap available %d", xPortGetMinimumEverFreeHeapSize());
+		ESP_LOGW(TAG, "Stack value: %d", uxTaskGetStackHighWaterMark(NULL));
 		fb::global::getEventManager()->dispatchEvent();
 	}
 	// fb::global::getEventManager()->pushEvent({fb::event::EventGroup::BOOT, 0, (void*)(_boot_count % 5)});

@@ -1,5 +1,6 @@
 #include "fb_state_booted.hpp"
 
+#include "fb_clock.hpp"
 #include "fb_state_wifi_connect.hpp"
 #include "fb_wifi.hpp"
 
@@ -32,6 +33,7 @@ void StateBooted::enter()
 {
 	//инициализируем единоразовыи компоненты
 	wifi::init();
+	clock::initClock();
 }
 
 void StateBooted::exit()

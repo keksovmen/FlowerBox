@@ -1,5 +1,6 @@
 #include "fb_state_time_init.hpp"
 
+#include "fb_clock.hpp"
 #include "fb_globals.hpp"
 
 
@@ -22,15 +23,20 @@ const char* StateTimeInit::getName()
 
 void StateTimeInit::handleEvent(const event::Event& event)
 {
-
+	if(event.groupId == event::EventGroup::CLOCK){
+		if(event.eventId == clock::ClockEventId::SYNCED){
+			//transition to working state
+			FB_DEBUG_LOG("Time synced, ready to work");
+		}
+	}
 }
 
 void StateTimeInit::enter()
 {
-	// global::getEventManager()->attachListener(global::getPinManager());
+	clock::syncRequest();
 }
 
 void StateTimeInit::exit()
 {
-	// global::getEventManager()->detachListener(global::getPinManager());
+
 }

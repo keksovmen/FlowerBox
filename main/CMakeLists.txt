@@ -10,6 +10,7 @@ idf_component_register(
 		"states/fb_state_time_init.cpp"
 		"states/fb_state_manager.cpp"
 		"states/fb_state_wifi_connect.cpp"
+		"states/fb_state_wifi_connected.cpp"
 
     INCLUDE_DIRS
 		"include"

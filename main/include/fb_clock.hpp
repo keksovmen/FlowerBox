@@ -2,10 +2,40 @@
 
 
 
+#include <functional>
+
+
+
 namespace fb
 {
 	namespace clock
 	{
-		bool syncTime();
+		enum class ClockEventId : int
+		{
+			SYNCED
+		};
+		bool operator==(int val, ClockEventId id);
+
+
+
+		struct Time
+		{
+			const int hours;
+			const int minutes;
+			const int seconds;
+
+
+
+			Time(int hours, int minutes, int seconds);
+
+			bool operator<(const Time& t);
+			bool operator>(const Time& t);
+		};
+
+
+
+		void initClock();
+		void syncRequest();
+		void deinitClock();
 	}
 }
