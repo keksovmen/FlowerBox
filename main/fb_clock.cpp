@@ -60,6 +60,43 @@ bool clock::operator==(int val, ClockEventId id)
 
 
 
+Time::Time(int hours, int minutes, int seconds)
+	: hours(hours), minutes(minutes), seconds(seconds)
+{
+
+}
+
+bool Time::operator<(const Time& t) const
+{
+	if(this->hours > t.hours){
+		return false;
+	}
+
+	if(this->hours < t.hours){
+		return true;
+	}
+
+	if(this->minutes > t.minutes){
+		return false;
+	}
+
+	if(this->minutes < t.minutes){
+		return true;
+	}
+
+	if(this->seconds > t.seconds){
+		return false;
+	}
+
+	if(this->seconds < t.seconds){
+		return true;
+	}
+
+	return false;
+}
+
+
+
 void clock::initClock()
 {
 	FB_DEBUG_TAG_ENTER();

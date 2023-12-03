@@ -28,8 +28,7 @@ namespace fb
 
 			Time(int hours, int minutes, int seconds);
 
-			bool operator<(const Time& t);
-			bool operator>(const Time& t);
+			bool operator<(const Time& t) const;
 		};
 
 
