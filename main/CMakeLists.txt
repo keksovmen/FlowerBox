@@ -3,6 +3,7 @@ idf_component_register(
 		"fb_clock.cpp"
 		"fb_event_manager.cpp"
 		"fb_globals.cpp"
+		"fb_http_server.cpp"
 		"fb_pins.cpp"
 		"fb_wifi.cpp"
 		"main.cpp"
