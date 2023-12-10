@@ -1,0 +1,36 @@
+body {
+	background: #EFCFAF;
+	font-size: 20px;
+}
+
+.title {
+	margin: auto;
+}
+
+.panel {
+	display: grid;
+	grid-row-gap: 10px;
+	grid-template-columns: auto;
+	justify-content: space-evenly;
+	margin: auto;
+	max-width: 300px;
+}
+
+.button {
+	align-items: center;
+	background: #FAFAAF;
+	border-color: black;
+	border-width: 4px;
+	border: solid;
+	display: flex;
+	justify-content: space-evenly;
+	margin: auto;
+	min-height: 30px;
+	text-align: center;
+	width: 100%;
+}
+
+.button:hover {
+	background: #EAEAAE;
+	border-color: gray;
+}

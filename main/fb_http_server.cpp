@@ -1,10 +1,17 @@
 #include "fb_http_server.hpp"
 
 #include <cstdio>
+#include <cstring>
 
 #include "fb_debug.hpp"
 
 #include "esp_http_server.h"
+
+
+
+#define _PATH_PREFIX "/spiffs/"
+#define _FILE_INDEX "index.html"
+#define _FILE_STYLE "style.css"
 
 
 
@@ -24,12 +31,18 @@ static httpd_handle_t _server = nullptr;
 static esp_err_t _fileHandler(httpd_req_t *r)
 {
 	FB_DEBUG_TAG_ENTER();
-	FB_DEBUG_TAG_LOG("File: %s", static_cast<const char*>(r->user_ctx));
+	const char* fileName = static_cast<const char*>(r->user_ctx);
 
-	auto* f = std::fopen(static_cast<const char*>(r->user_ctx), "rb");
+	FB_DEBUG_TAG_LOG("File: %s", fileName);
+
+	auto* f = std::fopen(fileName, "rb");
 	if(!f){
-		FB_DEBUG_TAG_LOG_E("Failed to open: %s", static_cast<const char*>(r->user_ctx));
+		FB_DEBUG_TAG_LOG_E("Failed to open: %s", fileName);
 		return httpd_resp_send_404(r);
+	}
+
+	if(std::strstr(fileName, ".css")){
+		httpd_resp_set_type(r, "text/css");
 	}
 
 	esp_err_t err;
@@ -81,10 +94,18 @@ static void _registerUris()
 		.uri = "/",
 		.method = HTTP_GET,
 		.handler = &_fileHandler,
-		.user_ctx = reinterpret_cast<void*>(const_cast<char*>("/spiffs/index.html")),
+		.user_ctx = reinterpret_cast<void*>(const_cast<char*>(_PATH_PREFIX _FILE_INDEX)),
+	};
+
+	const httpd_uri_t style = {
+		.uri = "/" _FILE_STYLE,
+		.method = HTTP_GET,
+		.handler = &_fileHandler,
+		.user_ctx = reinterpret_cast<void*>(const_cast<char*>(_PATH_PREFIX _FILE_STYLE)),
 	};
 
 	httpd_register_uri_handler(_server, &index);
+	httpd_register_uri_handler(_server, &style);
 }
 
 
