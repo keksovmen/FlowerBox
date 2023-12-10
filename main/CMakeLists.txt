@@ -2,6 +2,7 @@ idf_component_register(
 	SRCS 
 		"fb_clock.cpp"
 		"fb_event_manager.cpp"
+		"fb_file_system.cpp"
 		"fb_globals.cpp"
 		"fb_http_server.cpp"
 		"fb_pins.cpp"
@@ -17,3 +18,5 @@ idf_component_register(
 		"include"
 		"include/states"
 		)
+
+spiffs_create_partition_image(storage ../spiffs_image FLASH_IN_PROJECT)

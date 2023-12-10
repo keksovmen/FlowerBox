@@ -90,6 +90,8 @@
 		"stop_token": "cpp",
 		"cinttypes": "cpp",
 		"bitset": "cpp",
-		"*.inc": "cpp"
+		"*.inc": "cpp",
+		"stack": "cpp",
+		"cerrno": "c"
 	}
 }

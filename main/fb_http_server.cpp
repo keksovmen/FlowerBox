@@ -1,5 +1,7 @@
 #include "fb_http_server.hpp"
 
+#include <cstdio>
+
 #include "fb_debug.hpp"
 
 #include "esp_http_server.h"
@@ -19,11 +21,46 @@ static httpd_handle_t _server = nullptr;
 
 
 
-static esp_err_t _indexHandler(httpd_req_t *r)
+static esp_err_t _fileHandler(httpd_req_t *r)
 {
 	FB_DEBUG_TAG_ENTER();
+	FB_DEBUG_TAG_LOG("File: %s", static_cast<const char*>(r->user_ctx));
 
-	const esp_err_t err = httpd_resp_send(r, "<html><head></head><body><h1>Hello world</h1></body>", HTTPD_RESP_USE_STRLEN);
+	auto* f = std::fopen(static_cast<const char*>(r->user_ctx), "rb");
+	if(!f){
+		FB_DEBUG_TAG_LOG_E("Failed to open: %s", static_cast<const char*>(r->user_ctx));
+		return httpd_resp_send_404(r);
+	}
+
+	esp_err_t err;
+	char buffer[512];
+	int count;
+
+	while((count = std::fread(buffer, sizeof(*buffer), sizeof(buffer), f)) != 0){
+		FB_DEBUG_TAG_LOG("Read %d bytes", count);
+		if(std::ferror(f)){
+			FB_DEBUG_TAG_LOG_W("File error occurred!");
+			break;
+		}
+
+		err = httpd_resp_send_chunk(r, buffer, count);
+		if(err != ESP_OK){
+			FB_DEBUG_TAG_LOG_E("Http send chunk error occurred! %d", err);
+			break;
+		}
+
+		if(std::feof(f)){
+			FB_DEBUG_TAG_LOG("File EOF occurred");
+			break;
+		}
+	}
+
+	err = httpd_resp_send_chunk(r, buffer, 0);
+	if(err != ESP_OK){
+		FB_DEBUG_TAG_LOG_E("Http send chunk error occurred! %d", err);
+	}
+
+	std::fclose(f);
 
 	FB_DEBUG_TAG_EXIT();
 
@@ -40,11 +77,11 @@ static void _initServer()
 
 static void _registerUris()
 {
-	httpd_uri_t index = {
+	const httpd_uri_t index = {
 		.uri = "/",
 		.method = HTTP_GET,
-		.handler = &_indexHandler,
-		.user_ctx = nullptr,
+		.handler = &_fileHandler,
+		.user_ctx = reinterpret_cast<void*>(const_cast<char*>("/spiffs/index.html")),
 	};
 
 	httpd_register_uri_handler(_server, &index);
