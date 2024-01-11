@@ -4,6 +4,7 @@
 #include <cstring>
 
 #include "fb_debug.hpp"
+#include "fb_templates.hpp"
 
 #include "esp_http_server.h"
 
@@ -30,6 +31,9 @@ static httpd_handle_t _server = nullptr;
 
 static esp_err_t _fileHandler(httpd_req_t *r)
 {
+	// templates::Engine e(nullptr, 0, [](auto data, auto size){});
+	// e.process("123");
+
 	FB_DEBUG_TAG_ENTER();
 	const char* fileName = static_cast<const char*>(r->user_ctx);
 
