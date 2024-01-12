@@ -19,9 +19,7 @@ body {
 .button {
 	align-items: center;
 	background: #FAFAAF;
-	border-color: black;
-	border-width: 4px;
-	border: solid;
+	border: solid 4px black;
 	display: flex;
 	justify-content: space-evenly;
 	margin: auto;
