@@ -1,7 +1,23 @@
+/**
+ * @file fb_http_server.cpp
+ * @author your name (you@domain.com)
+ * @brief URI rules must be considered in .html files and any others
+ * 		each actual page MUST end with file extension -> we now it is this file we want to fetch
+ * 		THERE IS NO FOLDERS so /path/file.ext is invalid must be only file.ext -> in html specify absolute paths
+ * @version 0.1
+ * @date 2024-01-13
+ * 
+ * @copyright Copyright (c) 2024
+ * 
+ */
+
+
+
 #include "fb_http_server.hpp"
 
 #include <cstdio>
 #include <cstring>
+#include <string>
 
 #include "fb_debug.hpp"
 
@@ -162,10 +178,21 @@ static esp_err_t _multipartFileInputHandler(httpd_req_t* r, DataCb cb)
 
 
 
+static std::string _composeFileName(const char* base, const char* uri)
+{
+	//must skip all preceding / in uri
+	auto tmp = std::string(uri);
+	const auto beginning = tmp.find_first_not_of('/');
+
+	return std::string(base) + tmp.substr(beginning == std::string::npos ? 0 : beginning);
+}
+
 static esp_err_t _fileHandler(httpd_req_t *r)
 {
 	FB_DEBUG_TAG_ENTER();
-	const char* fileName = static_cast<const char*>(r->user_ctx);
+	const std::string file = _composeFileName(static_cast<const char*>(r->user_ctx), r->uri);
+	const char* fileName = file.c_str();
+	FB_DEBUG_TAG_LOG("uri: %s\nfile name: %s", r->uri, fileName);
 
 	FB_DEBUG_TAG_LOG("File: %s", fileName);
 
@@ -235,6 +262,8 @@ static void _initServer()
 {
 	httpd_config_t cfg = HTTPD_DEFAULT_CONFIG();
 	cfg.max_resp_headers = 32;
+	//turning on /* syntax for uris
+	cfg.uri_match_fn = httpd_uri_match_wildcard;
 
 	ESP_ERROR_CHECK(httpd_start(&_server, &cfg));
 }
@@ -242,25 +271,11 @@ static void _initServer()
 static void _registerUris()
 {
 	//TODO: use request->uri to define what file you need in file handler, so you can make uri as =/* everything, and remuve user_ctx
-	const httpd_uri_t index = {
-		.uri = "/",
+	const httpd_uri_t files = {
+		.uri = "/*",
 		.method = HTTP_GET,
 		.handler = &_fileHandler,
-		.user_ctx = reinterpret_cast<void*>(const_cast<char*>(_PATH_PREFIX _FILE_INDEX)),
-	};
-
-	const httpd_uri_t style = {
-		.uri = "/" _FILE_STYLE,
-		.method = HTTP_GET,
-		.handler = &_fileHandler,
-		.user_ctx = reinterpret_cast<void*>(const_cast<char*>(_PATH_PREFIX _FILE_STYLE)),
-	};
-
-	const httpd_uri_t update = {
-		.uri = "/" _FILE_UPDATE,
-		.method = HTTP_GET,
-		.handler = &_fileHandler,
-		.user_ctx = reinterpret_cast<void*>(const_cast<char*>(_PATH_PREFIX _FILE_UPDATE)),
+		.user_ctx = reinterpret_cast<void*>(const_cast<char*>(_PATH_PREFIX)),
 	};
 
 	const httpd_uri_t update_post = {
@@ -270,9 +285,7 @@ static void _registerUris()
 		.user_ctx = NULL,
 	};
 
-	httpd_register_uri_handler(_server, &index);
-	httpd_register_uri_handler(_server, &style);
-	httpd_register_uri_handler(_server, &update);
+	httpd_register_uri_handler(_server, &files);
 	httpd_register_uri_handler(_server, &update_post);
 }
 
