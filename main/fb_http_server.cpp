@@ -14,10 +14,16 @@
 #define _FILE_STYLE "style.css"
 #define _FILE_UPDATE "update.html"
 
+#define _HEADER_CONTENT_TYPE "Content-Type"
+#define _CONTENT_TYPE_BOUNDARY "boundary="
+#define _DATA_DELIMETER "\r\n\r\n"
+
 
 
 using namespace fb;
 using namespace http;
+
+using DataCb = void(*)(const char* data, int size);
 
 
 
@@ -26,6 +32,133 @@ static const char* TAG = "fb_http_server";
 
 
 static httpd_handle_t _server = nullptr;
+
+
+
+static bool _composeSeparator(httpd_req_t* r, char* separator, int size)
+{
+	char tmp[256];
+	const esp_err_t err = httpd_req_get_hdr_value_str(r, _HEADER_CONTENT_TYPE, tmp, sizeof(tmp) - 1);
+	if(err != ESP_OK){
+		//todo add 400 error, missing content type
+		return false;
+	}
+
+	const char* at = strstr(tmp, _CONTENT_TYPE_BOUNDARY);
+	sscanf(at + strlen(_CONTENT_TYPE_BOUNDARY), "%s", tmp);
+	
+	sprintf(separator, "\r\n--%.*s--", size - 7, tmp);
+
+	return true;
+}
+
+
+
+static esp_err_t _multipartFileInputHandler(httpd_req_t* r, DataCb cb)
+{
+	FB_DEBUG_TAG_ENTER();
+
+	FB_DEBUG_TAG_LOG("Content length = %d", r->content_len);
+
+	char separator[128];
+
+	if(!_composeSeparator(r, separator, sizeof(separator))){
+		httpd_resp_send_err(r, HTTPD_400_BAD_REQUEST, "Not found boundary at: Content-Type: boundary=xxxxxx");
+		return ESP_FAIL;
+	}
+
+	const int separator_len = strlen(separator);
+	FB_DEBUG_TAG_LOG("Found separator: %s, length: %d", separator, separator_len);
+
+	char buffer[512];
+	//0 - looking for data beginning
+	//1 - providing data
+	//2 - looking for data end
+	int state = 0;
+	int actual_data = 0;
+	int remaining = r->content_len;
+
+	while (remaining > 0) {
+		char* out = buffer;
+
+		const int received = httpd_req_recv(r, out, remaining > sizeof(buffer) - 1 ? sizeof(buffer) -1 : remaining);
+		buffer[received] = '\0';
+
+		//error cases
+		if (received <= 0) {
+			if (received == HTTPD_SOCK_ERR_TIMEOUT) {
+				/* Retry if timeout occurred */
+				continue;
+			}else{
+				//handle unexpected client lost
+				FB_DEBUG_TAG_LOG_W("Unexpected error in receiving data");
+				httpd_resp_send_500(r);
+
+	            return ESP_FAIL;
+			}
+		}
+
+		//decrease counter
+		remaining -= received;
+
+		switch (state)
+		{
+		case 0:
+		{
+			char* at = strstr(out, _DATA_DELIMETER);
+			assert(at);
+			out = at + strlen(_DATA_DELIMETER);
+
+			FB_DEBUG_TAG_LOG("Found data at offset: %u", at - buffer);
+			
+			/* fall through */
+			state = 1;
+			__attribute__((fallthrough));
+		}
+		
+		case 1:
+		{
+			int valid_len = 0;
+			if(remaining == 0){
+				//separator in current block
+				char* at = strstr(out, separator);
+				valid_len = at - out;
+
+			}else if(remaining <= separator_len){
+				//separator in next block, this block contains last drop of data
+				const int separator_len_in_block = separator_len - remaining;
+				valid_len = received - (((int)(out - buffer)) - separator_len_in_block);
+				//change state to next
+				state = 2;
+
+			}else if(remaining > separator_len){
+				//separator in next blocks
+				valid_len = received - (out - buffer);
+			}
+
+			actual_data += valid_len;
+			FB_DEBUG_TAG_LOG("Received [%d / %d], actual data [%d/%d]", received, remaining, valid_len, actual_data);
+
+			break;
+		}
+		
+		case 2:
+			{
+				FB_DEBUG_TAG_LOG("Received [%d / %d], no actual data in this block", received, remaining);
+				break;
+
+			}
+		
+		default:
+			assert(0);
+			break;
+		}
+	}
+
+	FB_DEBUG_TAG_EXIT();
+
+	return ESP_OK;
+}
 
 
 
@@ -85,103 +218,11 @@ static esp_err_t _updateHandler(httpd_req_t *r)
 {
 	FB_DEBUG_TAG_ENTER();
 
-	FB_DEBUG_TAG_LOG("Content length = %d", r->content_len);
+	esp_err_t err = _multipartFileInputHandler(r, [](const char* data, int size){
+		FB_DEBUG_TAG_LOG("Data block of size %d:\n%.*s", size, size, data);
+	});
 
-	//TODO: clean up
-
-	char separator[128];
-	int separator_len = 0;
-
-	{
-		char tmp[256];
-		const esp_err_t err = httpd_req_get_hdr_value_str(r, "Content-Type", tmp, sizeof(tmp) - 1);
-		if(err != ESP_OK){
-			//todo add 400 error, missing content type
-			return ESP_FAIL;
-		}
-
-		const char* beginning = strstr(tmp, "boundary=");
-		sscanf(beginning + strlen("boundary="), "%s", tmp);
-	
-		sprintf(separator, "\r\n--%.*s--", sizeof(separator) - 7, tmp);
-
-		separator_len = strlen(separator);
-		FB_DEBUG_TAG_LOG("Found separator: %s, length: %d", separator, separator_len);
-	}
-
-	char buffer[512];
-	bool data_found = false;
-	bool data_end = false;
-	int remaining = r->content_len;
-	int actual_data = 0;
-
-
-
-	//TODO: handle multipart data
-	//first string is the delimeter of parts, opening do not ends with --
-	//so we look for data section that is separated by \r\n from begining and end
-	//------WebKitFormBoundaryBMZzMyhZeAIZM0b5
-	//Content-Disposition: form-data; name="file"; filename="storage.bin"
-	//Content-Type: application/octet-stream
-	//
-	//data
-	//
-	//------WebKitFormBoundaryBMZzMyhZeAIZM0b5--
-	while (remaining > 0) {
-		char* out = buffer;
-
-		const int received = httpd_req_recv(r, out, remaining > sizeof(buffer) - 1 ? sizeof(buffer) -1 : remaining);
-		buffer[received] = '\0';
-
-		//error cases
-		if (received <= 0) {
-			if (received == HTTPD_SOCK_ERR_TIMEOUT) {
-				/* Retry if timeout occurred */
-				continue;
-			}else{
-				//handle unexpected client lost
-				FB_DEBUG_TAG_LOG_W("Unexpected error in receiving data");
-	            return ESP_FAIL;
-			}
-		}
-
-		//find beginning of data
-		if(!data_found){
-			//find double delimiters
-			char* at = strstr(out, "\r\n\r\n");
-			assert(at);
-			FB_DEBUG_TAG_LOG("Found data at %u", at - buffer);
-			data_found = true;
-			out = at + 4;
-		}
-		
-		remaining -= received;
-
-		if(!data_end){
-			int valid_len = 0;
-			if(remaining == 0){
-				//separator in current block
-				char* at = strstr(out, separator);
-				valid_len = at - out;
-
-			}else if(remaining <= separator_len){
-				//separator in next block, this block contains last drop of data
-				const int separator_len_in_block = separator_len - remaining;
-				valid_len = received - (((int)(out - buffer)) - separator_len_in_block);
-				data_end = true;
-
-			}else if(remaining > separator_len){
-				//separator in next blocks
-				valid_len = received - (out - buffer);
-			}
-
-			actual_data += valid_len;
-
-			FB_DEBUG_TAG_LOG("Received %d, remains %d, actual data %d:\n%.*s", received, remaining, actual_data, valid_len, out);
-		}
-	}
-
-	const esp_err_t err = httpd_resp_send(r, NULL, 0);
+	err |= httpd_resp_sendstr(r, "<h1>Success</h1>");
 
 	FB_DEBUG_TAG_EXIT();
 
