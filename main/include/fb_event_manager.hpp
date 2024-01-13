@@ -24,6 +24,7 @@ namespace fb
 			STATE,
 			TIMERS,
 			CLOCK,
+			UPDATE,
 		};
 
 

@@ -20,6 +20,7 @@
 #include <string>
 
 #include "fb_debug.hpp"
+#include "fb_update.hpp"
 
 #include "esp_http_server.h"
 
@@ -39,7 +40,7 @@
 using namespace fb;
 using namespace http;
 
-using DataCb = void(*)(const char* data, int size);
+using DataCb = bool(*)(const char* data, int size);
 
 
 
@@ -138,7 +139,12 @@ static esp_err_t _multipartFileInputHandler(httpd_req_t* r, DataCb cb)
 			if(remaining == 0){
 				//separator in current block
 				char* at = strstr(out, separator);
-				valid_len = at - out;
+				if(at != NULL){
+					valid_len = at - out;
+				}else{
+					//в случаи когда данные содержат в себе \0 и не являются строками
+					valid_len = received - separator_len;
+				}
 
 			}else if(remaining <= separator_len){
 				//separator in next block, this block contains last drop of data
@@ -154,6 +160,12 @@ static esp_err_t _multipartFileInputHandler(httpd_req_t* r, DataCb cb)
 
 			actual_data += valid_len;
 			FB_DEBUG_TAG_LOG("Received [%d / %d], actual data [%d/%d]", received, remaining, valid_len, actual_data);
+
+			if(!cb(out, valid_len)){
+				FB_DEBUG_TAG_LOG("Callback returned false, so aborting file input");
+				httpd_resp_send_err(r, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to consume data in callback");
+				return ESP_FAIL;
+			}
 
 			break;
 		}
@@ -245,11 +257,23 @@ static esp_err_t _updateHandler(httpd_req_t *r)
 {
 	FB_DEBUG_TAG_ENTER();
 
+	if(!update::begin()){
+		httpd_resp_send_err(r, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to start ota");
+		return ESP_FAIL;
+	}
+
 	esp_err_t err = _multipartFileInputHandler(r, [](const char* data, int size){
-		FB_DEBUG_TAG_LOG("Data block of size %d:\n%.*s", size, size, data);
+		// FB_DEBUG_TAG_LOG("Data block of size %d:\n%.*s", size, size, data);
+		return update::writeSequential(data, size);
 	});
 
-	err |= httpd_resp_sendstr(r, "<h1>Success</h1>");
+	if(err == ESP_OK){
+		if(update::end()){
+			err |= httpd_resp_sendstr(r, "<h1>Success</h1>");
+		}else{
+			err |= httpd_resp_send_err(r, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to end ota update");
+		}
+	}
 
 	FB_DEBUG_TAG_EXIT();
 

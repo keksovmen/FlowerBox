@@ -6,6 +6,7 @@ idf_component_register(
 		"fb_globals.cpp"
 		"fb_http_server.cpp"
 		"fb_pins.cpp"
+		"fb_update.cpp"
 		"fb_wifi.cpp"
 		"main.cpp"
 		"states/fb_state_booted.cpp"
