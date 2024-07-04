@@ -2,6 +2,8 @@
 
 #include "fb_clock.hpp"
 #include "fb_globals.hpp"
+#include "fb_state_wifi_init.hpp"
+#include "fb_wifi.hpp"
 
 
 
@@ -29,6 +31,11 @@ void StateTimeInit::handleEvent(const event::Event& event)
 			FB_DEBUG_LOG("Time synced, ready to work");
 			global::getEventManager()->pushEvent(event::Event{fb::event::EventGroup::TRANSITION, 0, nullptr});
 		}
+	}else if(event.groupId == event::EventGroup::WIFI){
+		//handle on wifi connect and on wifi failure events
+		if(event.eventId == wifi::WifiEventId::DISCONNECTED){
+			getContext().transition(std::make_unique<StateWifiInit>(getContext()));
+		}
 	}
 }
 
@@ -36,9 +43,11 @@ void StateTimeInit::enter()
 {
 	clock::initClock();
 	clock::syncRequest();
+
+	//TODO: start timer if no clock event is provided then something wrong with internet access
 }
 
 void StateTimeInit::exit()
 {
-
+	clock::deinitClock();
 }

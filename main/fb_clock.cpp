@@ -6,6 +6,7 @@
 
 #include "fb_debug.hpp"
 #include "fb_globals.hpp"
+#include "fb_settings.hpp"
 
 #include "esp_log.h"
 #include "esp_netif_sntp.h"
@@ -101,7 +102,14 @@ void clock::initClock()
 {
 	FB_DEBUG_TAG_ENTER();
 
-	esp_sntp_config_t config = ESP_NETIF_SNTP_DEFAULT_CONFIG(CONFIG_SNTP_TIME_SERVER);
+	esp_sntp_config_t config;
+
+	if(settings::getWifiMode() == settings::WifiMode::STA){
+		config = ESP_NETIF_SNTP_DEFAULT_CONFIG(settings::getSntpServerUrl().c_str());
+	}else{
+		config = ESP_NETIF_SNTP_DEFAULT_CONFIG("192.168.4.2");
+	}
+
 	config.wait_for_sync = false;
 	config.start = false;
 	config.sync_cb = &_on_sntp_sync_event;

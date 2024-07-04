@@ -14,7 +14,7 @@ namespace fb
 	{
 		enum class WifiEventId : int
 		{
-			CONNECTED,
+			CONNECTED,			//when successfully connected as STA or somebody is connected as AP
 			FAILED_TO_CONNECT,
 			DISCONNECTED,
 			AP_CONNECTED,		//when somebody connects to AP
@@ -27,8 +27,6 @@ namespace fb
 		bool operator==(int val, WifiEventId id);
 
 
-
-		void init();
 
 		esp_err_t connect(const std::string& ssid, const std::string& password);
 		esp_err_t shutdown();

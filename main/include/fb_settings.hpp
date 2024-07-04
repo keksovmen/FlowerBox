@@ -26,13 +26,15 @@ namespace fb
 
 
 		//getters
-		const std::string& getApSsid();
-		const std::string& getApPass();
+		std::string getApSsid();
+		std::string getApPass();
 
-		const std::string& getStaSsid();
-		const std::string& getStaPass();
+		std::string getStaSsid();
+		std::string getStaPass();
 
 		WifiMode getWifiMode();
+
+		std::string getSntpServerUrl();
 
 
 		//setters
@@ -43,6 +45,8 @@ namespace fb
 		void setStaPass(const std::string& val);
 
 		void setWifiMode(WifiMode val);
+
+		void setSntpPass(const std::string& val);
 	} // namespace settings
 	
 }

@@ -1,6 +1,7 @@
 #include "fb_state_wifi_init.hpp"
 
 #include "fb_state_time_init.hpp"
+#include "fb_settings.hpp"
 #include "fb_wifi.hpp"
 
 
@@ -29,17 +30,27 @@ void StateWifiInit::handleEvent(const event::Event& event)
 			getContext().transition(std::make_unique<StateTimeInit>(getContext()));
 
 		}else if(event.eventId == wifi::WifiEventId::FAILED_TO_CONNECT){
+			FB_DEBUG_LOG("Failed to connect");
+			abort();
 			//TODO:
 			//go to provision state
+			//or try again until network is provided
 		}
 	}
 }
 
 void StateWifiInit::enter()
 {
-	wifi::init();
+	assert(wifi::init(wifi::WifiConfig{
+		settings::getApSsid(),
+		settings::getApPass(),
+		settings::getStaSsid(),
+		settings::getStaPass(),
+		settings::getWifiMode() == settings::WifiMode::STA ?
+			wifi::WifiState::STA : wifi::WifiState::AP}));
 	//TODO: add logic for wifi mode AP or STA
-	wifi::connect(CONFIG_EXAMPLE_WIFI_SSID, CONFIG_EXAMPLE_WIFI_PASSWORD);
+	// wifi::start(CONFIG_EXAMPLE_WIFI_SSID, CONFIG_EXAMPLE_WIFI_PASSWORD);
+	assert(wifi::start());
 }
 
 void StateWifiInit::exit()
