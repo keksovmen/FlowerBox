@@ -6,25 +6,25 @@
 
 
 
-
 namespace fb
 {
 	namespace state
 	{
-		class StateWifiConnected : public State
+		/**
+		 * @brief initializes all hardware that is required
+		 */
+
+		class StateHwInit : public State
 		{
 			public:
-				StateWifiConnected(StateManager& context);
+				StateHwInit(StateManager& context);
 
 				virtual const char* getName() override;
 
-				virtual void handleEvent(const event::Event& event);
+				virtual void handleEvent(const event::Event& event) override;
 
 				virtual void enter() override;
 				virtual void exit() override;
-
-			private:
-				StateManager _childManager;
 		};
 	}
 }

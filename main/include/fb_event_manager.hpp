@@ -20,6 +20,7 @@ namespace fb
 		enum class EventGroup : int
 		{
 			BOOT,
+			TRANSITION,
 			WIFI,
 			STATE,
 			TIMERS,

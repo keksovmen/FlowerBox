@@ -5,18 +5,18 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "E:\\Programm\\EMBEDED\\ESP\\esp-idf-v5.1.1\\components\\**",
-                "D:\\Users\\Roma\\.espressif\\tools\\xtensa-esp32-elf\\esp-12.2.0_20230208\\xtensa-esp32-elf\\xtensa-esp32-elf\\include\\**"
+                "D:\\Users\\Roma\\.espressif\\tools\\riscv32-esp-elf\\esp-13.2.0_20230928\\riscv32-esp-elf\\riscv32-esp-elf\\include**"
             ],
             "defines": [
                 "_DEBUG",
                 "UNICODE",
                 "_UNICODE"
             ],
-            "windowsSdkVersion": "10.0.17763.0",
-            "compilerPath": "cl.exe",
+            // "windowsSdkVersion": "10.0.17763.0",
+            // "compilerPath": "cl.exe",
             "cStandard": "c17",
             "cppStandard": "c++17",
-            "intelliSenseMode": "windows-msvc-x64",
+            // "intelliSenseMode": "windows-msvc-x64",
             "compilerArgs": []
         }
     ],

@@ -95,6 +95,12 @@
 		"cerrno": "c",
 		"esp_https_ota.h": "c",
 		"esp_partition.h": "c",
-		"esp_ota_ops.h": "c"
+		"esp_ota_ops.h": "c",
+		"charconv": "cpp",
+		"iomanip": "cpp",
+		"optional": "cpp",
+		"variant": "cpp",
+		"format": "cpp",
+		"span": "cpp"
 	}
 }

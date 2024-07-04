@@ -36,5 +36,8 @@ namespace fb
 		void initClock();
 		void syncRequest();
 		void deinitClock();
+
+		bool isTimeSynced();
+		Time getCurrentTime();
 	}
 }

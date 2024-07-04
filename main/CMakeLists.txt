@@ -9,15 +9,19 @@ idf_component_register(
 		"fb_update.cpp"
 		"fb_wifi.cpp"
 		"main.cpp"
-		"states/fb_state_booted.cpp"
-		"states/fb_state_time_init.cpp"
 		"states/fb_state_manager.cpp"
-		"states/fb_state_wifi_connect.cpp"
-		"states/fb_state_wifi_connected.cpp"
+		"states/boot/fb_state_booted.cpp"
+		"states/boot/fb_state_hw_init.cpp"
+		"states/boot/fb_state_wifi_init.cpp"
+		"states/boot/fb_state_time_init.cpp"
+		"states/work/fb_state_work.cpp"
+		"states/work/fb_state_wifi_connected.cpp"
 
     INCLUDE_DIRS
 		"include"
 		"include/states"
+		"include/states/boot"
+		"include/states/work"
 		)
 
 spiffs_create_partition_image(storage ../spiffs_image FLASH_IN_PROJECT)

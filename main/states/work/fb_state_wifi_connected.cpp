@@ -14,7 +14,7 @@ using namespace state;
 
 
 StateWifiConnected::StateWifiConnected(StateManager& context)
-	: State(context), _childManager("StateWifiConnectedManager")
+	: State(context)
 {
 
 }
@@ -26,24 +26,24 @@ const char* StateWifiConnected::getName()
 
 void StateWifiConnected::handleEvent(const event::Event& event)
 {
-	if(event.groupId == event::EventGroup::WIFI){
-		if(event.eventId == wifi::WifiEventId::DISCONNECTED){
-			getContext().transition(std::make_unique<StateWifiConnect>(getContext()));
-			return;
-		}
-	}
+	// if(event.groupId == event::EventGroup::WIFI){
+	// 	if(event.eventId == wifi::WifiEventId::DISCONNECTED){
+	// 		getContext().transition(std::make_unique<StateWifiConnect>(getContext()));
+	// 		return;
+	// 	}
+	// }
 
-	_childManager.handleEvent(event);
+	// _childManager.handleEvent(event);
 }
 
 void StateWifiConnected::enter()
 {
-	_childManager.init(std::make_unique<StateTimeInit>(_childManager));
-	http::startServer();
+	// _childManager.init(std::make_unique<StateTimeInit>(_childManager));
+	// http::startServer();
 }
 
 void StateWifiConnected::exit()
 {
-	_childManager.deinit();
-	http::stopServer();
+	// _childManager.deinit();
+	// http::stopServer();
 }

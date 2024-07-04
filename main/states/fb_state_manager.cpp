@@ -47,6 +47,7 @@ void StateManager::handleEvent(const event::Event& event)
 {
 	FB_DEBUG_ENTER();
 
+	//TODO: put mutex because on transition call will change ptr
 	FB_DEBUG_LOG("%s->handleEvent()", _currentState->getName());
 	_currentState->handleEvent(event);
 	
@@ -73,6 +74,8 @@ void StateManager::transition(std::unique_ptr<State>&& nextState)
 	assert(_currentState);
 	assert(nextState);
 
+	//TODO: put mutex because on transition call will change ptr
+
 	FB_DEBUG_LOG("%s->exit()", _currentState->getName());
 	_currentState->exit();
 
@@ -95,4 +98,56 @@ void StateManager::deinit()
 	}
 	
 	FB_DEBUG_EXIT();
+}
+
+
+
+
+CompositeState::CompositeState(StateManager& context, const std::string& name)
+	: State(context), StateManager(name)
+{
+
+}
+
+void CompositeState::enter()
+{
+	FB_DEBUG_ENTER();
+
+	_onCompositeEnter();
+	init(_createInitialState());
+
+	FB_DEBUG_EXIT();
+}
+
+void CompositeState::exit()
+{
+	FB_DEBUG_ENTER();
+
+	_onCompositeExit();
+	deinit();
+
+	FB_DEBUG_EXIT();
+}
+
+void CompositeState::handleEvent(const event::Event& event)
+{
+	if(_onCompositeEventHandler(event)){
+		StateManager::handleEvent(event);
+	}
+}
+
+
+void CompositeState::_onCompositeEnter()
+{
+
+}
+
+void CompositeState::_onCompositeExit()
+{
+
+}
+
+bool CompositeState::_onCompositeEventHandler(const event::Event& event)
+{
+	return true;
 }

@@ -17,7 +17,7 @@ namespace fb
 
 
 
-		class State : public debug::Named, public event::EventListener
+		class State : public virtual debug::Named, public virtual event::EventListener
 		{
 			public:
 				State(StateManager& context);
@@ -34,7 +34,7 @@ namespace fb
 
 
 
-		class StateManager : public debug::Named, public event::EventListener
+		class StateManager : public virtual debug::Named, public virtual event::EventListener
 		{
 			public:
 				StateManager(const std::string& name);
@@ -67,6 +67,29 @@ namespace fb
 			private:
 				const std::string _name;
 				std::unique_ptr<State> _currentState;
+		};
+
+
+
+		class CompositeState : public State, public StateManager
+		{
+			public:
+				CompositeState(StateManager& context, const std::string& name);
+				// ~CompositeState();
+
+				virtual void enter() override;
+				virtual void exit() override;
+
+				virtual void handleEvent(const event::Event& event) override;
+			
+			protected:
+				virtual void _onCompositeEnter();
+				virtual void _onCompositeExit();
+				//return true if MUST send event to child false to end event
+				virtual bool _onCompositeEventHandler(const event::Event& event);
+			
+			private:
+				virtual std::unique_ptr<State> _createInitialState() = 0;
 		};
 	}
 }

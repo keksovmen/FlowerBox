@@ -10,10 +10,14 @@ namespace fb
 {
 	namespace state
 	{
-		class StateBooted : public State
+		/**
+		 * @brief Tries to fix WIFI state
+		 */
+		
+		class StateWifiLost : public State
 		{
 			public:
-				StateBooted(StateManager& context);
+				StateWifiLost(StateManager& context);
 
 				virtual const char* getName() override;
 
