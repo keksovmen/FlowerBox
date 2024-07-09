@@ -24,7 +24,7 @@ namespace fb
 
 		
 		
-		void startInitial();
+		void startProvision();
 		void startWorking();
 
 		void stop();

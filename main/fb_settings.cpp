@@ -29,7 +29,7 @@ std::string settings::getStaPass()
 
 WifiMode settings::getWifiMode()
 {
-	return WifiMode::AP;
+	return WifiMode::STA;
 }
 
 std::string settings::getSntpServerUrl()

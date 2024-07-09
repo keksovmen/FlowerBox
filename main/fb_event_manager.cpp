@@ -55,6 +55,7 @@ const char* event::eventGroupToStr(const EventGroup& group)
 {
 	const char* names[] = {
 		"BOOT",
+		"TRANSITION",
 		"WIFI",
 		"STATE",
 		"TIMERS",

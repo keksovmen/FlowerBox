@@ -23,7 +23,7 @@ namespace fb
 
 
 
-		using EndpointCallback = std::function<bool(httpd_req_t, void*)>;
+		using EndpointCallback = esp_err_t(*)(httpd_req_t*);
 
 
 
@@ -31,6 +31,7 @@ namespace fb
 		{
 			std::string address;
 			EndpointMethod method;
+			void* data;
 			EndpointCallback callback;
 		};
 
@@ -39,15 +40,15 @@ namespace fb
 		class Builder
 		{
 			public:
-				Builder();
+				// Builder();
 
 				Builder& setPort(int port);
 				Builder& addEndpoint(const Endpoint& endpoint);
 
-				std::unique_ptr<Server*> build();
+				std::unique_ptr<Server> build();
 			private:
 
-				int _port;
+				int _port = 80;
 				std::vector<Endpoint> _endpoints;
 
 		};

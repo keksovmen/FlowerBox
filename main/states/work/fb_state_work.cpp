@@ -1,7 +1,8 @@
 #include "fb_state_work.hpp"
 
-#include "fb_http_server.hpp"
+// #include "fb_http_server.hpp"
 #include "fb_state_wifi_connected.hpp"
+#include "fb_server.hpp"
 
 
 
@@ -18,12 +19,14 @@ StateWork::StateWork(StateManager& context)
 
 void StateWork::_onCompositeEnter()
 {
-	http::startServer();
+	server::startWorking();
+	// http::startServer();
 }
 
 void StateWork::_onCompositeExit()
 {
-	http::stopServer();
+	server::stop();
+	// http::stopServer();
 }
 
 bool StateWork::_onCompositeEventHandler(const event::Event& event)

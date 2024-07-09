@@ -10,6 +10,9 @@ idf_component_register(
 		"fb_settings.cpp"
 		"fb_wifi.cpp"
 		"main.cpp"
+		"servers/fb_server.cpp"
+		"servers/fb_server_update.cpp"
+		"servers/fb_server_update.cpp"
 		"states/fb_state_manager.cpp"
 		"states/boot/fb_state_booted.cpp"
 		"states/boot/fb_state_hw_init.cpp"
@@ -20,6 +23,7 @@ idf_component_register(
 
     INCLUDE_DIRS
 		"include"
+		"include/servers"
 		"include/states"
 		"include/states/boot"
 		"include/states/work"

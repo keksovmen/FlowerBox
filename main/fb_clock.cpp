@@ -105,7 +105,9 @@ void clock::initClock()
 	esp_sntp_config_t config;
 
 	if(settings::getWifiMode() == settings::WifiMode::STA){
-		config = ESP_NETIF_SNTP_DEFAULT_CONFIG(settings::getSntpServerUrl().c_str());
+		//TODO: change it to constant char* not temporal
+		// config = ESP_NETIF_SNTP_DEFAULT_CONFIG(settings::getSntpServerUrl().c_str());
+		config = ESP_NETIF_SNTP_DEFAULT_CONFIG(CONFIG_SNTP_TIME_SERVER);
 	}else{
 		config = ESP_NETIF_SNTP_DEFAULT_CONFIG("192.168.4.2");
 	}
