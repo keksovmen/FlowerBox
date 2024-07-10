@@ -4,6 +4,7 @@
 
 #include "fb_server_builder.hpp"
 #include "fb_server_update.hpp"
+#include "fb_server_html.hpp"
 
 
 
@@ -42,13 +43,14 @@ void server::startProvision()
 	builder.setPort(80);
 
 	registerServerUpdate(builder);
+	registerServerHtml(builder);
 
 	_server = builder.build();
 }
 
 void server::startWorking()
 {
-
+	startProvision();
 }
 
 void server::stop()

@@ -8,6 +8,7 @@
 #define _HEADER_CONTENT_TYPE "Content-Type"
 #define _CONTENT_TYPE_BOUNDARY "boundary="
 #define _DATA_DELIMETER "\r\n\r\n"
+#define _FILE_UPDATE "update.html"
 
 
 
@@ -189,5 +190,5 @@ static esp_err_t _update_cb(httpd_req_t* r)
 
 void server::registerServerUpdate(Builder& builder)
 {
-	builder.addEndpoint(Endpoint{"/update", EndpointMethod::POST, nullptr, &_update_cb});
+	builder.addEndpoint(Endpoint{"/" _FILE_UPDATE, EndpointMethod::POST, nullptr, &_update_cb});
 }
