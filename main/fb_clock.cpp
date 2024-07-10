@@ -24,6 +24,10 @@ static const char* TAG = "fb_clock";
 
 
 
+static std::string _serverAddress;
+
+
+
 static void _print_servers(void)
 {
 	FB_DEBUG_TAG_LOG("List of configured NTP servers:");
@@ -102,16 +106,16 @@ void clock::initClock()
 {
 	FB_DEBUG_TAG_ENTER();
 
-	esp_sntp_config_t config;
 
 	if(settings::getWifiMode() == settings::WifiMode::STA){
-		//TODO: change it to constant char* not temporal
-		// config = ESP_NETIF_SNTP_DEFAULT_CONFIG(settings::getSntpServerUrl().c_str());
-		config = ESP_NETIF_SNTP_DEFAULT_CONFIG(CONFIG_SNTP_TIME_SERVER);
+		_serverAddress = settings::getSntpServerUrl();
 	}else{
-		config = ESP_NETIF_SNTP_DEFAULT_CONFIG("192.168.4.2");
+		_serverAddress = "192.168.4.2";
 	}
 
+	assert(!_serverAddress.empty());
+
+	esp_sntp_config_t config = ESP_NETIF_SNTP_DEFAULT_CONFIG(_serverAddress.c_str());
 	config.wait_for_sync = false;
 	config.start = false;
 	config.sync_cb = &_on_sntp_sync_event;
