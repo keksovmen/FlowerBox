@@ -21,7 +21,7 @@ const esp_partition_t* _partition = NULL;
 
 
 
-bool operator==(int val, UpdateEventId id)
+bool update::operator==(int val, UpdateEventId id)
 {
 	return val == static_cast<int>(id);
 }

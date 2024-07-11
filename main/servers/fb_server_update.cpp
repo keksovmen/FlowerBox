@@ -128,7 +128,7 @@ static esp_err_t _multipartFileInputHandler(httpd_req_t* r, DataCb cb)
 			}
 
 			actual_data += valid_len;
-			FB_DEBUG_TAG_LOG("Received [%d / %d], actual data [%d/%d]", received, remaining, valid_len, actual_data);
+			// FB_DEBUG_TAG_LOG("Received [%d / %d], actual data [%d/%d]", received, remaining, valid_len, actual_data);
 
 			if(!cb(out, valid_len)){
 				FB_DEBUG_TAG_LOG("Callback returned false, so aborting file input");
