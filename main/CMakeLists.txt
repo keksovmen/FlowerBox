@@ -11,6 +11,7 @@ idf_component_register(
 		"fb_wifi.cpp"
 		"main.cpp"
 		"box/fb_box.cpp"
+		"box/fb_property.cpp"
 		"servers/fb_server.cpp"
 		"servers/fb_server_builder.cpp"
 		"servers/fb_server_update.cpp"
