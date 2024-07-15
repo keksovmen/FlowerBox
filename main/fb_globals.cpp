@@ -30,6 +30,7 @@ void global::init()
 
 	_flowerBox = std::make_unique<box::Box>("TEST_NAME", "0.0.1", getUniqueId());
 	_flowerBox->addProperty({"First prop", "Description", "Int", 0, 0, 0, 100, 30});
+	_flowerBox->addSensor({"Sensor 1", "Description", "Int", 0, 0, 0, 100});
 }
 
 event::EventManager* global::getEventManager()

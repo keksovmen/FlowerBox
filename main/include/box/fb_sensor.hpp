@@ -12,23 +12,22 @@ namespace fb
 {
 	namespace box
 	{
-		class Property : public Serializable
+		class Sensor : public Serializable
 		{
 			public:
-				Property(const std::string& name,
+				Sensor(const std::string& name,
 					const std::string& description,
 					const std::string& valueType,
 					int id,
 					int tid,
 					double minValue,
-					double maxValue,
-					double value);
+					double maxValue);
 
 
 				virtual std::string toJson() const override;
 
 				int getId() const;
-				
+
 				void setId(int id);
 			
 			private:
@@ -39,8 +38,6 @@ namespace fb
 				int _tid;
 				double _minValue;
 				double _maxValue;
-				double _value;
 		};
 	} // namespace box
-	
 } // namespace fb
