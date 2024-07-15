@@ -45,6 +45,10 @@ std::string Box::toJson() const
 	std::for_each(_sensors.begin(), _sensors.end(), [&ids](const auto& p){ids.push_back(p.getId());});
 	cJSON_AddItemToObject(obj, "sensor_ids", cJSON_CreateIntArray(ids.data(), _sensors.size()));
 
+	ids.clear();
+	std::for_each(_switches.begin(), _switches.end(), [&ids](const auto& p){ids.push_back(p.getId());});
+	cJSON_AddItemToObject(obj, "sensor_ids", cJSON_CreateIntArray(ids.data(), _switches.size()));
+
 	std::string result(cJSON_PrintUnformatted(obj));
 
 	cJSON_Delete(obj);
@@ -52,34 +56,49 @@ std::string Box::toJson() const
 	return result;
 }
 
-void Box::addProperty(const Property& prop)
+void Box::addProperty(const Property& val)
 {
 	auto iter = std::find_if(_properties.begin(), _properties.end(),
-		[prop](const Property& left){return left.getId() == prop.getId();});
+		[val](const Property& left){return left.getId() == val.getId();});
 	
 	if(iter != _properties.end()){
-		FB_DEBUG_TAG_LOG_W("Failed to add property with id %d, it is already exist", prop.getId());
+		FB_DEBUG_TAG_LOG_W("Failed to add property with id %d, it is already exist", val.getId());
 		return;
 	}
 
-	_properties.push_back(prop);
+	_properties.push_back(val);
 
-	FB_DEBUG_TAG_LOG_W("Added a property with id %d", prop.getId());
+	FB_DEBUG_TAG_LOG_W("Added a property with id %d", val.getId());
 }
 
-void Box::addSensor(const Sensor& sensor)
+void Box::addSensor(const Sensor& val)
 {
 	auto iter = std::find_if(_sensors.begin(), _sensors.end(),
-		[sensor](const Sensor& left){return left.getId() == sensor.getId();});
+		[val](const Sensor& left){return left.getId() == val.getId();});
 	
 	if(iter != _sensors.end()){
-		FB_DEBUG_TAG_LOG_W("Failed to add sensor with id %d, it is already exist", sensor.getId());
+		FB_DEBUG_TAG_LOG_W("Failed to add sensor with id %d, it is already exist", val.getId());
 		return;
 	}
 
-	_sensors.push_back(sensor);
+	_sensors.push_back(val);
 
-	FB_DEBUG_TAG_LOG_W("Added a sensor with id %d", sensor.getId());
+	FB_DEBUG_TAG_LOG_W("Added a sensor with id %d", val.getId());
+}
+
+void Box::addSwitch(const Switch& val)
+{
+	auto iter = std::find_if(_switches.begin(), _switches.end(),
+		[val](const Switch& left){return left.getId() == val.getId();});
+	
+	if(iter != _switches.end()){
+		FB_DEBUG_TAG_LOG_W("Failed to add switch with id %d, it is already exist", val.getId());
+		return;
+	}
+
+	_switches.push_back(val);
+
+	FB_DEBUG_TAG_LOG_W("Added a switch with id %d", val.getId());
 }
 
 const Property* Box::getProperty(int id) const
@@ -100,6 +119,18 @@ const Sensor* Box::getSensor(int id) const
 		[id](const Sensor& left){return left.getId() == id;});
 	
 	if(iter == _sensors.end()){
+		return nullptr;
+	}
+
+	return &(*iter);
+}
+
+const Switch* Box::getSwitch(int id) const
+{
+	auto iter = std::find_if(_switches.begin(), _switches.end(),
+		[id](const Switch& left){return left.getId() == id;});
+	
+	if(iter == _switches.end()){
 		return nullptr;
 	}
 

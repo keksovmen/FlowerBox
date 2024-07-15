@@ -86,6 +86,29 @@ static esp_err_t _sensor_cb(httpd_req_t* r)
 	return err;
 }
 
+static esp_err_t _switch_cb(httpd_req_t* r)
+{
+	FB_DEBUG_TAG_ENTER();
+
+	esp_err_t err = ESP_OK;
+
+	const int id = _get_id_from_path(r->uri);
+
+	FB_DEBUG_TAG_LOG("Requesting SwitchInfo with id: %d", id);
+
+	const auto* prop = global::getFlowerBox()->getSwitch(id);
+	const auto result = prop->toJson();
+	FB_DEBUG_TAG_LOG("Sending SwitchInfo: %s", result.c_str());
+	
+	err = httpd_resp_send(r, result.c_str(), result.length());
+
+	FB_DEBUG_TAG_EXIT();
+
+	return err;
+}
+
+
+
 void server::registerServerBox(Builder& builder)
 {
 	//TODO: add endpoints for each part of andoird api
@@ -93,4 +116,5 @@ void server::registerServerBox(Builder& builder)
 	builder.addEndpoint(Endpoint{_URL_PATH, EndpointMethod::GET, nullptr, &_box_cb});
 	builder.addEndpoint(Endpoint{"/property/*", EndpointMethod::GET, nullptr, &_property_cb});
 	builder.addEndpoint(Endpoint{"/sensor/*", EndpointMethod::GET, nullptr, &_sensor_cb});
+	builder.addEndpoint(Endpoint{"/switch/*", EndpointMethod::GET, nullptr, &_switch_cb});
 }

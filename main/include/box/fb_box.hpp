@@ -9,6 +9,7 @@
 #include "fb_id.hpp"
 #include "fb_property.hpp"
 #include "fb_sensor.hpp"
+#include "fb_switch.hpp"
 
 
 
@@ -26,11 +27,13 @@ namespace fb
 
 				virtual std::string toJson() const override;
 
-				void addProperty(const Property& prop);
-				void addSensor(const Sensor& sensor);
+				void addProperty(const Property& val);
+				void addSensor(const Sensor& val);
+				void addSwitch(const Switch& val);
 
 				const Property* getProperty(int id) const;
 				const Sensor* getSensor(int id) const;
+				const Switch* getSwitch(int id) const;
 			
 			private:
 				const id::UniqueId _uniqueId;
@@ -40,6 +43,7 @@ namespace fb
 
 				std::vector<Property> _properties;
 				std::vector<Sensor> _sensors;
+				std::vector<Switch> _switches;
 		};
 	} // namespace box
 	
