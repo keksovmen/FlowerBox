@@ -47,7 +47,7 @@ std::string Box::toJson() const
 
 	ids.clear();
 	std::for_each(_switches.begin(), _switches.end(), [&ids](const auto& p){ids.push_back(p.getId());});
-	cJSON_AddItemToObject(obj, "sensor_ids", cJSON_CreateIntArray(ids.data(), _switches.size()));
+	cJSON_AddItemToObject(obj, "switch_ids", cJSON_CreateIntArray(ids.data(), _switches.size()));
 
 	std::string result(cJSON_PrintUnformatted(obj));
 

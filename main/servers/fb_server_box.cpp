@@ -39,7 +39,7 @@ static esp_err_t _box_cb(httpd_req_t* r)
 static int _get_id_from_path(const char* path)
 {
 	const auto uri = std::string(path);
-	const int id = std::atoi(uri.substr(uri.find_last_of("/", 0)).c_str());
+	const int id = std::atoi(uri.substr(uri.find_last_of("/") + 1).c_str());
 
 	return id;
 }

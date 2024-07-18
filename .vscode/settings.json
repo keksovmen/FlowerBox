@@ -101,6 +101,7 @@
 		"optional": "cpp",
 		"variant": "cpp",
 		"format": "cpp",
-		"span": "cpp"
+		"span": "cpp",
+		"esp_efuse_table.h": "c"
 	}
 }
