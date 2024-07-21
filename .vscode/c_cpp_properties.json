@@ -4,20 +4,18 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                "E:\\Programm\\EMBEDED\\ESP\\esp-idf-v5.1.1\\components\\**",
-                "D:\\Users\\Roma\\.espressif\\tools\\riscv32-esp-elf\\esp-13.2.0_20230928\\riscv32-esp-elf\\riscv32-esp-elf\\include**"
+                "D:\\embeded\\esp-idf\\components\\**",
+                "C:/Users/Roma/.espressif/tools/riscv32-esp-elf/esp-13.2.0_20230928/riscv32-esp-elf/riscv32-esp-elf/include/**"
             ],
             "defines": [
                 "_DEBUG",
                 "UNICODE",
                 "_UNICODE"
             ],
-            // "windowsSdkVersion": "10.0.17763.0",
-            // "compilerPath": "cl.exe",
             "cStandard": "c17",
-            "cppStandard": "c++17",
-            // "intelliSenseMode": "windows-msvc-x64",
-            "compilerArgs": []
+            "cppStandard": "c++23",
+            "compilerArgs": [],
+            "compilerPath": "C:\\Users\\Roma\\.espressif\\tools\\riscv32-esp-elf\\esp-13.2.0_20230928\\riscv32-esp-elf\\bin\\riscv32-esp-elf-c++.exe"
         }
     ],
     "version": 4
