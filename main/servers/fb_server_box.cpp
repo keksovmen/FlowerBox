@@ -7,7 +7,7 @@
 
 
 #define _BOX_PATH "/info"
-#define _PROPERTY_PATH "/property/"
+#define _PROPERTY_PATH "/property/*"
 #define _SENSOR_PATH "/sensor/*"
 #define _SWITCH_PATH "/switch/*"
 
@@ -66,7 +66,7 @@ static int _timestamp_from_data_path(const char* path)
 
 
 
-static esp_err_t _property_cb(httpd_req_t* r)
+static esp_err_t _property_get_cb(httpd_req_t* r)
 {
 	FB_DEBUG_TAG_ENTER();
 
@@ -83,6 +83,63 @@ static esp_err_t _property_cb(httpd_req_t* r)
 	httpd_resp_set_type(r, HTTPD_TYPE_JSON);
 	
 	err = httpd_resp_send(r, result.c_str(), result.length());
+
+	FB_DEBUG_TAG_EXIT();
+
+	return err;
+}
+
+static esp_err_t _property_set_cb(httpd_req_t* r)
+{
+FB_DEBUG_TAG_ENTER();
+
+	esp_err_t err = ESP_OK;
+
+	const int id = _id_from_data_path(r->uri);
+
+	FB_DEBUG_TAG_LOG("Requesting set property value with id: %d", id);
+
+	if(strstr(r->uri, "set") == NULL){
+		FB_DEBUG_TAG_LOG("Not set request");
+		err = httpd_resp_send_500(r);
+
+		return err;
+	}
+
+	char tmp[256];
+	assert(r->content_len <= sizeof(tmp));
+
+	int read = 0;
+	int step = 0;
+	do{
+		step = httpd_req_recv(r, tmp + read, sizeof(tmp) - read);
+		if(step == HTTPD_SOCK_ERR_TIMEOUT){
+			continue;
+		}
+
+		if(step < 0){
+			FB_DEBUG_TAG_LOG("Failed to read body");
+			err = httpd_resp_send_500(r);
+			break;
+		}
+
+		read += step;
+	}while(read != r->content_len);
+
+	tmp[read] = 0;
+
+	char result[64];
+	memset(result, 0, sizeof(result));
+
+	err = httpd_query_key_value(tmp, "value", result, sizeof(result));
+	if(err != ESP_OK){
+		FB_DEBUG_TAG_LOG("Failed to find value key");
+		err = httpd_resp_send_500(r);
+
+	}else{
+		FB_DEBUG_TAG_LOG("Setting property with id %d to %s", id, result);
+		err = httpd_resp_send(r, nullptr, 0);
+	}
 
 	FB_DEBUG_TAG_EXIT();
 
@@ -216,7 +273,9 @@ void server::registerServerBox(Builder& builder)
 	//TODO: URL for this api must start from some preffix
 	builder.addEndpoint(Endpoint{_BOX_PATH, EndpointMethod::GET, nullptr, &_box_cb});
 
-	builder.addEndpoint(Endpoint{_PROPERTY_PATH, EndpointMethod::GET, nullptr, &_property_cb});
+	builder.addEndpoint(Endpoint{_PROPERTY_PATH, EndpointMethod::GET, nullptr, &_property_get_cb});
+	builder.addEndpoint(Endpoint{_PROPERTY_PATH, EndpointMethod::POST, nullptr, &_property_set_cb});
+
 	builder.addEndpoint(Endpoint{_SENSOR_PATH, EndpointMethod::GET, nullptr, &_sensor_cb});
 	builder.addEndpoint(Endpoint{_SWITCH_PATH, EndpointMethod::GET, nullptr, &_switch_cb});
 
