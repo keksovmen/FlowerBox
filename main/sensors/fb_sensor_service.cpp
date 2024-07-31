@@ -1,5 +1,7 @@
 #include "fb_sensor_service.hpp"
 
+#include <ranges>
+
 #include "ds18b20.h"
 
 
@@ -64,7 +66,8 @@ void SensorService::forseRead()
 std::vector<TemperatureSensor> SensorService::getSensors() const
 {
 	// TODO: use range library to convert unordered map to list and then to values only
-	return {};
+	auto view = _tempSensorList | std::views::values | std::views::as_rvalue;
+	return {std::ranges::begin(view), std::ranges::end(view)};
 }
 
 void SensorService::_task(void *arg)
