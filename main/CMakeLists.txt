@@ -16,6 +16,7 @@ idf_component_register(
 		"box/fb_sensor.cpp"
 		"box/fb_switch.cpp"
 		"box/fb_data_entry.cpp"
+		"sensors/fb_sensor_service.cpp"
 		"servers/fb_server.cpp"
 		"servers/fb_server_builder.cpp"
 		"servers/fb_server_update.cpp"
@@ -23,6 +24,7 @@ idf_component_register(
 		"servers/fb_server_box.cpp"
 		"states/fb_state_manager.cpp"
 		"states/fb_main_state_manager.cpp"
+		"states/fb_state_sensor_init.cpp"
 		"states/boot/fb_state_booted.cpp"
 		"states/boot/fb_state_hw_init.cpp"
 		"states/boot/fb_state_wifi_init.cpp"
@@ -34,6 +36,7 @@ idf_component_register(
     INCLUDE_DIRS
 		"include"
 		"include/box"
+		"include/sensors"
 		"include/servers"
 		"include/states"
 		"include/states/boot"
