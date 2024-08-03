@@ -17,17 +17,17 @@ StateSensorInit::StateSensorInit(StateManager& context)
 
 void StateSensorInit::enter()
 {
-	sensor::SensorService service(10);
-	service.start();
+	// sensor::SensorService service(10);
+	// service.start();
 	// for(;;){
-		vTaskDelay(pdMS_TO_TICKS(1000));
-		service.forseScan();
-		service.forseRead();
-		vTaskDelay(pdMS_TO_TICKS(1000));
-		for(const auto& v : service.getSensors())
-		{
-			FB_DEBUG_LOG("Sensor[%s]: %llX, value = %.2f", v.alive ? "+" : "-", v.id, v.value)
-		}
+		// vTaskDelay(pdMS_TO_TICKS(1000));
+		// service.forseScan();
+		// service.forseRead();
+		// vTaskDelay(pdMS_TO_TICKS(1000));
+		// for(const auto& v : service.getSensors())
+		// {
+		// 	FB_DEBUG_LOG("Sensor[%s]: %llX, value = %.2f", v.alive ? "+" : "-", v.id, v.value)
+		// }
 	// }
 }
 

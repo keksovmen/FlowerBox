@@ -1,6 +1,8 @@
 #include "fb_state_hw_init.hpp"
 
 #include "fb_file_system.hpp"
+#include "fb_globals.hpp"
+#include "fb_sensor_event.hpp"
 #include "fb_state_wifi_init.hpp"
 
 
@@ -23,14 +25,17 @@ const char* StateHwInit::getName()
 
 void StateHwInit::handleEvent(const event::Event& event)
 {
-
+	if(event.groupId == event::EventGroup::SENSOR){
+		if(event.eventId == sensor::SensorEvent::TEMPERATURE_SENSOR_SCANNED){
+			getContext().transition(std::make_unique<StateWifiInit>(getContext()));
+		}
+	}
 }
 
 void StateHwInit::enter()
 {
 	fs::init();
-	
-	getContext().transition(std::make_unique<StateWifiInit>(getContext()));
+	global::getSensorService()->start(pins::TEMPERATURE_SENSOR_PIN);
 }
 
 void StateHwInit::exit()

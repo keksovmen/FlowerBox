@@ -22,6 +22,7 @@
 #include "nvs_flash.h"
 
 #include "fb_state_booted.hpp"
+#include "fb_state_sensor_init.hpp"
 #include "fb_globals.hpp"
 
 
@@ -42,7 +43,7 @@ extern "C" void app_main(void)
 	auto* stateManager = fb::global::getStateManager();
 	stateManager->init(std::make_unique<fb::state::StateBooted>(*stateManager));
 
-	fb::global::getEventManager()->attachListener(fb::global::getPinManager());
+	// fb::global::getEventManager()->attachListener(fb::global::getPinManager());
 	fb::global::getEventManager()->attachListener(stateManager);
 	fb::global::getEventManager()->pushEvent({fb::event::EventGroup::BOOT, 0, NULL});
 

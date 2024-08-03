@@ -7,6 +7,7 @@
 #include <functional>
 
 #include "fb_debug.hpp"
+#include "fb_sensor_event.hpp"
 #include "fb_sensor_temperature.hpp"
 // #include "fb_subject.hpp"
 
@@ -14,6 +15,7 @@
 #include "freertos/task.h"
 #include "freertos/queue.h"
 #include "freertos/semphr.h"
+#include "freertos/timers.h"
 
 #include "onewire.h"
 
@@ -26,11 +28,9 @@ namespace fb
 		class SensorService : public debug::Named
 		{
 			public:
-				SensorService(int gpio);
-
 				virtual const char* getName() override;
 
-				void start();
+				void start(int gpio);
 				void stop();
 
 				void forseScan();
@@ -44,12 +44,11 @@ namespace fb
 
 
 
-				const int _gpio;
-
 				std::unordered_map<TemperatureSensor::Id, TemperatureSensor> _tempSensorList;
 				SemaphoreHandle_t _mutex;
 				QueueHandle_t _actionQueue;
 				TaskHandle_t _taskHndl;
+				TimerHandle_t _timerHndl;
 				OW_t _wireIface;
 
 
@@ -58,6 +57,7 @@ namespace fb
 				static void _task(void* arg);
 				static void _scanAction(SensorService* me);
 				static void _temperatureAction(SensorService* me);
+				static void _timer(TimerHandle_t timer);
 
 				std::vector<TemperatureSensor::Id> _scanRequest();
 				//занимает время для сенсоров для формирования ответа
@@ -69,6 +69,8 @@ namespace fb
 				void _updateSensorStates(const std::vector<TemperatureSensor::Id>& alive);
 				//меняет значение температуры сенсора
 				void _updateTemperatureValue(TemperatureSensor::Id id, float value);
+
+				void _dropEvent(SensorEvent e, TemperatureSensor* data);
 		};
 	}
 }

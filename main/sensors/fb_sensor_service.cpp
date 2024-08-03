@@ -3,6 +3,14 @@
 #include <ranges>
 
 #include "ds18b20.h"
+#include "fb_globals.hpp"
+
+
+
+#define _QUEUE_SIZE 5
+
+#define _TASK_STACK_SIZE 2 * 1024
+#define _TASK_PRIORITY 10
 
 
 
@@ -15,27 +23,28 @@ static const char* TAG = "SensorService";
 
 
 
-SensorService::SensorService(int gpio)
-	: _gpio(gpio)
-{
-}
-
 const char *SensorService::getName()
 {
 	return "SensorService";
 }
 
-void SensorService::start()
+void SensorService::start(int gpio)
 {
-	assert(ow_init(&_wireIface, _gpio));
+	assert(ow_init(&_wireIface, gpio));
 
 	_mutex = xSemaphoreCreateMutex();
 	assert(_mutex);
 
-	_actionQueue = xQueueCreate(5, sizeof(SensorService::Action));
+	_actionQueue = xQueueCreate(_QUEUE_SIZE, sizeof(SensorService::Action));
 	assert(_actionQueue);
 
-	auto err = xTaskCreate(&SensorService::_task, getName(), 2 * 1024, this, 10, &_taskHndl);
+	_timerHndl = xTimerCreate(getName(), pdMS_TO_TICKS(3000), pdTRUE, this, &SensorService::_timer);
+	assert(_timerHndl);
+
+	auto err = xTimerStart(_timerHndl, portMAX_DELAY);
+	assert(err = pdPASS);
+
+	err = xTaskCreate(&SensorService::_task, getName(), _TASK_STACK_SIZE, this, _TASK_PRIORITY, &_taskHndl);
 	assert(err == pdPASS);
 }
 
@@ -65,8 +74,8 @@ void SensorService::forseRead()
 
 std::vector<TemperatureSensor> SensorService::getSensors() const
 {
-	// TODO: use range library to convert unordered map to list and then to values only
 	auto view = _tempSensorList | std::views::values | std::views::as_rvalue;
+
 	return {std::ranges::begin(view), std::ranges::end(view)};
 }
 
@@ -81,10 +90,42 @@ void SensorService::_task(void *arg)
 		auto err = xQueueReceive(me->_actionQueue, &action, portMAX_DELAY);
 		assert(err == pdPASS);
 
-		action(me);
+		std::invoke(action, me);
 	}
 
 	vTaskDelete(NULL);
+}
+
+void SensorService::_scanAction(SensorService* me)
+{
+	const auto list = me->_scanRequest();
+
+	FB_DEBUG_TAG_LOG("Scan action find %d devices", list.size());
+
+	me->_updateSensorStates(list);
+
+	me->_dropEvent(SensorEvent::TEMPERATURE_SENSOR_SCANNED, nullptr);
+}
+
+void SensorService::_temperatureAction(SensorService* me)
+{
+	me->_temperatureMesureRequest();
+
+	for (auto kv : me->_tempSensorList)
+	{
+		const auto val = me->_tempreatureValueRequest(kv.first);
+
+		FB_DEBUG_TAG_LOG("Temperature action got %f for id %llX", val, kv.first);
+
+		me->_updateTemperatureValue(kv.first, val);
+	}
+}
+
+void SensorService::_timer(TimerHandle_t timer)
+{
+	SensorService* me = reinterpret_cast<SensorService*>(pvTimerGetTimerID(timer));
+	me->forseScan();
+	me->forseRead();
 }
 
 std::vector<TemperatureSensor::Id> SensorService::_scanRequest()
@@ -140,14 +181,23 @@ void SensorService::_updateSensorStates(const std::vector<TemperatureSensor::Id>
 			if (!sensor.alive)
 			{
 				sensor.alive = true;
-				// TODO: drop state changed event
+				_dropEvent(SensorEvent::TEMPERATURE_SENSOR_DETECTED, &_tempSensorList[id]);
 			}
 		}
 		else
 		{
 			_tempSensorList[id] = TemperatureSensor{true, 0.0f, id};
-			// TODO: drop new sensor event
-			// TODO: drop state changed event for that sensor
+			_dropEvent(SensorEvent::TEMPERATURE_SENSOR_DETECTED, &_tempSensorList[id]);
+		}
+	}
+
+	//others devices must became disabled
+	auto filter = [this, alive](const TemperatureSensor& val){return std::find(alive.begin(), alive.end(), val.id) == alive.end();};
+
+	for(auto& sensor : _tempSensorList | std::views::values | std::views::filter(filter)){
+		if(sensor.alive){
+			sensor.alive = false;
+			_dropEvent(SensorEvent::TEMPERATURE_SENSOR_LOST, &_tempSensorList[sensor.id]);
 		}
 	}
 }
@@ -160,27 +210,15 @@ void SensorService::_updateTemperatureValue(TemperatureSensor::Id id, float valu
 	if (sensor.value != value)
 	{
 		sensor.value = value;
-		// TODO: drop temperature change event
+		_dropEvent(SensorEvent::TEMPERATURE_SENSOR_VALUE_CHANGED, &_tempSensorList[id]);
 	}
 }
 
-void SensorService::_scanAction(SensorService* me)
+void SensorService::_dropEvent(SensorEvent e, TemperatureSensor* data)
 {
-	const auto list = me->_scanRequest();
-
-	FB_DEBUG_TAG_LOG("Scan action find %d devices", list.size());
-
-	me->_updateSensorStates(list);
-}
-
-void SensorService::_temperatureAction(SensorService* me)
-{
-	for (auto kv : me->_tempSensorList)
-	{
-		const auto val = me->_tempreatureValueRequest(kv.first);
-
-		FB_DEBUG_TAG_LOG("Temperature action got %f for id %llX", val, kv.first);
-
-		me->_updateTemperatureValue(kv.first, val);
-	}
+	global::getEventManager()->pushEvent(event::Event{
+		event::EventGroup::SENSOR,
+		static_cast<int>(e),
+		data
+	});	
 }

@@ -18,6 +18,7 @@ static std::unique_ptr<event::EventManager> _eventManager;
 static std::unique_ptr<pins::PinManager> _pinManager;
 static std::unique_ptr<state::StateManager> _stateManager;
 static std::unique_ptr<box::Box> _flowerBox;
+static std::unique_ptr<sensor::SensorService> _sensorService;
 
 
 
@@ -32,6 +33,8 @@ void global::init()
 	_flowerBox->addProperty({"First prop", "Description", "Int", 0, 0, 0, 100, 30});
 	_flowerBox->addSensor({"Sensor 1", "Description", "Int", 0, 1, 0, 100});
 	_flowerBox->addSwitch({"Switch 1", "Description", 1, 2, true, {0}, {0}});
+
+	_sensorService = std::make_unique<sensor::SensorService>();
 }
 
 event::EventManager* global::getEventManager()
@@ -60,4 +63,9 @@ id::UniqueId global::getUniqueId()
 box::Box* global::getFlowerBox()
 {
 	return _flowerBox.get();
+}
+
+sensor::SensorService* global::getSensorService()
+{
+	return _sensorService.get();
 }
