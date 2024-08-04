@@ -67,6 +67,7 @@ void Box::addProperty(const Property& val)
 	}
 
 	_properties.push_back(val);
+	_properties.back().setId(_properties.size() - 1);
 
 	FB_DEBUG_TAG_LOG_W("Added a property with id %d", val.getId());
 }
@@ -82,6 +83,7 @@ void Box::addSensor(const Sensor& val)
 	}
 
 	_sensors.push_back(val);
+	_sensors.back().setId(_sensors.size() - 1);
 
 	FB_DEBUG_TAG_LOG_W("Added a sensor with id %d", val.getId());
 }
@@ -97,6 +99,7 @@ void Box::addSwitch(const Switch& val)
 	}
 
 	_switches.push_back(val);
+	_switches.back().setId(_switches.size() - 1);
 
 	FB_DEBUG_TAG_LOG_W("Added a switch with id %d", val.getId());
 }

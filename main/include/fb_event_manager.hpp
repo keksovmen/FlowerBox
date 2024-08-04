@@ -26,6 +26,7 @@ namespace fb
 			TIMERS,
 			CLOCK,
 			UPDATE,
+			SENSOR,
 		};
 
 
