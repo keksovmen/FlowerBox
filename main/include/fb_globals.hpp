@@ -8,6 +8,7 @@
 #include "fb_pins.hpp"
 #include "fb_sensor_service.hpp"
 #include "fb_state_manager.hpp"
+#include "fb_sensor_storage.hpp"
 
 
 
@@ -27,5 +28,6 @@ namespace fb
 		box::Box* getFlowerBox();
 
 		sensor::SensorService* getSensorService();
+		sensor::SensorStorage* getSensorStorage();
 	}
 }

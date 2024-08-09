@@ -9,8 +9,8 @@ using namespace box;
 
 
 
-BoxService::BoxService(Box& box)
-	: _box(box)
+BoxService::BoxService(Box& box, sensor::SensorStorage& storage)
+	: _box(box), _storage(storage)
 {
 	//TODO: put somehere else
 	//TODO: current value take from SensorService
@@ -33,6 +33,22 @@ void BoxService::handleEvent(const event::Event& event)
 			_box.addProperty(Property{
 				"Temp. description", "Defines sensor description", "str", 0, 0, 0, 128, 0
 			});
+
+		}else if(event.eventId == sensor::SensorEvent::TEMPERATURE_SENSOR_VALUE_CHANGED){
+			auto* sensor = reinterpret_cast<sensor::TemperatureSensor*>(event.data);
+			_storage.addSensorValue(sensor->id, sensor->value);
+
+			//for check working purposes only
+			// {
+			// 	auto iter = _storage.getSensorValues(sensor->id, 0);
+			// 	if(iter){
+			// 		for(; iter != _storage.getSensorValuesEnd(); ++iter){
+			// 			ESP_LOGI(getName(), "Sensor data entry: at %llu, %.2f", (*iter).timestamp, (*iter).value);
+			// 		}
+			// 	}else{
+			// 		ESP_LOGI(getName(), "No values present in storage");
+			// 	}
+			// }
 		}
 	}
 }

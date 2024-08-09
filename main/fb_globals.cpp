@@ -20,6 +20,7 @@ static std::unique_ptr<pins::PinManager> _pinManager;
 static std::unique_ptr<state::StateManager> _stateManager;
 static std::unique_ptr<box::Box> _flowerBox;
 static std::unique_ptr<sensor::SensorService> _sensorService;
+static std::unique_ptr<sensor::SensorStorage> _sensorStorage;
 static std::unique_ptr<box::BoxService> _boxService;
 
 
@@ -37,7 +38,8 @@ void global::init()
 	// _flowerBox->addSwitch({"Switch 1", "Description", 1, 2, true, {0}, {0}});
 
 	_sensorService = std::make_unique<sensor::SensorService>();
-	_boxService = std::make_unique<box::BoxService>(*_flowerBox.get());
+	_sensorStorage = std::make_unique<sensor::SensorStorage>();
+	_boxService = std::make_unique<box::BoxService>(*_flowerBox.get(), *_sensorStorage.get());
 	_eventManager->attachListener(_boxService.get());
 }
 
@@ -72,4 +74,9 @@ box::Box* global::getFlowerBox()
 sensor::SensorService* global::getSensorService()
 {
 	return _sensorService.get();
+}
+
+sensor::SensorStorage* getSensorStorage()
+{
+	return _sensorStorage.get();
 }
