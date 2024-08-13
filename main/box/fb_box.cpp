@@ -27,18 +27,13 @@ Box::Box(const std::string& name,
 
 std::string Box::toJson() const
 {
-	// int ids[] = {0, 1, 2, 3};
 	cJSON* obj = cJSON_CreateObject();
 	cJSON_AddStringToObject(obj, "name", _name.c_str());
 	cJSON_AddStringToObject(obj, "version", _version.c_str());
 	cJSON_AddNumberToObject(obj, "unique_id", _uniqueId);
 
-	//TODO: use cJSON and add all missing fields from android app
-	// cJSON_AddItemToObject(obj, "switch_ids", cJSON_CreateIntArray(ids, 4));
-	// cJSON_AddItemToObject(obj, "sensor_ids", cJSON_CreateIntArray(ids, 4));
-
 	std::vector<int> ids;
-	std::for_each(_properties.begin(), _properties.end(), [&ids](const auto& p){ids.push_back(p.getId());});
+	std::for_each(_properties.begin(), _properties.end(), [&ids](const auto& p){ids.push_back(p->getId());});
 	cJSON_AddItemToObject(obj, "properties_ids", cJSON_CreateIntArray(ids.data(), _properties.size()));
 
 	ids.clear();
@@ -56,20 +51,20 @@ std::string Box::toJson() const
 	return result;
 }
 
-void Box::addProperty(const Property& val)
+void Box::addProperty(std::unique_ptr<PropertyIface> val)
 {
 	auto iter = std::find_if(_properties.begin(), _properties.end(),
-		[val](const Property& left){return left.getId() == val.getId();});
+		[&val](const auto& left){return left->getId() == val->getId();});
 	
 	if(iter != _properties.end()){
-		FB_DEBUG_TAG_LOG_W("Failed to add property with id %d, it is already exist", val.getId());
+		FB_DEBUG_TAG_LOG_W("Failed to add property with id %d, it is already exist", val->getId());
 		return;
 	}
 
-	_properties.push_back(val);
-	_properties.back().setId(_properties.size() - 1);
+	_properties.push_back(std::move(val));
+	_properties.back()->setId(_properties.size() - 1);
 
-	FB_DEBUG_TAG_LOG_W("Added a property with id %d", val.getId());
+	FB_DEBUG_TAG_LOG_W("Added a property with id %d", _properties.back()->getId());
 }
 
 void Box::addSensor(const Sensor& val)
@@ -104,16 +99,16 @@ void Box::addSwitch(const Switch& val)
 	FB_DEBUG_TAG_LOG_W("Added a switch with id %d", val.getId());
 }
 
-const Property* Box::getProperty(int id) const
+PropertyIface* Box::getProperty(int id)
 {
 	auto iter = std::find_if(_properties.begin(), _properties.end(),
-		[id](const Property& left){return left.getId() == id;});
+		[id](const auto& left){return left->getId() == id;});
 	
 	if(iter == _properties.end()){
 		return nullptr;
 	}
 
-	return &(*iter);
+	return iter->get();
 }
 
 const Sensor* Box::getSensor(int id) const

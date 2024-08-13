@@ -2,8 +2,9 @@
 
 
 
-#include <vector>
+#include <memory>
 #include <string>
+#include <vector>
 
 #include "fb_serializable.hpp"
 #include "fb_id.hpp"
@@ -27,11 +28,11 @@ namespace fb
 
 				virtual std::string toJson() const override;
 
-				void addProperty(const Property& val);
+				void addProperty(std::unique_ptr<PropertyIface> val);
 				void addSensor(const Sensor& val);
 				void addSwitch(const Switch& val);
 
-				const Property* getProperty(int id) const;
+				PropertyIface* getProperty(int id);
 				const Sensor* getSensor(int id) const;
 				const Switch* getSwitch(int id) const;
 			
@@ -41,7 +42,7 @@ namespace fb
 				std::string _name;
 				std::string _version;
 
-				std::vector<Property> _properties;
+				std::vector<std::unique_ptr<PropertyIface>> _properties;
 				std::vector<Sensor> _sensors;
 				std::vector<Switch> _switches;
 		};
