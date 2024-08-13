@@ -20,7 +20,7 @@ void SensorStorage::addSensorState(TemperatureSensor::Id id, bool state)
 SensorStorage::Iterator SensorStorage::getSensorValues(TemperatureSensor::Id id, clock::Timestamp from) const
 {
 	return _sensorData.findValueIndex([&from](const SensorStorageEntry& e){
-		return e.timestamp >= from;
+		return e.timestamp > from;
 	});
 }
 

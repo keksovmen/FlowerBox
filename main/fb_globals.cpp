@@ -76,7 +76,7 @@ sensor::SensorService* global::getSensorService()
 	return _sensorService.get();
 }
 
-sensor::SensorStorage* getSensorStorage()
+sensor::SensorStorage* global::getSensorStorage()
 {
 	return _sensorStorage.get();
 }

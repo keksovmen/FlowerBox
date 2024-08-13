@@ -27,39 +27,6 @@ namespace fb
 		{
 			public:
 				static constexpr int BufferSize = 10;
-				// class SensorStorageIterator
-				// {
-				// 	public:
-
-				// 	using iterator_category = std::forward_iterator_tag;
-				// 	using value_type = SensorStorageEntry;
-				// 	using element_type = SensorStorageEntry;
-				// 	using pointer = SensorStorageEntry*;
-				// 	using reference = SensorStorageEntry&;
-				// 	using difference_type = std::ptrdiff_t;
-
-				// 	SensorStorageIterator()
-				// 			: _data(data), _index(index)
-				// 	{
-
-				// 	}
-
-				// 	const reference operator*()
-				// 	{
-				// 		return _data[_index];
-				// 	}
-
-				// 	bool operator==(const SensorStorageIterator& r)
-				// 	{
-				// 		return _index == r._index;
-				// 	}
-
-				// 	SensorStorageIterator& operator++()
-				// 	{
-				// 		return *this;
-				// 	}
-
-				// };
 
 
 
@@ -67,7 +34,7 @@ namespace fb
 				 * @brief то чем мы будем проходится по списку сохраненных данныъ
 				 * 
 				 */
-				//TODO: change to iterator in cycle buffer
+
 				using Iterator = util::CycleBuffer<SensorStorageEntry, BufferSize>::Iterator;
 
 
@@ -103,13 +70,13 @@ namespace fb
 			private:
 				using Buffer = util::CycleBuffer<SensorStorageEntry, BufferSize>;
 
+
+
 				Buffer _sensorData;
 
 
 
 				Buffer& _getSensorValueBuffer(TemperatureSensor::Id id);
-
-
 		};
 	}
 }

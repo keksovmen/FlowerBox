@@ -208,15 +208,30 @@ static esp_err_t _sensor_data_cb(httpd_req_t* r)
 
 	FB_DEBUG_TAG_LOG("Requesting Sensor data with id: %d, and timestamp: %lld", id, timestamp);
 
-	box::DataEntry entry(228);
-	const auto result = entry.toJson();
-
-	FB_DEBUG_TAG_LOG("Sending DataEntry: %s", result.c_str());
-	
 	httpd_resp_set_type(r, HTTPD_TYPE_JSON);
 
+	auto iter = global::getSensorStorage()->getSensorValues(id, timestamp);
+	if(!iter){
+		err = httpd_resp_send(r, "[]", HTTPD_RESP_USE_STRLEN);
+		return err; 
+	}
+
+	const auto end = global::getSensorStorage()->getSensorValuesEnd();
+
 	err |= httpd_resp_sendstr_chunk(r, "[");
-	err |= httpd_resp_send_chunk(r, result.c_str(), result.length());
+	bool comaFlag = false;
+	for(; iter != end; iter++){
+		if(comaFlag){
+			err |= httpd_resp_send_chunk(r, ",", 1);
+		}
+		comaFlag = true;
+
+		box::DataEntry entry(iter->value, iter->timestamp);
+		const auto result = entry.toJson();
+		FB_DEBUG_TAG_LOG("Sending DataEntry: %s", result.c_str());
+		err |= httpd_resp_send_chunk(r, result.c_str(), result.length());
+	}
+
 	err |= httpd_resp_sendstr_chunk(r, "]");
 	err |= httpd_resp_sendstr_chunk(r, nullptr);
 

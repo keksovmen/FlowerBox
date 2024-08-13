@@ -24,6 +24,7 @@ namespace fb
 						using value_type = T;
 						using element_type = T;
 						using pointer = value_type*;
+						using const_pointer = const value_type*;
 						using reference = value_type&;
 						using const_reference = const value_type&;
 						using difference_type = std::ptrdiff_t;
@@ -59,6 +60,19 @@ namespace fb
 							}
 
 							return *this;
+						}
+
+						CycleBufferIterator operator++(int)
+						{
+							CycleBufferIterator tmp = *this;
+							++(*this);
+
+							return tmp;
+						}
+
+						const_pointer operator->() const
+						{
+							return &(operator*());
 						}
 
 						operator bool() const
