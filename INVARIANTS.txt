@@ -1,0 +1,2 @@
+All properties VALUES send as strings without \" symbols from APP
+All MIN and MAX property VALUES send as floats in json from ESP

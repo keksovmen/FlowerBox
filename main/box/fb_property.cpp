@@ -48,7 +48,7 @@ std::string PropertyBase<T>::toJson() const
 	cJSON_AddNumberToObject(obj, "tid", _tid);
 	cJSON_AddRawToObject(obj, "min_value", _minValueToString().c_str());
 	cJSON_AddRawToObject(obj, "max_value", _maxValueToString().c_str());
-	cJSON_AddRawToObject(obj, "value", _valueToString(_value).c_str());
+	cJSON_AddStringToObject(obj, "value", _valueToString(_value).c_str());
 
 	std::string result(cJSON_PrintUnformatted(obj));
 
@@ -131,17 +131,12 @@ PropertyString::PropertyString(
 
 std::pair<bool, std::string> PropertyString::_strToValue(const std::string& str) const
 {
-	auto val = str;
-	if(str.contains("\"")){
-		val = str.substr(1, str.length() - 2);
-	}
-
-	return {true, val};
+	return {true, str};
 }
 
 std::string PropertyString::_valueToString(std::string val) const
 {
-	return "\"" + val + "\"";
+	return val;
 }
 
 std::string PropertyString::_minValueToString() const
