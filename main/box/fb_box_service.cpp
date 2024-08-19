@@ -1,5 +1,6 @@
 #include "fb_box_service.hpp"
 
+#include "fb_tid.hpp"
 #include "fb_sensor_event.hpp"
 
 
@@ -16,12 +17,9 @@ BoxService::BoxService(Box& box, sensor::SensorStorage& storage)
 	//TODO: current value take from SensorService
 	//TODO: add property action cb
 	_box.addProperty(std::make_unique<PropertyInt>(
-		"Sensors period in sec",
-		"Define period at which sensors are asked for data",
-		0,
+		Tid::PROPERTY_SENSOR_PERIOD_GLOBAL,
 		[](int val){return true;},
-		1, 1, 600
-	));
+		1));
 }
 
 void BoxService::handleEvent(const event::Event& event)
@@ -29,18 +27,15 @@ void BoxService::handleEvent(const event::Event& event)
 	if(event.groupId == event::EventGroup::SENSOR){
 		if(event.eventId == sensor::SensorEvent::TEMPERATURE_SENSOR_DETECTED){
 			//добавить устройство в Box
-			_box.addSensor(Sensor{
-				"Temp. DS18B20", "Description", "float", 0, 0, -50.0, 100.0
-			});
+			const auto& sen = _box.addSensor(Sensor{Tid::SENSOR_DS18B20});
 
 			//добвить свойства: период опроса, название датчика
 			_box.addProperty(std::make_unique<PropertyString>(
-				"Temp. description",
-				"Defines sensor description",
-				0,
+				"Temp. sensor " + std::to_string(sen.getId()) + " description",
+				"Defines sensor description with id " + std::to_string(sen.getId()),
+				Tid::PROPERTY_SENSOR_DESCRIPTION,
 				[](std::string val){return true;},
-				"default value", 0, 300
-			));
+				sen.getDescription()));
 
 		}else if(event.eventId == sensor::SensorEvent::TEMPERATURE_SENSOR_VALUE_CHANGED){
 			auto* sensor = reinterpret_cast<sensor::TemperatureSensor*>(event.data);

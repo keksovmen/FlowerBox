@@ -5,6 +5,7 @@
 #include <string>
 
 #include "fb_serializable.hpp"
+#include "fb_object_base.hpp"
 
 
 
@@ -12,32 +13,14 @@ namespace fb
 {
 	namespace box
 	{
-		class Sensor : public Serializable
+		//TODO: make generic
+		//TODO: add list of properties ids
+		class Sensor : public ObjectStaticTid
 		{
 			public:
-				Sensor(const std::string& name,
-					const std::string& description,
-					const std::string& valueType,
-					int id,
-					int tid,
-					double minValue,
-					double maxValue);
-
+				Sensor(Tid tid);
 
 				virtual std::string toJson() const override;
-
-				int getId() const;
-
-				void setId(int id);
-			
-			private:
-				std::string _name;
-				std::string _description;
-				std::string _valueType;
-				int _id;
-				int _tid;
-				double _minValue;
-				double _maxValue;
 		};
 	} // namespace box
 } // namespace fb

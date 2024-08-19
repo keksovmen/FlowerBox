@@ -17,6 +17,8 @@ idf_component_register(
 		"box/fb_switch.cpp"
 		"box/fb_data_entry.cpp"
 		"box/fb_box_service.cpp"
+		"box/fb_object_base.cpp"
+		"box/fb_tid.cpp"
 		"sensors/fb_sensor_service.cpp"
 		"sensors/fb_sensor_storage.cpp"
 		"servers/fb_server.cpp"

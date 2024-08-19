@@ -67,20 +67,23 @@ void Box::addProperty(std::unique_ptr<PropertyIface> val)
 	FB_DEBUG_TAG_LOG_W("Added a property with id %d", _properties.back()->getId());
 }
 
-void Box::addSensor(const Sensor& val)
+Sensor& Box::addSensor(const Sensor& val)
 {
 	auto iter = std::find_if(_sensors.begin(), _sensors.end(),
 		[val](const Sensor& left){return left.getId() == val.getId();});
 	
 	if(iter != _sensors.end()){
 		FB_DEBUG_TAG_LOG_W("Failed to add sensor with id %d, it is already exist", val.getId());
-		return;
+		assert(0);
+		return _sensors.front();
 	}
 
 	_sensors.push_back(val);
 	_sensors.back().setId(_sensors.size() - 1);
 
 	FB_DEBUG_TAG_LOG_W("Added a sensor with id %d", val.getId());
+
+	return _sensors.back();
 }
 
 void Box::addSwitch(const Switch& val)

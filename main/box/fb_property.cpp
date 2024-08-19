@@ -9,15 +9,15 @@ using namespace box;
 
 
 
-
-void PropertyIface::setId(int id)
+PropertyIface::PropertyIface(Tid tid)
+	: ObjectStaticTid(tid)
 {
-	_id = id;
+
 }
 
-int PropertyIface::getId() const
+PropertyIface::~PropertyIface()
 {
-	return _id;
+
 }
 
 
@@ -29,11 +29,23 @@ PropertyBase<T>::PropertyBase(
 			Tid tid,
 			const ActionSet& action,
 			T value)
-	: _name(name), _description(description),
-	_tid(tid), _action(action),
-	_value(value)
+	: PropertyIface(tid),
+	_action(action), _value(value)
 {
+	setName(name);
+	setDescription(description);
+}
 
+template<class T>
+void PropertyBase<T>::setMinValueStr(const std::string& val)
+{
+	assert(0);
+}
+
+template<class T>
+void PropertyBase<T>::setMaxValueStr(const std::string& val)
+{
+	assert(0);
 }
 
 //TODO: create cJson and append key value as str
@@ -41,13 +53,13 @@ template<class T>
 std::string PropertyBase<T>::toJson() const
 {
 	cJSON* obj = cJSON_CreateObject();
-	cJSON_AddStringToObject(obj, "name", _name.c_str());
-	cJSON_AddStringToObject(obj, "description", _description.c_str());
-	cJSON_AddStringToObject(obj, "value_type", _getValueType().c_str());
+	cJSON_AddStringToObject(obj, "name", getName().c_str());
+	cJSON_AddStringToObject(obj, "description", getDescription().c_str());
+	cJSON_AddStringToObject(obj, "value_type", getValueType().c_str());
 	cJSON_AddNumberToObject(obj, "id", getId());
-	cJSON_AddNumberToObject(obj, "tid", _tid);
-	cJSON_AddRawToObject(obj, "min_value", _minValueToString().c_str());
-	cJSON_AddRawToObject(obj, "max_value", _maxValueToString().c_str());
+	cJSON_AddNumberToObject(obj, "tid", static_cast<double>(getTid()));
+	cJSON_AddRawToObject(obj, "min_value", getMinValueStr().c_str());
+	cJSON_AddRawToObject(obj, "max_value", getMaxValueStr().c_str());
 	cJSON_AddStringToObject(obj, "value", _valueToString(_value).c_str());
 
 	std::string result(cJSON_PrintUnformatted(obj));
@@ -85,7 +97,15 @@ PropertyInt::PropertyInt(
 	: PropertyBase(name, description, tid, action, value),
 	_minValue(minValue), _maxValue(maxValue) 
 {
+	setValueType("int");
+}
 
+PropertyInt::PropertyInt(Tid tid, const ActionSet& action, int value)
+	: PropertyBase(tidToName(tid), tidToDescription(tid), tid, action, value),
+	_minValue(std::atoi(tidToMinValue(tid))),
+	_maxValue(std::atoi(tidToMaxValue(tid)))
+{
+	setValueType("int");
 }
 
 std::pair<bool, int> PropertyInt::_strToValue(const std::string& str) const
@@ -98,21 +118,6 @@ std::string PropertyInt::_valueToString(int val) const
 	return std::to_string(val);
 }
 
-std::string PropertyInt::_minValueToString() const
-{
-	return std::to_string(_minValue);
-}
-
-std::string PropertyInt::_maxValueToString() const
-{
-	return std::to_string(_maxValue);
-}
-
-std::string PropertyInt::_getValueType() const
-{
-	return "int";
-}
-
 
 
 PropertyString::PropertyString(
@@ -120,13 +125,16 @@ PropertyString::PropertyString(
 			const std::string& description,
 			Tid tid,
 			const ActionSet& action,
-			const std::string& value,
-			int minLength,
-			int maxLength)
-	: PropertyBase(name, description, tid, action, value),
-	_minLength(minLength), _maxLength(maxLength) 
+			const std::string& value)
+	: PropertyBase(name, description, tid, action, value)
 {
+	setValueType("str");
+}
 
+PropertyString::PropertyString(Tid tid, const ActionSet& action, const std::string& value)
+	: PropertyBase(tidToName(tid), tidToDescription(tid), tid, action, value)
+{
+	setValueType("str");
 }
 
 std::pair<bool, std::string> PropertyString::_strToValue(const std::string& str) const
@@ -137,64 +145,4 @@ std::pair<bool, std::string> PropertyString::_strToValue(const std::string& str)
 std::string PropertyString::_valueToString(std::string val) const
 {
 	return val;
-}
-
-std::string PropertyString::_minValueToString() const
-{
-	return std::to_string(_minLength);
-}
-
-std::string PropertyString::_maxValueToString() const
-{
-	return std::to_string(_maxLength);
-}
-
-std::string PropertyString::_getValueType() const
-{
-	return "str";
-}
-
-
-Property::Property(const std::string& name,
-	const std::string& description,
-	const std::string& valueType,
-	int id,
-	int tid,
-	double minValue,
-	double maxValue,
-	double value)
-	: _name(name), _description(description), _valueType(valueType),
-	_id(id), _tid(tid),
-	_minValue(minValue), _maxValue(maxValue), _value(value)
-{
-
-}
-
-std::string Property::toJson() const
-{
-	cJSON* obj = cJSON_CreateObject();
-	cJSON_AddStringToObject(obj, "name", _name.c_str());
-	cJSON_AddStringToObject(obj, "description", _description.c_str());
-	cJSON_AddStringToObject(obj, "value_type", _valueType.c_str());
-	cJSON_AddNumberToObject(obj, "id", _id);
-	cJSON_AddNumberToObject(obj, "tid", _tid);
-	cJSON_AddNumberToObject(obj, "min_value", _minValue);
-	cJSON_AddNumberToObject(obj, "max_value", _maxValue);
-	cJSON_AddNumberToObject(obj, "value", _value);
-
-	std::string result(cJSON_PrintUnformatted(obj));
-
-	cJSON_Delete(obj);
-
-	return result;
-}
-
-int Property::getId() const
-{
-	return _id;
-}
-
-void Property::setId(int id)
-{
-	_id = id;
 }
