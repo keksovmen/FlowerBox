@@ -2,6 +2,7 @@
 
 #include "fb_tid.hpp"
 #include "fb_sensor_event.hpp"
+#include "fb_globals.hpp"
 
 
 
@@ -18,7 +19,10 @@ BoxService::BoxService(Box& box, sensor::SensorStorage& storage)
 	//TODO: add property action cb
 	_box.addProperty(std::make_unique<PropertyInt>(
 		Tid::PROPERTY_SENSOR_PERIOD_GLOBAL,
-		[](int val){return true;},
+		[](int val){
+			global::getSensorService()->setTimerPeriod(val * 1000);
+			return true;
+		},
 		1));
 }
 
