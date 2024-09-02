@@ -72,6 +72,13 @@ void SensorService::forseRead()
 	assert(err == pdPASS);
 }
 
+void SensorService::setTimerPeriod(int ms)
+{
+	assert(_timerHndl);
+	
+	xTimerChangePeriod(_timerHndl, pdMS_TO_TICKS(ms), portMAX_DELAY);
+}
+
 std::vector<TemperatureSensor> SensorService::getSensors() const
 {
 	auto view = _tempSensorList | std::views::values | std::views::as_rvalue;

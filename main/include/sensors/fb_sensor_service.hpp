@@ -35,6 +35,8 @@ namespace fb
 
 				void forseScan();
 				void forseRead();
+
+				void setTimerPeriod(int ms);
 			
 				//вернет копию, дабы синхронизацию не ломать
 				std::vector<TemperatureSensor> getSensors() const;
