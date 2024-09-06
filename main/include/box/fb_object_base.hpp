@@ -2,6 +2,8 @@
 
 
 
+#include <vector>
+
 #include "fb_tid.hpp"
 #include "fb_serializable.hpp"
 
@@ -15,6 +17,10 @@ namespace fb
 		class ObjectIface : public Serializable
 		{
 			public:
+				using PropertyArray = std::vector<int>;
+
+
+
 				virtual ~ObjectIface();
 
 				void setTid(Tid tid);
@@ -34,6 +40,9 @@ namespace fb
 				const std::string& getValueType() const;
 				const std::string& getMinValueStr() const;
 				const std::string& getMaxValueStr() const;
+
+				void addPropertyDependency(int propertyId);
+				const PropertyArray& getPropertyDependencies() const;
 			
 			private:
 				Tid _tid;
@@ -44,6 +53,8 @@ namespace fb
 				std::string _valueType;
 				std::string _minValue;
 				std::string _maxValue;
+
+				PropertyArray _dependentProperties;
 		};
 
 

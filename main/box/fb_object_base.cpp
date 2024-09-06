@@ -1,5 +1,7 @@
 #include "fb_object_base.hpp"
 
+#include <algorithm>
+
 
 
 using namespace fb;
@@ -80,6 +82,18 @@ const std::string& ObjectIface::getMinValueStr() const
 const std::string& ObjectIface::getMaxValueStr() const
 {
 	return _maxValue;
+}
+
+void ObjectIface::addPropertyDependency(int propertyId)
+{
+	assert(std::find(_dependentProperties.begin(), _dependentProperties.end(), propertyId) == _dependentProperties.end());
+
+	_dependentProperties.push_back(propertyId);
+}
+
+const ObjectIface::PropertyArray& ObjectIface::getPropertyDependencies() const
+{
+	return _dependentProperties;
 }
 
 

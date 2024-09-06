@@ -25,6 +25,8 @@ std::string Sensor::toJson() const
 	cJSON_AddNumberToObject(obj, "tid", static_cast<double>(getTid()));
 	cJSON_AddRawToObject(obj, "min_value", getMinValueStr().c_str());
 	cJSON_AddRawToObject(obj, "max_value", getMaxValueStr().c_str());
+	cJSON_AddItemToObject(obj, "property_ids", cJSON_CreateIntArray(getPropertyDependencies().data(), getPropertyDependencies().size()));
+	
 
 	std::string result(cJSON_PrintUnformatted(obj));
 

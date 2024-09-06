@@ -19,6 +19,8 @@ idf_component_register(
 		"box/fb_box_service.cpp"
 		"box/fb_object_base.cpp"
 		"box/fb_tid.cpp"
+		"sensors/fb_sensor_iface.cpp"
+		"sensors/fb_sensor_temperature.cpp"
 		"sensors/fb_sensor_service.cpp"
 		"sensors/fb_sensor_storage.cpp"
 		"servers/fb_server.cpp"
@@ -36,11 +38,13 @@ idf_component_register(
 		"states/work/fb_state_work.cpp"
 		"states/work/fb_state_wifi_connected.cpp"
 		"states/update/fb_state_update.cpp"
+		"switches/fb_light_switch.cpp"
 
     INCLUDE_DIRS
 		"include"
 		"include/box"
 		"include/sensors"
+		"include/switches"
 		"include/servers"
 		"include/states"
 		"include/states/boot"

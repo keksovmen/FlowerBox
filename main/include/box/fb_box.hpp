@@ -28,7 +28,7 @@ namespace fb
 
 				virtual std::string toJson() const override;
 
-				void addProperty(std::unique_ptr<PropertyIface> val);
+				const PropertyIface* addProperty(std::unique_ptr<PropertyIface> val);
 				Sensor& addSensor(const Sensor& val);
 				void addSwitch(const Switch& val);
 

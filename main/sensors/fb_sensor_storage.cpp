@@ -9,6 +9,7 @@ using namespace sensor;
 
 void SensorStorage::addSensorValue(TemperatureSensor::Id id, float value)
 {
+	//TODO: add check if last value was approximate the same ignore new alue
 	_sensorData.pushValue(SensorStorageEntry{value, clock::currentTime()});
 }
 

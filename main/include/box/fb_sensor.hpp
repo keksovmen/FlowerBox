@@ -4,7 +4,6 @@
 
 #include <string>
 
-#include "fb_serializable.hpp"
 #include "fb_object_base.hpp"
 
 
@@ -14,7 +13,7 @@ namespace fb
 	namespace box
 	{
 		//TODO: make generic
-		//TODO: add list of properties ids
+		//TODO: add list of dependent properti ids
 		class Sensor : public ObjectStaticTid
 		{
 			public:

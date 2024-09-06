@@ -29,21 +29,24 @@ BoxService::BoxService(Box& box, sensor::SensorStorage& storage)
 void BoxService::handleEvent(const event::Event& event)
 {
 	if(event.groupId == event::EventGroup::SENSOR){
-		if(event.eventId == sensor::SensorEvent::TEMPERATURE_SENSOR_DETECTED){
+		if(event.eventId == sensor::SensorEvent::SENSOR_INITIALIZED){
 			//добавить устройство в Box
-			const auto& sen = _box.addSensor(Sensor{Tid::SENSOR_DS18B20});
+			auto& sen = _box.addSensor(Sensor{Tid::SENSOR_DS18B20});
 
 			//добвить свойства: период опроса, название датчика
-			_box.addProperty(std::make_unique<PropertyString>(
+			const auto* prop = _box.addProperty(std::make_unique<PropertyString>(
 				"Temp. sensor " + std::to_string(sen.getId()) + " description",
 				"Defines sensor description with id " + std::to_string(sen.getId()),
 				Tid::PROPERTY_SENSOR_DESCRIPTION,
 				[](std::string val){return true;},
 				sen.getDescription()));
+			
+			sen.addPropertyDependency(prop->getId());
 
-		}else if(event.eventId == sensor::SensorEvent::TEMPERATURE_SENSOR_VALUE_CHANGED){
-			auto* sensor = reinterpret_cast<sensor::TemperatureSensor*>(event.data);
-			_storage.addSensorValue(sensor->id, sensor->value);
+		}else if(event.eventId == sensor::SensorEvent::SENSOR_VALUE_CHANGED){
+			//TODO: fix it, now it is wrong pointer type
+			// auto* sensor = reinterpret_cast<sensor::TemperatureSensor*>(event.data);
+			// _storage.addSensorValue(sensor->id, sensor->value);
 
 			//for check working purposes only
 			// {

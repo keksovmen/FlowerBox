@@ -51,20 +51,23 @@ std::string Box::toJson() const
 	return result;
 }
 
-void Box::addProperty(std::unique_ptr<PropertyIface> val)
+const PropertyIface* Box::addProperty(std::unique_ptr<PropertyIface> val)
 {
 	auto iter = std::find_if(_properties.begin(), _properties.end(),
 		[&val](const auto& left){return left->getId() == val->getId();});
 	
 	if(iter != _properties.end()){
 		FB_DEBUG_TAG_LOG_W("Failed to add property with id %d, it is already exist", val->getId());
-		return;
+		assert(0);
+		return nullptr;
 	}
 
 	_properties.push_back(std::move(val));
 	_properties.back()->setId(_properties.size() - 1);
 
 	FB_DEBUG_TAG_LOG_W("Added a property with id %d", _properties.back()->getId());
+
+	return _properties.back().get();
 }
 
 Sensor& Box::addSensor(const Sensor& val)

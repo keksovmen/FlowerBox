@@ -24,6 +24,7 @@ namespace fb
 		class Named
 		{
 			public:
+				//TODO: make it const
 				virtual const char* getName() = 0;
 		};
 	};

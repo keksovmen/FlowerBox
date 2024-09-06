@@ -8,10 +8,9 @@ namespace fb
 	{
 		enum class SensorEvent : int
 		{
-			TEMPERATURE_SENSOR_SCANNED,			//когда закончили сканировать
-			TEMPERATURE_SENSOR_DETECTED,		//когда нашли устройство во время скана
-			TEMPERATURE_SENSOR_VALUE_CHANGED,	//у устройства изменилось значение
-			TEMPERATURE_SENSOR_LOST,			//устройство потеряно
+			SENSOR_INITIALIZED,					//сенсор инициализирован, аргумент есть сенсор
+			SENSOR_LOST,						//сенсор потерян, по какой либо причине
+			SENSOR_VALUE_CHANGED,				//сенсор изменил свое значение
 		};
 
 		constexpr bool operator==(int id, SensorEvent e){

@@ -15,6 +15,7 @@ using namespace global;
 
 
 
+//TODO: change to local values to be staticly defined
 static std::unique_ptr<event::EventManager> _eventManager;
 static std::unique_ptr<pins::PinManager> _pinManager;
 static std::unique_ptr<state::StateManager> _stateManager;

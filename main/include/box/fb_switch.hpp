@@ -13,6 +13,7 @@ namespace fb
 {
 	namespace box
 	{
+		//TODO: make it child of ObjectHolder
 		class Switch : public Serializable
 		{
 			public:

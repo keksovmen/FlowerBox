@@ -128,6 +128,7 @@ FB_DEBUG_TAG_ENTER();
 
 	tmp[read] = 0;
 
+	//TODO: made it hold max property length
 	char result[64];
 	memset(result, 0, sizeof(result));
 

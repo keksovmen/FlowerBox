@@ -9,6 +9,7 @@
 #include "fb_debug.hpp"
 #include "fb_sensor_event.hpp"
 #include "fb_sensor_temperature.hpp"
+#include "fb_sensor_iface.hpp"
 // #include "fb_subject.hpp"
 
 #include "freertos/FreeRTOS.h"
@@ -30,7 +31,7 @@ namespace fb
 			public:
 				virtual const char* getName() override;
 
-				void start(int gpio);
+				void start();
 				void stop();
 
 				void forseScan();
@@ -45,6 +46,8 @@ namespace fb
 				using Action = std::function<void(SensorService*)>;
 
 
+
+				std::vector<SensorIface*> _sensors;
 
 				std::unordered_map<TemperatureSensor::Id, TemperatureSensor> _tempSensorList;
 				SemaphoreHandle_t _mutex;
@@ -73,6 +76,7 @@ namespace fb
 				void _updateTemperatureValue(TemperatureSensor::Id id, float value);
 
 				void _dropEvent(SensorEvent e, TemperatureSensor* data);
+				void _dropEvent(SensorEvent e, SensorIface* data);
 		};
 	}
 }

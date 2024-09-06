@@ -26,7 +26,7 @@ const char* StateHwInit::getName()
 void StateHwInit::handleEvent(const event::Event& event)
 {
 	if(event.groupId == event::EventGroup::SENSOR){
-		if(event.eventId == sensor::SensorEvent::TEMPERATURE_SENSOR_SCANNED){
+		if(event.eventId == sensor::SensorEvent::SENSOR_INITIALIZED){
 			getContext().transition(std::make_unique<StateWifiInit>(getContext()));
 		}
 	}
@@ -35,7 +35,7 @@ void StateHwInit::handleEvent(const event::Event& event)
 void StateHwInit::enter()
 {
 	fs::init();
-	global::getSensorService()->start(pins::TEMPERATURE_SENSOR_PIN);
+	global::getSensorService()->start();
 }
 
 void StateHwInit::exit()

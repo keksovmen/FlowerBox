@@ -4,6 +4,7 @@
 
 #include "ds18b20.h"
 #include "fb_globals.hpp"
+#include "fb_pins.hpp"
 
 
 
@@ -28,9 +29,10 @@ const char *SensorService::getName()
 	return "SensorService";
 }
 
-void SensorService::start(int gpio)
+void SensorService::start()
 {
-	assert(ow_init(&_wireIface, gpio));
+	// assert(ow_init(&_wireIface, gpio));
+	assert(!_mutex);
 
 	_mutex = xSemaphoreCreateMutex();
 	assert(_mutex);
@@ -46,6 +48,8 @@ void SensorService::start(int gpio)
 
 	err = xTaskCreate(&SensorService::_task, getName(), _TASK_STACK_SIZE, this, _TASK_PRIORITY, &_taskHndl);
 	assert(err == pdPASS);
+
+	_sensors.push_back(new TempreatureSensorTest(pins::TEMPERATURE_SENSOR_PIN));
 }
 
 void SensorService::stop()
@@ -88,7 +92,7 @@ std::vector<TemperatureSensor> SensorService::getSensors() const
 
 void SensorService::_task(void *arg)
 {
-	SensorService *me = reinterpret_cast<SensorService *>(arg);
+	SensorService *me = reinterpret_cast<SensorService*>(arg);
 
 	for (;;)
 	{
@@ -105,27 +109,34 @@ void SensorService::_task(void *arg)
 
 void SensorService::_scanAction(SensorService* me)
 {
-	const auto list = me->_scanRequest();
-
-	FB_DEBUG_TAG_LOG("Scan action find %d devices", list.size());
-
-	me->_updateSensorStates(list);
-
-	me->_dropEvent(SensorEvent::TEMPERATURE_SENSOR_SCANNED, nullptr);
+	//TODO: change to range with filter
+	std::for_each(me->_sensors.begin(), me->_sensors.end(),
+		[me](auto* entry){
+			if(!entry->isInit()){
+				if(entry->init()){
+					//need to drop event, that given sensor is init properly
+					me->_dropEvent(SensorEvent::SENSOR_INITIALIZED, entry);
+				}
+			}
+		}
+	);
 }
 
 void SensorService::_temperatureAction(SensorService* me)
 {
-	me->_temperatureMesureRequest();
-
-	for (auto kv : me->_tempSensorList)
-	{
-		const auto val = me->_tempreatureValueRequest(kv.first);
-
-		FB_DEBUG_TAG_LOG("Temperature action got %f for id %llX", val, kv.first);
-
-		me->_updateTemperatureValue(kv.first, val);
-	}
+	//TODO: change to range with filter
+	std::for_each(me->_sensors.begin(), me->_sensors.end(),
+		[me](auto* entry){
+			if(entry->isInit()){
+				if(entry->update()){
+					//TODO: some how determine was value changed or not
+					me->_dropEvent(SensorEvent::SENSOR_VALUE_CHANGED, entry);
+				}else{
+					me->_dropEvent(SensorEvent::SENSOR_LOST, entry);
+				}
+			}
+		}
+	);
 }
 
 void SensorService::_timer(TimerHandle_t timer)
@@ -188,13 +199,13 @@ void SensorService::_updateSensorStates(const std::vector<TemperatureSensor::Id>
 			if (!sensor.alive)
 			{
 				sensor.alive = true;
-				_dropEvent(SensorEvent::TEMPERATURE_SENSOR_DETECTED, &_tempSensorList[id]);
+				// _dropEvent(SensorEvent::TEMPERATURE_SENSOR_DETECTED, &_tempSensorList[id]);
 			}
 		}
 		else
 		{
 			_tempSensorList[id] = TemperatureSensor{true, 0.0f, id};
-			_dropEvent(SensorEvent::TEMPERATURE_SENSOR_DETECTED, &_tempSensorList[id]);
+			// _dropEvent(SensorEvent::TEMPERATURE_SENSOR_DETECTED, &_tempSensorList[id]);
 		}
 	}
 
@@ -204,7 +215,7 @@ void SensorService::_updateSensorStates(const std::vector<TemperatureSensor::Id>
 	for(auto& sensor : _tempSensorList | std::views::values | std::views::filter(filter)){
 		if(sensor.alive){
 			sensor.alive = false;
-			_dropEvent(SensorEvent::TEMPERATURE_SENSOR_LOST, &_tempSensorList[sensor.id]);
+			_dropEvent(SensorEvent::SENSOR_LOST, &_tempSensorList[sensor.id]);
 		}
 	}
 }
@@ -217,11 +228,20 @@ void SensorService::_updateTemperatureValue(TemperatureSensor::Id id, float valu
 	if (sensor.value != value)
 	{
 		sensor.value = value;
-		_dropEvent(SensorEvent::TEMPERATURE_SENSOR_VALUE_CHANGED, &_tempSensorList[id]);
+		// _dropEvent(SensorEvent::TEMPERATURE_SENSOR_VALUE_CHANGED, &_tempSensorList[id]);
 	}
 }
 
 void SensorService::_dropEvent(SensorEvent e, TemperatureSensor* data)
+{
+	global::getEventManager()->pushEvent(event::Event{
+		event::EventGroup::SENSOR,
+		static_cast<int>(e),
+		data
+	});	
+}
+
+void SensorService::_dropEvent(SensorEvent e, SensorIface* data)
 {
 	global::getEventManager()->pushEvent(event::Event{
 		event::EventGroup::SENSOR,
