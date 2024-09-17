@@ -9,6 +9,9 @@
 #include "fb_sensor_service.hpp"
 #include "fb_state_manager.hpp"
 #include "fb_sensor_storage.hpp"
+#include "fb_switch_service.hpp"
+
+#include "fb_switch_iface.hpp"
 
 
 
@@ -29,5 +32,7 @@ namespace fb
 
 		sensor::SensorService* getSensorService();
 		sensor::SensorStorage* getSensorStorage();
+
+		switches::SwitchService* getSwitchService();
 	}
 }

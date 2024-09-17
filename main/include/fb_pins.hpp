@@ -11,7 +11,10 @@ namespace fb
 {
 	namespace pins
 	{
-		static constexpr int TEMPERATURE_SENSOR_PIN = 10;
+		static constexpr int PIN_SENSOR_TEMPERATURE = 10;
+		static constexpr int PIN_GREEN_LED = 4;
+		// static constexpr int PIN_SENSOR_TEMPERATURE = 10;
+
 
 		class PinManager : public debug::Named, public event::EventListener
 		{

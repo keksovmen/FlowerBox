@@ -7,6 +7,7 @@
 
 #include "fb_main_state_manager.hpp"
 #include "fb_box_service.hpp"
+#include "fb_heat_switch.hpp"
 
 
 
@@ -15,48 +16,68 @@ using namespace global;
 
 
 
-//TODO: change to local values to be staticly defined
-static std::unique_ptr<event::EventManager> _eventManager;
-static std::unique_ptr<pins::PinManager> _pinManager;
-static std::unique_ptr<state::StateManager> _stateManager;
-static std::unique_ptr<box::Box> _flowerBox;
-static std::unique_ptr<sensor::SensorService> _sensorService;
-static std::unique_ptr<sensor::SensorStorage> _sensorStorage;
-static std::unique_ptr<box::BoxService> _boxService;
+//сервисы туть
+static event::EventManager _eventManager;
+static pins::PinManager _pinManager;
+static state::StateManager _stateManager("STATE_MANAGER");
+
+static sensor::SensorService _sensorService;
+static sensor::SensorStorage _sensorStorage;
+
+static switches::SwitchService _swithService;
+
+static box::Box _flowerBox("TEST_NAME", "0.0.1", getUniqueId());
+static box::BoxService* _boxService;
+
+//сенсоры туть
+static sensor::TempreatureSensorTest _sensorTempInside(pins::PIN_SENSOR_TEMPERATURE);
+
+//переключатели туть
+static switches::HeatSwitch _switchHeating(&_sensorTempInside, 28.5, 29, pins::PIN_GREEN_LED);
 
 
 
 void global::init()
 {
-	assert(!_eventManager);
-	_eventManager = std::make_unique<event::EventManager>();
-	_pinManager = std::make_unique<pins::PinManager>();
-	_stateManager = std::make_unique<state::MainStateManager>();
+	_boxService = new box::BoxService(_flowerBox, _sensorStorage);
 
-	_flowerBox = std::make_unique<box::Box>("TEST_NAME", "0.0.1", getUniqueId());
-	// _flowerBox->addProperty({"First prop", "Description", "Int", 0, 0, 0, 100, 30});
-	// _flowerBox->addSensor({"Sensor 1", "Description", "Int", 0, 1, 0, 100});
-	// _flowerBox->addSwitch({"Switch 1", "Description", 1, 2, true, {0}, {0}});
+	_sensorService.addSensor(&_sensorTempInside);
 
-	_sensorService = std::make_unique<sensor::SensorService>();
-	_sensorStorage = std::make_unique<sensor::SensorStorage>();
-	_boxService = std::make_unique<box::BoxService>(*_flowerBox.get(), *_sensorStorage.get());
-	_eventManager->attachListener(_boxService.get());
+	_swithService.addSwitch(&_switchHeating);
+
+	//TODO: put somewhere else, in to BoxService and let it listen for events -> create properties and devices
+	auto* lightSwitchPropertyForse = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_FORSE,
+		[](int val){
+			_switchHeating.setForseFlag(static_cast<bool>(val));
+			return true;
+		}, _switchHeating.isOn()
+	);
+	_flowerBox.addProperty(std::unique_ptr<box::PropertyIface>(lightSwitchPropertyForse));
+
+	auto* lightSwitchWrapper = new box::Switch(
+		box::Tid::SWITCH_LIGHT,
+		{lightSwitchPropertyForse->getId()},
+		{},
+		[](){return _switchHeating.isOn();}
+	);
+	_flowerBox.addSwitch(lightSwitchWrapper);
+
+	_eventManager.attachListener(_boxService);
 }
 
 event::EventManager* global::getEventManager()
 {
-	return _eventManager.get();
+	return &_eventManager;
 }
 
 pins::PinManager* global::getPinManager()
 {
-	return _pinManager.get();
+	return &_pinManager;
 }
 
 state::StateManager* global::getStateManager()
 {
-	return _stateManager.get();
+	return &_stateManager;
 }
 
 id::UniqueId global::getUniqueId()
@@ -69,15 +90,20 @@ id::UniqueId global::getUniqueId()
 
 box::Box* global::getFlowerBox()
 {
-	return _flowerBox.get();
+	return &_flowerBox;
 }
 
 sensor::SensorService* global::getSensorService()
 {
-	return _sensorService.get();
+	return &_sensorService;
 }
 
 sensor::SensorStorage* global::getSensorStorage()
 {
-	return _sensorStorage.get();
+	return &_sensorStorage;
+}
+
+switches::SwitchService* global::getSwitchService()
+{
+	return &_swithService;
 }

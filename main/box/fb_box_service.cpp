@@ -15,7 +15,6 @@ BoxService::BoxService(Box& box, sensor::SensorStorage& storage)
 	: _box(box), _storage(storage)
 {
 	//TODO: put somehere else
-	//TODO: current value take from SensorService
 	//TODO: add property action cb
 	_box.addProperty(std::make_unique<PropertyInt>(
 		Tid::PROPERTY_SENSOR_PERIOD_GLOBAL,
@@ -23,7 +22,7 @@ BoxService::BoxService(Box& box, sensor::SensorStorage& storage)
 			global::getSensorService()->setTimerPeriod(val * 1000);
 			return true;
 		},
-		1));
+		global::getSensorService()->getTimerPeriod() / 1000));
 }
 
 void BoxService::handleEvent(const event::Event& event)

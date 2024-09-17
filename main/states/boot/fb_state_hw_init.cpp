@@ -36,6 +36,7 @@ void StateHwInit::enter()
 {
 	fs::init();
 	global::getSensorService()->start();
+	global::getSwitchService()->start();
 }
 
 void StateHwInit::exit()

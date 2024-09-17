@@ -31,14 +31,22 @@ namespace fb
 		class TempreatureSensorTest : public SensorIface
 		{
 			public:
+				constexpr static float InvalidValue = -255.0f;
+
+
+
 				TempreatureSensorTest(int gpio);
 				~TempreatureSensorTest();
 
 				virtual const char* getName() override;
+				
+				float getValue() const;
 
 			private:
 				OW_t _interface;
 				std::vector<TemperatureSensor> _sensors;
+
+				float _value = InvalidValue;
 
 
 
