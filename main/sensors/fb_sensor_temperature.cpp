@@ -27,6 +27,11 @@ const char* TempreatureSensorTest::getName()
 	return "TempreatureSensor";
 }
 
+float TempreatureSensorTest::getValue() const
+{
+	return _value;
+}
+
 bool TempreatureSensorTest::_doInit()
 {
 	if (!ow_reset(&_interface)){
@@ -58,6 +63,8 @@ bool TempreatureSensorTest::_doUpdate()
 	std::for_each(_sensors.begin(), _sensors.end(),
 		[this](auto& entry){
 			entry.value = _tempreatureValueRequest(entry.id);
+			this->_value = entry.value; 
+			FB_DEBUG_LOG("Temperature = %.2f", this->_value);
 		});
 	
 	//TODO: made some checks if sensor was lost through some of operations

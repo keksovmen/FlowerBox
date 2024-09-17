@@ -15,13 +15,16 @@ namespace fb
 		{
 			SENSOR_DS18B20 = 0,
 
+			SWITCH_LIGHT = 256,
+
 			PROPERTY_SENSOR_PERIOD_GLOBAL = 512,
 			PROPERTY_SENSOR_DESCRIPTION,
+			PROPERTY_SWITCH_FORSE,
 
 			MAX
 		};
 
-		int operatir(const Tid& t);
+		// operator int(const Tid& t);
 		
 
 

@@ -41,7 +41,7 @@ std::string Box::toJson() const
 	cJSON_AddItemToObject(obj, "sensor_ids", cJSON_CreateIntArray(ids.data(), _sensors.size()));
 
 	ids.clear();
-	std::for_each(_switches.begin(), _switches.end(), [&ids](const auto& p){ids.push_back(p.getId());});
+	std::for_each(_switches.begin(), _switches.end(), [&ids](const auto* p){ids.push_back(p->getId());});
 	cJSON_AddItemToObject(obj, "switch_ids", cJSON_CreateIntArray(ids.data(), _switches.size()));
 
 	std::string result(cJSON_PrintUnformatted(obj));
@@ -89,20 +89,20 @@ Sensor& Box::addSensor(const Sensor& val)
 	return _sensors.back();
 }
 
-void Box::addSwitch(const Switch& val)
+void Box::addSwitch(Switch* val)
 {
 	auto iter = std::find_if(_switches.begin(), _switches.end(),
-		[val](const Switch& left){return left.getId() == val.getId();});
+		[val](const Switch* left){return left->getId() == val->getId();});
 	
 	if(iter != _switches.end()){
-		FB_DEBUG_TAG_LOG_W("Failed to add switch with id %d, it is already exist", val.getId());
+		FB_DEBUG_TAG_LOG_W("Failed to add switch with id %d, it is already exist", val->getId());
 		return;
 	}
 
 	_switches.push_back(val);
-	_switches.back().setId(_switches.size() - 1);
+	_switches.back()->setId(_switches.size() - 1);
 
-	FB_DEBUG_TAG_LOG_W("Added a switch with id %d", val.getId());
+	FB_DEBUG_TAG_LOG_W("Added a switch with id %d", val->getId());
 }
 
 PropertyIface* Box::getProperty(int id)
@@ -132,11 +132,11 @@ const Sensor* Box::getSensor(int id) const
 const Switch* Box::getSwitch(int id) const
 {
 	auto iter = std::find_if(_switches.begin(), _switches.end(),
-		[id](const Switch& left){return left.getId() == id;});
+		[id](const auto* left){return left->getId() == id;});
 	
 	if(iter == _switches.end()){
 		return nullptr;
 	}
 
-	return &(*iter);
+	return (*iter);
 }

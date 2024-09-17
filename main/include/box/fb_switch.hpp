@@ -2,10 +2,11 @@
 
 
 
-#include <vector>
+#include <functional>
 #include <string>
+#include <vector>
 
-#include "fb_serializable.hpp"
+#include "fb_object_base.hpp"
 
 
 
@@ -14,32 +15,23 @@ namespace fb
 	namespace box
 	{
 		//TODO: make it child of ObjectHolder
-		class Switch : public Serializable
+		class Switch : public ObjectStaticTid
 		{
 			public:
-				Switch(const std::string& name,
-					const std::string& description,
-					int id,
-					int tid,
-					bool state,
-					std::vector<int> dependentProperties,
-					std::vector<int> dependentSensors
-					);
+				using ReadStateCb = std::function<bool()>;
 
+
+
+				Switch(Tid tid,
+					std::vector<int> dependentProperties,
+					std::vector<int> dependentSensors,
+					const ReadStateCb& stateCb);
 
 				virtual std::string toJson() const override;
-
-				int getId() const;
-
-				void setId(int id);
 			
 			private:
-				std::string _name;
-				std::string _description;
-				int _id;
-				int _tid;
-				bool _state;
-				std::vector<int> _dependentProperties;
+				const ReadStateCb _stateCb;
+
 				std::vector<int> _dependentSensors;
 		};
 	} // namespace box

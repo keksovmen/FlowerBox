@@ -23,8 +23,10 @@ struct _TidHolder
 
 static const std::unordered_map<Tid, _TidHolder> _map = {
 	{Tid::SENSOR_DS18B20, {"DS18B20", "", "float", "-100.0", "100.0"}},
+	{Tid::SWITCH_LIGHT, {"Light switch", "", "bool", "0", "1"}},
 	{Tid::PROPERTY_SENSOR_PERIOD_GLOBAL, {"Sensor mesure period", "measured in SEC", "int", "1", "600"}},
-	{Tid::PROPERTY_SENSOR_DESCRIPTION, {"Changes description", "", "int", "0", "300"}}
+	{Tid::PROPERTY_SENSOR_DESCRIPTION, {"Changes description", "", "int", "0", "300"}},
+	{Tid::PROPERTY_SWITCH_FORSE, {"Forses on state", "", "bool", "0", "1"}}
 };
 
 
