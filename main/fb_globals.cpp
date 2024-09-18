@@ -8,6 +8,7 @@
 #include "fb_main_state_manager.hpp"
 #include "fb_box_service.hpp"
 #include "fb_heat_switch.hpp"
+#include "fb_time_switch.hpp"
 
 
 
@@ -27,6 +28,7 @@ static sensor::SensorStorage _sensorStorage;
 static switches::SwitchService _swithService;
 
 static box::Box _flowerBox("TEST_NAME", "0.0.1", getUniqueId());
+//TODO: made it somehow not call new in constructor, because it leads to crashes
 static box::BoxService* _boxService;
 
 //сенсоры туть
@@ -34,7 +36,7 @@ static sensor::TempreatureSensorTest _sensorTempInside(pins::PIN_SENSOR_TEMPERAT
 
 //переключатели туть
 static switches::HeatSwitch _switchHeating(&_sensorTempInside, 28.5, 29, pins::PIN_GREEN_LED);
-
+static switches::TimeSwitch _switchLight(clock::Time(0, 0, 0), clock::Time(0, 1, 0), pins::PIN_BLUE_LED);
 
 
 void global::init()
@@ -44,6 +46,7 @@ void global::init()
 	_sensorService.addSensor(&_sensorTempInside);
 
 	_swithService.addSwitch(&_switchHeating);
+	_swithService.addSwitch(&_switchLight);
 
 	//TODO: put somewhere else, in to BoxService and let it listen for events -> create properties and devices
 	auto* lightSwitchPropertyForse = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_FORSE,

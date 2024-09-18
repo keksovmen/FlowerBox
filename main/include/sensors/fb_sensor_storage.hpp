@@ -6,7 +6,7 @@
 #include <iterator>
 
 #include "fb_sensor_temperature.hpp"
-#include "fb_time.hpp"
+#include "fb_clock.hpp"
 #include "fb_cycle_buffer.hpp"
 
 

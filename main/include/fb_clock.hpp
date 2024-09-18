@@ -10,6 +10,10 @@ namespace fb
 {
 	namespace clock
 	{
+		using Timestamp = unsigned long long;
+
+
+
 		enum class ClockEventId : int
 		{
 			SYNCED
@@ -29,6 +33,7 @@ namespace fb
 			Time(int hours, int minutes, int seconds);
 
 			bool operator<(const Time& t) const;
+			operator Timestamp() const;
 		};
 
 
@@ -39,5 +44,7 @@ namespace fb
 
 		bool isTimeSynced();
 		Time getCurrentTime();
+
+		Timestamp currentTimeStamp();
 	}
 }

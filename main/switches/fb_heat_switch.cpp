@@ -35,18 +35,9 @@ const char* HeatSwitch::getName()
 	return "HeatSwitch";
 }
 
-void HeatSwitch::setForseFlag(bool state)
-{
-	_isForseOn = state;
-}
-
 bool HeatSwitch::_condition(SwitchIface* me)
 {
 	HeatSwitch* mePtr = reinterpret_cast<HeatSwitch*>(me);
-
-	if(mePtr->_isForseOn){
-		return true;
-	}
 
 	if(mePtr->_colling){
 		//охлождаемся, ждем когда температура упадет ниже минимума, тогда включаемся

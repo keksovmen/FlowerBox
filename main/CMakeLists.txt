@@ -9,7 +9,6 @@ idf_component_register(
 		"fb_update.cpp"
 		"fb_settings.cpp"
 		"fb_wifi.cpp"
-		"fb_time.cpp"
 		"fb_service_iface.cpp"
 		"main.cpp"
 		"box/fb_box.cpp"
@@ -41,6 +40,7 @@ idf_component_register(
 		"states/update/fb_state_update.cpp"
 		"switches/fb_switch_iface.cpp"
 		"switches/fb_heat_switch.cpp"
+		"switches/fb_time_switch.cpp"
 		"switches/fb_switch_service.cpp"
 
     INCLUDE_DIRS

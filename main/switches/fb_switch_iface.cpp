@@ -19,6 +19,17 @@ SwitchIface::~SwitchIface()
 
 void SwitchIface::check()
 {
+	if(_forseFlag){
+		if(!_state){
+			FB_DEBUG_LOG("[%s] forse flag is set -> action", getName());
+
+			_actionCb(this, true);
+			_state = true;		
+		}
+
+		return;
+	}
+
 	if (_conditionCb(this))
 	{
 		if (!_state)
@@ -39,6 +50,11 @@ void SwitchIface::check()
 			_actionCb(this, false);
 		}
 	}
+}
+
+void SwitchIface::setForseFlag(bool state)
+{
+	_forseFlag = state;
 }
 
 bool SwitchIface::isOn() const

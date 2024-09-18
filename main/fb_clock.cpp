@@ -100,6 +100,11 @@ bool Time::operator<(const Time& t) const
 	return false;
 }
 
+Time::operator Timestamp() const
+{
+	return this->hours * 60 * 60 + this->minutes * 60 + this->seconds;
+}
+
 
 
 void clock::initClock()
@@ -142,4 +147,23 @@ void clock::deinitClock()
 	esp_netif_sntp_deinit();
 
 	FB_DEBUG_TAG_EXIT();
+}
+
+Time clock::getCurrentTime()
+{
+	time_t now;
+	time(&now);
+
+	struct tm tmp;
+	localtime_r(&now, &tmp);
+
+	return Time(tmp.tm_hour, tmp.tm_min, tmp.tm_sec);
+}
+
+Timestamp clock::currentTimeStamp()
+{
+	time_t now;
+	time(&now);
+
+	return now;
 }

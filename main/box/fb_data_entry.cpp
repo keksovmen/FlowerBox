@@ -1,7 +1,6 @@
 #include "fb_data_entry.hpp"
 
 #include "cJSON.h"
-#include "fb_time.hpp"
 
 
 
@@ -11,7 +10,7 @@ using namespace box;
 
 
 DataEntry::DataEntry(float value)
-	: _value(value), _timestamp(clock::currentTime())
+	: _value(value), _timestamp(clock::currentTimeStamp())
 {
 
 }

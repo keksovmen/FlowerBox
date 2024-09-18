@@ -32,6 +32,7 @@ namespace fb
 				virtual ~SwitchIface();
 
 				void check();
+				void setForseFlag(bool state);
 
 				bool isOn() const;
 
@@ -41,6 +42,7 @@ namespace fb
 				const ActionCb _actionCb;
 
 				bool _state = false;
+				bool _forseFlag = false;
 		};
 
 	} // namespace switches

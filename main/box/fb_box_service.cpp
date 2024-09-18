@@ -22,7 +22,7 @@ BoxService::BoxService(Box& box, sensor::SensorStorage& storage)
 			global::getSensorService()->setTimerPeriod(val * 1000);
 			return true;
 		},
-		global::getSensorService()->getTimerPeriod() / 1000));
+		3));//TODO: fix it, service has not been stated here so timer is not exists
 }
 
 void BoxService::handleEvent(const event::Event& event)

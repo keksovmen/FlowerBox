@@ -21,15 +21,12 @@ namespace fb
 
 				virtual const char* getName() override;
 
-				void setForseFlag(bool state);
-			
 			private:
 				const sensor::TempreatureSensorTest* _sensor;
 
 				float _lowTemp;
 				float _highTemp;
 				int _gpio;
-				bool _isForseOn = false;
 				bool _colling = false;
 
 
