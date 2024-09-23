@@ -35,8 +35,32 @@ static box::BoxService* _boxService;
 static sensor::TempreatureSensorTest _sensorTempInside(pins::PIN_SENSOR_TEMPERATURE);
 
 //переключатели туть
-static switches::HeatSwitch _switchHeating(&_sensorTempInside, 28.5, 29, pins::PIN_GREEN_LED);
 static switches::TimeSwitch _switchLight(clock::Time(0, 0, 0), clock::Time(0, 1, 0), pins::PIN_BLUE_LED);
+static switches::HeatSwitch _switchHeating(&_sensorTempInside, 28.5, 29, pins::PIN_GREEN_LED);
+static switches::FanSwitch _switchFan(&_sensorTempInside, 30, 31, pins::PIN_COOL_LED);
+
+
+
+static void _registerSwitchProperties(switches::SwitchIface* sw, box::Tid tid)
+{
+	auto* forseProperty = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_FORSE,
+		[sw](int val){
+			sw->setForseFlag(static_cast<bool>(val));
+			return true;
+		}, sw->isOn()
+	);
+	//TODO: possible fuck up?
+	_flowerBox.addProperty(std::unique_ptr<box::PropertyIface>(forseProperty));
+
+	auto* switchBoxWrapper = new box::Switch(
+		tid,
+		{forseProperty->getId()},
+		{},
+		[sw](){return sw->isOn();}
+	);
+	_flowerBox.addSwitch(switchBoxWrapper);
+}
+
 
 
 void global::init()
@@ -45,25 +69,14 @@ void global::init()
 
 	_sensorService.addSensor(&_sensorTempInside);
 
-	_swithService.addSwitch(&_switchHeating);
 	_swithService.addSwitch(&_switchLight);
+	_swithService.addSwitch(&_switchHeating);
+	_swithService.addSwitch(&_switchFan);
 
 	//TODO: put somewhere else, in to BoxService and let it listen for events -> create properties and devices
-	auto* lightSwitchPropertyForse = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_FORSE,
-		[](int val){
-			_switchHeating.setForseFlag(static_cast<bool>(val));
-			return true;
-		}, _switchHeating.isOn()
-	);
-	_flowerBox.addProperty(std::unique_ptr<box::PropertyIface>(lightSwitchPropertyForse));
-
-	auto* lightSwitchWrapper = new box::Switch(
-		box::Tid::SWITCH_LIGHT,
-		{lightSwitchPropertyForse->getId()},
-		{},
-		[](){return _switchHeating.isOn();}
-	);
-	_flowerBox.addSwitch(lightSwitchWrapper);
+	_registerSwitchProperties(&_switchLight, box::Tid::SWITCH_LIGHT);
+	_registerSwitchProperties(&_switchHeating, box::Tid::SWITCH_HEAT);
+	_registerSwitchProperties(&_switchFan, box::Tid::SWITCH_FAN);
 
 	_eventManager.attachListener(_boxService);
 }
