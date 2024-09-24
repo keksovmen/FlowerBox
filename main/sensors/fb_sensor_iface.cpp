@@ -15,7 +15,7 @@ bool SensorIface::init()
 {
 	const bool result = _doInit();
 	FB_DEBUG_LOG("init() = %d", result);
-	_initFlag = true;
+	_initFlag = result;
 
 	return result;
 }

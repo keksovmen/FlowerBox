@@ -12,7 +12,8 @@ using namespace sensor;
 
 
 
-TempreatureSensorTest::TempreatureSensorTest(int gpio)
+TempreatureSensorTest::TempreatureSensorTest(int gpio, int expectedDevices)
+	: _expectedDevices(expectedDevices)
 {
 	assert(ow_init(&_interface, gpio));
 }
@@ -27,9 +28,18 @@ const char* TempreatureSensorTest::getName()
 	return "TempreatureSensor";
 }
 
-float TempreatureSensorTest::getValue() const
+float TempreatureSensorTest::getValue(int index) const
 {
-	return _value;
+	if(index >= _sensors.size()){
+		return InvalidValue;
+	}
+
+	return _sensors[index].value;
+}
+
+int TempreatureSensorTest::getDeviceCount() const
+{
+	return _expectedDevices;
 }
 
 bool TempreatureSensorTest::_doInit()
@@ -38,22 +48,26 @@ bool TempreatureSensorTest::_doInit()
 		return false;
 	}
 
-	_sensors.clear();
-	// std::vector<TemperatureSensor::Id> result;
+	//обнуляем состояния
+	std::for_each(_sensors.begin(), _sensors.end(), [](auto& s){s.alive = false; s.value = InvalidValue});
 	TemperatureSensor::Id sensors[10];
 
 	const int num_devs = ow_romsearch(&_interface, sensors, sizeof(sensors) / sizeof(sensors[0]), OW_SEARCH_ROM);
-	// result.insert(result.begin(), sensors, sensors + num_devs);
 
 	//TODO: change to ranges
 	for(int i = 0; i < num_devs; i++){
-		_sensors.insert(_sensors.end(), {true, -255, sensors[i]});
+		const auto id = sensors[i];
+		auto iter = std::find_if(_sensors.begin(), _sensors.end(),
+			[id](const TemperatureSensor& s){return s.id == id;});
+		
+		if(iter == _sensors.end()){
+			_sensors.insert(_sensors.end(), {true, InvalidValue, sensors[i]});
+		}else{
+			(*iter).alive = true;
+		}
 	}
 
-	//TODO: update current sensor states, change alive flag accordingly
-
-
-	return num_devs > 0;
+	return num_devs == _expectedDevices;
 }
 
 bool TempreatureSensorTest::_doUpdate()
@@ -63,8 +77,7 @@ bool TempreatureSensorTest::_doUpdate()
 	std::for_each(_sensors.begin(), _sensors.end(),
 		[this](auto& entry){
 			entry.value = _tempreatureValueRequest(entry.id);
-			this->_value = entry.value; 
-			FB_DEBUG_LOG("Temperature = %.2f", this->_value);
+			FB_DEBUG_LOG("Temperature[0x%llX] = %.2f", entry.id, entry.value);
 		});
 	
 	//TODO: made some checks if sensor was lost through some of operations

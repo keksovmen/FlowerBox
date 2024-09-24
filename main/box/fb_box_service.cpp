@@ -30,17 +30,22 @@ void BoxService::handleEvent(const event::Event& event)
 	if(event.groupId == event::EventGroup::SENSOR){
 		if(event.eventId == sensor::SensorEvent::SENSOR_INITIALIZED){
 			//добавить устройство в Box
-			auto& sen = _box.addSensor(Sensor{Tid::SENSOR_DS18B20});
+			const sensor::TempreatureSensorTest* sensors = reinterpret_cast<sensor::TempreatureSensorTest*>(event.data);
+			for(int i = 0; i < sensors->getDeviceCount(); i++)
+			{
+				auto& sen = _box.addSensor(Sensor{Tid::SENSOR_DS18B20});
+				
+				//добвить свойства: период опроса, название датчика
+				const auto* prop = _box.addProperty(std::make_unique<PropertyString>(
+					"Temp. sensor " + std::to_string(sen.getId()) + " description",
+					"Defines sensor description with id " + std::to_string(sen.getId()),
+					Tid::PROPERTY_SENSOR_DESCRIPTION,
+					[](std::string val){return true;},
+					sen.getDescription()));
+				
+				sen.addPropertyDependency(prop->getId());
+			}
 
-			//добвить свойства: период опроса, название датчика
-			const auto* prop = _box.addProperty(std::make_unique<PropertyString>(
-				"Temp. sensor " + std::to_string(sen.getId()) + " description",
-				"Defines sensor description with id " + std::to_string(sen.getId()),
-				Tid::PROPERTY_SENSOR_DESCRIPTION,
-				[](std::string val){return true;},
-				sen.getDescription()));
-			
-			sen.addPropertyDependency(prop->getId());
 
 		}else if(event.eventId == sensor::SensorEvent::SENSOR_VALUE_CHANGED){
 			//TODO: fix it, now it is wrong pointer type

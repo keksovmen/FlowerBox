@@ -32,12 +32,12 @@ static box::Box _flowerBox("TEST_NAME", "0.0.1", getUniqueId());
 static box::BoxService* _boxService;
 
 //сенсоры туть
-static sensor::TempreatureSensorTest _sensorTempInside(pins::PIN_SENSOR_TEMPERATURE);
+static sensor::TempreatureSensorTest _sensorTemperature(pins::PIN_SENSOR_TEMPERATURE, 2);
 
 //переключатели туть
 static switches::TimeSwitch _switchLight(clock::Time(0, 0, 0), clock::Time(0, 1, 0), pins::PIN_BLUE_LED);
-static switches::HeatSwitch _switchHeating(&_sensorTempInside, 28.5, 29, pins::PIN_GREEN_LED);
-static switches::FanSwitch _switchFan(&_sensorTempInside, 30, 31, pins::PIN_COOL_LED);
+static switches::HeatSwitch _switchHeating(&_sensorTemperature, 0, 28.5, 29, pins::PIN_GREEN_LED);
+static switches::FanSwitch _switchFan(&_sensorTemperature, 1, 30, 31, pins::PIN_COOL_LED);
 
 
 
@@ -67,7 +67,7 @@ void global::init()
 {
 	_boxService = new box::BoxService(_flowerBox, _sensorStorage);
 
-	_sensorService.addSensor(&_sensorTempInside);
+	_sensorService.addSensor(&_sensorTemperature);
 
 	_swithService.addSwitch(&_switchLight);
 	_swithService.addSwitch(&_switchHeating);
@@ -77,6 +77,16 @@ void global::init()
 	_registerSwitchProperties(&_switchLight, box::Tid::SWITCH_LIGHT);
 	_registerSwitchProperties(&_switchHeating, box::Tid::SWITCH_HEAT);
 	_registerSwitchProperties(&_switchFan, box::Tid::SWITCH_FAN);
+
+	auto* swapProperty = new box::PropertyInt(box::Tid::PROPERTY_SWAP_TEMP_SENSOR_INDEX,
+		[](int val){
+			_switchHeating.setSensorIndex(_switchHeating.getSensorIndex() == 0 ? 1 : 0);	
+			_switchFan.setSensorIndex(_switchFan.getSensorIndex() == 0 ? 1 : 0);	
+			return true;
+		},
+		0);
+	_flowerBox.addProperty(std::unique_ptr<box::PropertyIface>(swapProperty));
+	
 
 	_eventManager.attachListener(_boxService);
 }

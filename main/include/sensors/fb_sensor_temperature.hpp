@@ -35,19 +35,18 @@ namespace fb
 
 
 
-				TempreatureSensorTest(int gpio);
+				TempreatureSensorTest(int gpio, int expectedDevices);
 				~TempreatureSensorTest();
 
 				virtual const char* getName() override;
 				
-				float getValue() const;
+				float getValue(int index) const;
+				int getDeviceCount() const;
 
 			private:
 				OW_t _interface;
+				int _expectedDevices;
 				std::vector<TemperatureSensor> _sensors;
-
-				float _value = InvalidValue;
-
 
 
 				virtual bool _doInit() override;

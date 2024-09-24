@@ -15,17 +15,35 @@ namespace fb
 		class HeatSwitch : public SwitchIface
 		{
 			public:
-				HeatSwitch(sensor::TempreatureSensorTest* sensor,
+				HeatSwitch(sensor::TempreatureSensorTest* sensor, int sensorIndex,
 					float lowTemp, float highTemp, int gpio);
-				~HeatSwitch();
+				virtual ~HeatSwitch();
 
 				virtual const char* getName() override;
 
+				void setSensorIndex(int index);
+				int getSensorIndex() const;
+
+				float getLowTemp() const;
+				float getHighTemp() const;
+				int getGpio() const;
+				const sensor::TempreatureSensorTest* getSensor() const;
+
+
+			protected:
+				virtual bool _checkTemperature();
+
+				void _setColling(bool state);
+				bool _isColling() const;
+				float _getSensorValue() const;
+
 			private:
 				const sensor::TempreatureSensorTest* _sensor;
+				int _sensorIndex;
 
 				float _lowTemp;
 				float _highTemp;
+
 				int _gpio;
 				bool _colling = false;
 
@@ -35,5 +53,19 @@ namespace fb
 				static void _action(SwitchIface* me, bool value);
 		};
 
+
+
+		class FanSwitch : public HeatSwitch
+		{
+			public:
+				FanSwitch(sensor::TempreatureSensorTest* sensor, int sensorIndex,
+						float lowTemp, float highTemp, int gpio);
+
+				virtual const char* getName() override;
+			
+			protected:
+				virtual bool _checkTemperature();
+
+		};
 	} // namespace switches
 } // namespace fb
