@@ -33,25 +33,26 @@ void SensorService::addSensor(SensorIface* entry)
 
 std::vector<SensorIface*> SensorService::getSensors() const
 {
-	// auto view = _sensors | std::views::values | std::views::as_rvalue;
-
-	// return {std::ranges::begin(view), std::ranges::end(view)};
 	return _sensors;
 }
 
 void SensorService::_onPull()
 {
-	for(auto* s : _sensors){
-		if(s->isInit()){
-			if(s->update()){
-				_dropEvent(SensorEvent::SENSOR_VALUE_CHANGED, s);
-			}else{
-				_dropEvent(SensorEvent::SENSOR_LOST, s);
-			}
+	//инициализируем тех кто не еще не инициализирован
+	auto notInitFilter = [](auto* val){return val->isInit() == false;};
+	for(auto* s : _sensors | std::views::filter(notInitFilter)){
+		if(s->init()){
+			_dropEvent(SensorEvent::SENSOR_INITIALIZED, s);
+		}
+	}
+
+	//обновляем данные всех, кто инициализирован
+	auto initFilter = [&notInitFilter](auto* val){return !notInitFilter(val);};
+	for(auto* s : _sensors | std::views::filter(initFilter)){
+		if(s->update()){
+			_dropEvent(SensorEvent::SENSOR_VALUE_CHANGED, s);
 		}else{
-			if(s->init()){
-				_dropEvent(SensorEvent::SENSOR_INITIALIZED, s);
-			}
+			_dropEvent(SensorEvent::SENSOR_LOST, s);
 		}
 	}
 }

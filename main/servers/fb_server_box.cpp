@@ -91,7 +91,7 @@ static esp_err_t _property_get_cb(httpd_req_t* r)
 
 static esp_err_t _property_set_cb(httpd_req_t* r)
 {
-FB_DEBUG_TAG_ENTER();
+	FB_DEBUG_TAG_ENTER();
 
 	esp_err_t err = ESP_OK;
 
@@ -217,7 +217,7 @@ static esp_err_t _sensor_data_cb(httpd_req_t* r)
 		return err; 
 	}
 
-	const auto end = global::getSensorStorage()->getSensorValuesEnd();
+	const auto end = global::getSensorStorage()->getSensorValuesEnd(id);
 
 	err |= httpd_resp_sendstr_chunk(r, "[");
 	bool comaFlag = false;

@@ -48,11 +48,14 @@ void BoxService::handleEvent(const event::Event& event)
 
 
 		}else if(event.eventId == sensor::SensorEvent::SENSOR_VALUE_CHANGED){
-			//TODO: fix it, now it is wrong pointer type
-			// auto* sensor = reinterpret_cast<sensor::TemperatureSensor*>(event.data);
-			// _storage.addSensorValue(sensor->id, sensor->value);
+			//TODO: move it somehwere else maybe?
+			auto* sensor = reinterpret_cast<sensor::TempreatureSensorTest*>(event.data);
+			for(int i = 0; i < sensor->getDeviceCount(); i++)
+			{
+				_storage.addSensorValue(i, sensor->getValue(i));
+			}
 
-			//for check working purposes only
+			// for check working purposes only
 			// {
 			// 	auto iter = _storage.getSensorValues(sensor->id, 0);
 			// 	if(iter){

@@ -28,6 +28,8 @@ namespace fb
 
 
 
+		//TODO: made it accept OW_t interface as bus, and index of sensor on that bus, to have
+		//2 instances for ease of BOX api providing
 		class TempreatureSensorTest : public SensorIface
 		{
 			public:
@@ -42,6 +44,7 @@ namespace fb
 				
 				float getValue(int index) const;
 				int getDeviceCount() const;
+				const TemperatureSensor& getSensor(int index) const;
 
 			private:
 				OW_t _interface;

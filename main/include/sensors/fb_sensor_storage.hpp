@@ -45,6 +45,8 @@ namespace fb
 				 * @param id датчика
 				 * @param value значение
 				 */
+
+				//TODO: change id to arbitrary index
 				
 				void addSensorValue(TemperatureSensor::Id id, float value);
 				void addSensorState(TemperatureSensor::Id id, bool state);
@@ -65,14 +67,14 @@ namespace fb
 				 * @return Iterator 
 				 */
 
-				Iterator getSensorValuesEnd() const;
+				Iterator getSensorValuesEnd(TemperatureSensor::Id id) const;
 			
 			private:
 				using Buffer = util::CycleBuffer<SensorStorageEntry, BufferSize>;
 
 
-
-				Buffer _sensorData;
+				//TODO: make universal
+				std::array<Buffer, 2> _sensorData;
 
 
 

@@ -42,6 +42,13 @@ int TempreatureSensorTest::getDeviceCount() const
 	return _expectedDevices;
 }
 
+const TemperatureSensor& TempreatureSensorTest::getSensor(int index) const
+{
+	assert(index >= 0 && index < _sensors.size());
+	
+	return _sensors[index];
+}
+
 bool TempreatureSensorTest::_doInit()
 {
 	if (!ow_reset(&_interface)){
@@ -49,7 +56,7 @@ bool TempreatureSensorTest::_doInit()
 	}
 
 	//обнуляем состояния
-	std::for_each(_sensors.begin(), _sensors.end(), [](auto& s){s.alive = false; s.value = InvalidValue});
+	std::for_each(_sensors.begin(), _sensors.end(), [](auto& s){s.alive = false; s.value = InvalidValue;});
 	TemperatureSensor::Id sensors[10];
 
 	const int num_devs = ow_romsearch(&_interface, sensors, sizeof(sensors) / sizeof(sensors[0]), OW_SEARCH_ROM);

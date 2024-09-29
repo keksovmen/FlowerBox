@@ -125,6 +125,18 @@ namespace fb
 					return Iterator(_data, _writeIndex);
 				}
 
+				Iterator last() const
+				{
+					if(_length <= 0){
+						return Iterator(_data, Iterator::InvalidIndex);
+					}
+
+					//откатываем на еденицу, если мы не на 0 индексе, в противном случаи берем последний индекс
+					const int index = _writeIndex == 0 ? (_data.size() - 1) : (_writeIndex - 1);
+
+					return Iterator(_data, index);
+				}
+
 				// const T& getValue(int index);
 
 				//количество элементов которое можно считать
