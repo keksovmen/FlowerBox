@@ -41,16 +41,15 @@ void StateWifiInit::handleEvent(const event::Event& event)
 
 void StateWifiInit::enter()
 {
-	assert(wifi::init(wifi::WifiConfig{
-		settings::getApSsid(),
-		settings::getApPass(),
-		settings::getStaSsid(),
-		settings::getStaPass(),
-		settings::getWifiMode() == settings::WifiMode::STA ?
-			wifi::WifiState::STA : wifi::WifiState::AP}));
-	//TODO: add logic for wifi mode AP or STA
-	// wifi::start(CONFIG_EXAMPLE_WIFI_SSID, CONFIG_EXAMPLE_WIFI_PASSWORD);
-	assert(wifi::start());
+	assert(wifi::start(
+		wifi::WifiConfig{
+			settings::getApSsid(),
+			settings::getApPass(),
+			settings::getStaSsid(),
+			settings::getStaPass(),
+			settings::getWifiMode() == settings::WifiMode::STA ?
+				wifi::WifiState::STA : wifi::WifiState::AP}
+	));
 }
 
 void StateWifiInit::exit()

@@ -20,11 +20,13 @@ std::string settings::getApPass()
 std::string settings::getStaSsid()
 {
 	return CONFIG_EXAMPLE_WIFI_SSID;
+	// return "TEST_SSID";
 }
 
 std::string settings::getStaPass()
 {
 	return CONFIG_EXAMPLE_WIFI_PASSWORD;
+	// return "12345678";
 }
 
 WifiMode settings::getWifiMode()
@@ -36,3 +38,9 @@ std::string settings::getSntpServerUrl()
 {
 	return CONFIG_SNTP_TIME_SERVER;
 }
+
+bool settings::isWifiProvided()
+{
+	return false;
+}
+

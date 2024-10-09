@@ -36,6 +36,8 @@ namespace fb
 
 		std::string getSntpServerUrl();
 
+		bool isWifiProvided();
+
 
 		//setters
 		void setApSsid(const std::string& val);

@@ -59,12 +59,11 @@ namespace fb
 		 * Init wifi state
 		 * Does not start it
 		 * 
-		 * @param cfg 
 		 * @return true 
-		 * @return false pass or ssid is invalid (less than 8 bytes)
+		 * @return false esp errors
 		 */
 
-		bool init(const WifiConfig& cfg);
+		bool init();
 
 		/**
 		 * @brief if state is:
@@ -72,11 +71,12 @@ namespace fb
 		 * 		STA - will connect to AP,
 		 * 		SCAN - will start network scan
 		 * 
+		 * @param cfg 
 		 * @return true
 		 * @return false failed in any way possible
 		 */
 
-		bool start();
+		bool start(const WifiConfig& cfg);
 
 		/**
 		 * @brief if state is:

@@ -4,6 +4,9 @@
 #include "fb_globals.hpp"
 #include "fb_sensor_event.hpp"
 #include "fb_state_wifi_init.hpp"
+#include "fb_state_provision.hpp"
+#include "fb_settings.hpp"
+#include "fb_wifi.hpp"
 
 
 
@@ -27,7 +30,11 @@ void StateHwInit::handleEvent(const event::Event& event)
 {
 	if(event.groupId == event::EventGroup::SENSOR){
 		if(event.eventId == sensor::SensorEvent::SENSOR_INITIALIZED){
-			getContext().transition(std::make_unique<StateWifiInit>(getContext()));
+			if(settings::isWifiProvided()){
+				getContext().transition(std::make_unique<StateWifiInit>(getContext()));
+			}else{
+				getContext().transition(std::make_unique<StateProvision>(getContext()));
+			}
 		}
 	}
 }
@@ -37,6 +44,9 @@ void StateHwInit::enter()
 	fs::init();
 	global::getSensorService()->start();
 	global::getSwitchService()->start();
+	assert(wifi::init());
+
+	getContext().transition(std::make_unique<StateProvision>(getContext()));
 }
 
 void StateHwInit::exit()

@@ -103,6 +103,7 @@
 		"format": "cpp",
 		"span": "cpp",
 		"esp_efuse_table.h": "c",
-		"ranges": "cpp"
+		"ranges": "cpp",
+		"manager.h": "c"
 	}
 }

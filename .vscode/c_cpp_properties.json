@@ -12,7 +12,7 @@
                 "UNICODE",
                 "_UNICODE"
             ],
-            "cStandard": "c17",
+            "cStandard": "c23",
             "cppStandard": "c++23",
             "compilerArgs": [],
             "compilerPath": "C:\\Users\\Roma\\.espressif\\tools\\riscv32-esp-elf\\esp-13.2.0_20230928\\riscv32-esp-elf\\bin\\riscv32-esp-elf-c++.exe"

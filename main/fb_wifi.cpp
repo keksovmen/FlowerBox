@@ -27,7 +27,7 @@ static const char* TAG = "fb_wifi";
 static esp_netif_t *_netif = NULL;
 
 static int _reconnectAttempts = 0;
-static WifiConfig _cfg;
+static WifiConfig cfg;
 
 
 
@@ -142,42 +142,12 @@ static void _init()
 	wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
 	ESP_ERROR_CHECK(esp_wifi_init(&cfg));
 	ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_RAM));
-
-	if(_cfg.state == WifiState::STA){
-		ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
-		_netif = esp_netif_create_default_wifi_sta();
-
-		ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, WIFI_EVENT_STA_CONNECTED, &_on_wifi_connect, NULL));
-		ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, WIFI_EVENT_STA_DISCONNECTED, &_on_wifi_sta_disconnect, NULL));
-		ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &_on_sta_got_ip, NULL));
-
-	}else if(_cfg.state == WifiState::AP){
-		ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_AP));
-		_netif = esp_netif_create_default_wifi_ap();
-
-		ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, WIFI_EVENT_AP_STADISCONNECTED, &_on_wifi_ap_disconnect, NULL));
-		ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_AP_STAIPASSIGNED, &_on_ap_gave_ip, NULL));
-
-	}else{
-		assert(0);
-	}
-
-	ESP_ERROR_CHECK(esp_wifi_start());
 }
 
 
 
-bool wifi::operator==(int val, WifiEventId id)
+static bool _checkWifiConfig(const WifiConfig& cfg)
 {
-	return val == static_cast<int>(id);
-}
-
-
-
-bool wifi::init(const WifiConfig& cfg)
-{
-	FB_DEBUG_TAG_ENTER();
-
 	if(cfg.apSsid.length() < 8){
 		FB_DEBUG_TAG_LOG_E("Invalid AP ssid length must be >= 8");
 		return false;
@@ -203,44 +173,86 @@ bool wifi::init(const WifiConfig& cfg)
 		return false;
 	}
 
-	_cfg = cfg;
+	return true;
+}
+
+static void _launchWifi(const WifiConfig& cfg)
+{
+	if(cfg.state == WifiState::STA){
+		ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
+		_netif = esp_netif_create_default_wifi_sta();
+
+		ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, WIFI_EVENT_STA_CONNECTED, &_on_wifi_connect, NULL));
+		ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, WIFI_EVENT_STA_DISCONNECTED, &_on_wifi_sta_disconnect, NULL));
+		ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &_on_sta_got_ip, NULL));
+
+	}else if(cfg.state == WifiState::AP){
+		ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_AP));
+		_netif = esp_netif_create_default_wifi_ap();
+
+		ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, WIFI_EVENT_AP_STADISCONNECTED, &_on_wifi_ap_disconnect, NULL));
+		ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_AP_STAIPASSIGNED, &_on_ap_gave_ip, NULL));
+
+	}else{
+		assert(0);
+	}
+
+	ESP_ERROR_CHECK(esp_wifi_start());
+}
+
+
+bool wifi::operator==(int val, WifiEventId id)
+{
+	return val == static_cast<int>(id);
+}
+
+
+
+bool wifi::init()
+{
+	FB_DEBUG_TAG_ENTER();
 
 	static std::once_flag flag;
 	std::call_once(flag, &_init);
-
 
 	FB_DEBUG_TAG_EXIT();
 
 	return true;
 }
 
-bool wifi::start()
+bool wifi::start(const WifiConfig& cfg)
 {
 	FB_DEBUG_TAG_ENTER();
 	esp_err_t result = ESP_OK;
 
+	if(!_checkWifiConfig(cfg)){
+		return false;
+	}
+
+	_launchWifi(cfg);
+
 	//TODO: use state pattern
-	if(_cfg.state == WifiState::STA){
+	if(cfg.state == WifiState::STA){
 		//TODO: check current state of wifi, maybe need only to reconnect not full initialization
 		_reconnectAttempts = 0;
 
 		wifi_config_t wifi_config;
 		memset(&wifi_config, 0, sizeof(wifi_config));
 
-		memcpy(wifi_config.sta.ssid, _cfg.staSsid.c_str(), _cfg.staSsid.length() + 1);
-		memcpy(wifi_config.sta.password, _cfg.staPass.c_str(), _cfg.staPass.length() + 1);
+		memcpy(wifi_config.sta.ssid, cfg.staSsid.c_str(), cfg.staSsid.length() + 1);
+		memcpy(wifi_config.sta.password, cfg.staPass.c_str(), cfg.staPass.length() + 1);
 
 		ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config));
 		result = esp_wifi_connect();
 
-	}else if(_cfg.state == WifiState::AP){
+	}else if(cfg.state == WifiState::AP){
 		wifi_config_t wifi_config;
 		memset(&wifi_config, 0, sizeof(wifi_config));
 
-		memcpy(wifi_config.ap.ssid, _cfg.apSsid.c_str(), _cfg.apSsid.length() + 1);
-		memcpy(wifi_config.ap.password, _cfg.apPass.c_str(), _cfg.apPass.length() + 1);
+		memcpy(wifi_config.ap.ssid, cfg.apSsid.c_str(), cfg.apSsid.length() + 1);
+		memcpy(wifi_config.ap.password, cfg.apPass.c_str(), cfg.apPass.length() + 1);
 
-		wifi_config.ap.authmode = _cfg.apPass.empty() ? WIFI_AUTH_OPEN : WIFI_AUTH_WPA2_PSK;
+		wifi_config.ap.authmode = cfg.apPass.empty() ? WIFI_AUTH_OPEN : WIFI_AUTH_WPA2_PSK;
 		wifi_config.ap.max_connection = 1;
 
 		ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_AP, &wifi_config));

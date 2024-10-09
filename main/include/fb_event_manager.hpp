@@ -27,6 +27,7 @@ namespace fb
 			CLOCK,
 			UPDATE,
 			SENSOR,
+			PROVISION,
 		};
 
 

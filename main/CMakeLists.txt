@@ -32,6 +32,7 @@ idf_component_register(
 		"states/fb_main_state_manager.cpp"
 		"states/fb_state_sensor_init.cpp"
 		"states/boot/fb_state_booted.cpp"
+		"states/boot/fb_state_provision.cpp"
 		"states/boot/fb_state_hw_init.cpp"
 		"states/boot/fb_state_wifi_init.cpp"
 		"states/boot/fb_state_time_init.cpp"

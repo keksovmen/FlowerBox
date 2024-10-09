@@ -14,6 +14,7 @@
 #define FB_DEBUG_TAG_LOG_W(format, ...){ESP_LOGW(TAG, format, ##__VA_ARGS__);}
 #define FB_DEBUG_TAG_LOG_E(format, ...){ESP_LOGE(TAG, format, ##__VA_ARGS__);}
 #define FB_DEBUG_LOG(format, ...){ESP_LOGI(getName(), format, ##__VA_ARGS__);}
+#define FB_DEBUG_PTR_LOG(ptr, format, ...){ESP_LOGI((ptr)->getName(), format, ##__VA_ARGS__);}
 
 
 
