@@ -10,6 +10,7 @@ idf_component_register(
 		"fb_settings.cpp"
 		"fb_wifi.cpp"
 		"fb_service_iface.cpp"
+		"fb_provision.cpp"
 		"main.cpp"
 		"box/fb_box.cpp"
 		"box/fb_property.cpp"
