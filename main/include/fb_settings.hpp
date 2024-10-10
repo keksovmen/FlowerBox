@@ -20,7 +20,21 @@ namespace fb
 		enum class WifiMode : int
 		{
 			AP,
-			STA
+			STA,
+			MAX
+		};
+
+
+
+		struct NetworkConfig
+		{
+			WifiMode mode;
+			
+			std::string apSsid;
+			std::string apPass;
+
+			std::string staSsid;
+			std::string staPass;
 		};
 
 
@@ -49,6 +63,8 @@ namespace fb
 		void setWifiMode(WifiMode val);
 
 		void setSntpPass(const std::string& val);
+
+		void setWifiProvisioned();
 	} // namespace settings
 	
 }

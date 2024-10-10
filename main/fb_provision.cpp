@@ -1,7 +1,9 @@
 #include "fb_provision.hpp"
 
+#include <utility>
 #include <cstring>
 
+#include <cJSON.h>
 #include <wifi_provisioning/manager.h>
 #include <wifi_provisioning/scheme_softap.h>
 #include "esp_event.h"
@@ -15,7 +17,9 @@
 
 
 
-#define _ENDPOINT_WIFI_MODE "wifi_mode"
+#define _ENDPOINT_WIFI_MODE "box_settings"
+
+#define _JSON_KEY_WIFI_MODE "wifi_mode"
 
 
 
@@ -37,7 +41,29 @@ static void _eventHandler(void* arg, esp_event_base_t eventBase, int32_t eventId
 {
 	FB_DEBUG_TAG_LOG("Provision event %ld", eventId);
 
-	if(eventId == static_cast<int32_t>(WIFI_PROV_CRED_SUCCESS)){
+	if(eventId == static_cast<int32_t>(WIFI_PROV_CRED_RECV))
+	{
+		wifi_sta_config_t* cfg = reinterpret_cast<wifi_sta_config_t*>(eventData);
+
+		if(settings::getWifiMode() == settings::WifiMode::AP)
+		{
+			settings::setApSsid(reinterpret_cast<char*>(cfg->ssid));
+			settings::setApPass(reinterpret_cast<char*>(cfg->password));
+		}else
+		{
+			settings::setStaSsid(reinterpret_cast<char*>(cfg->ssid));
+			settings::setStaPass(reinterpret_cast<char*>(cfg->password));
+		}
+	}
+	else if(eventId == static_cast<int32_t>(WIFI_PROV_CRED_FAIL))
+	{
+		if(settings::getWifiMode() == settings::WifiMode::AP){
+			//так и должно быть, можно закрывать наш менеджер
+			global::getEventManager()->pushEvent({event::EventGroup::PROVISION, static_cast<int>(ProvisionEventId::SUCCESS), nullptr});	
+		}
+	}
+	else if(eventId == static_cast<int32_t>(WIFI_PROV_CRED_SUCCESS))
+	{
 		global::getEventManager()->pushEvent({event::EventGroup::PROVISION, static_cast<int>(ProvisionEventId::SUCCESS), nullptr});
 	}
 }
@@ -45,14 +71,44 @@ static void _eventHandler(void* arg, esp_event_base_t eventBase, int32_t eventId
 static esp_err_t _customProvisionHandler(uint32_t sessionId, const uint8_t* inBuf, ssize_t inLen,
 			uint8_t** outBuf, ssize_t* outLen, void* arg)
 {
-	if(inBuf){
-		FB_DEBUG_TAG_LOG("%.*s", inLen, reinterpret_cast<const char*>(inBuf));
+	FB_DEBUG_TAG_ENTER();
+
+	if(!inBuf){
+		return ESP_FAIL;
 	}
 
-	*outBuf = reinterpret_cast<uint8_t*>(strdup("some response"));
-	*outLen = strlen(reinterpret_cast<char*>(*outBuf)) + 1;
+	FB_DEBUG_TAG_LOG("%.*s", inLen, reinterpret_cast<const char*>(inBuf));
+	
+	cJSON* root = cJSON_ParseWithLength(reinterpret_cast<const char*>(inBuf), inLen);
+	if(root == NULL){
+		FB_DEBUG_TAG_LOG_E("Invalid JSON");
+		
+		return ESP_FAIL;
+	}
 
-	//TODO: set wifi mode
+	/*
+		{
+			"wifi_mode" : int,	//0 - AP, 1 - STA
+		}
+	*/
+
+	cJSON* item = cJSON_GetObjectItem(root, _JSON_KEY_WIFI_MODE);
+	if(item == NULL){
+		FB_DEBUG_TAG_LOG_W("NOT FOUND JSON KEY: " _JSON_KEY_WIFI_MODE);
+	}else{
+		int wifiMode = static_cast<int>(cJSON_GetNumberValue(item));
+		FB_DEBUG_TAG_LOG("WIFI mode %d", wifiMode);
+
+		if(wifiMode < 0 || wifiMode >= std::to_underlying(settings::WifiMode::MAX)){
+			FB_DEBUG_TAG_LOG_E("WIFI mode ILLEGAL");
+		}else{
+			settings::setWifiMode(static_cast<settings::WifiMode>(wifiMode));
+		}
+	}
+
+	cJSON_Delete(root);
+
+	FB_DEBUG_TAG_EXIT();
 
 	return ESP_OK;
 }
@@ -68,7 +124,7 @@ static void _initWifi()
 	assert(_apNetif);
 }
 
-static void _initProvision()
+static void _initManager()
 {
 	ESP_ERROR_CHECK(esp_event_handler_register(WIFI_PROV_EVENT, ESP_EVENT_ANY_ID, &_eventHandler, nullptr));
 
@@ -96,7 +152,7 @@ static void _deinitWifi()
 	esp_netif_destroy_default_wifi(_apNetif);
 }
 
-static void _deinitProvision()
+static void _deinitManager()
 {
 	esp_event_handler_unregister(WIFI_PROV_EVENT, ESP_EVENT_ANY_ID, &_eventHandler);
 	wifi_prov_mgr_deinit();
@@ -109,7 +165,7 @@ void provision::init()
 	FB_DEBUG_TAG_ENTER();
 
 	_initWifi();
-	_initProvision();
+	_initManager();
 
 	FB_DEBUG_TAG_EXIT();
 }
@@ -118,7 +174,7 @@ void provision::deinit()
 {
 	FB_DEBUG_TAG_ENTER();
 
-	_deinitProvision();
+	_deinitManager();
 	_deinitWifi();
 
 	FB_DEBUG_TAG_EXIT();
