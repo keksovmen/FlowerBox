@@ -2,6 +2,8 @@
 
 
 
+#include <string>
+
 #include "fb_box.hpp"
 #include "fb_event_manager.hpp"
 #include "fb_id.hpp"
@@ -34,5 +36,7 @@ namespace fb
 		sensor::SensorStorage* getSensorStorage();
 
 		switches::SwitchService* getSwitchService();
+
+		std::string getDeviceName();
 	}
 }

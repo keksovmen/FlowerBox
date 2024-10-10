@@ -15,7 +15,6 @@
 
 
 
-#define _DEVICE_PREFFIX "flowerbox_"
 #define _ENDPOINT_WIFI_MODE "wifi_mode"
 
 
@@ -83,8 +82,7 @@ static void _initProvision()
 
     wifi_prov_mgr_endpoint_create(_ENDPOINT_WIFI_MODE);
 
-	std::string deviceName = _DEVICE_PREFFIX + std::to_string(global::getUniqueId());
-	ESP_ERROR_CHECK(wifi_prov_mgr_start_provisioning(WIFI_PROV_SECURITY_0, nullptr, deviceName.c_str(), nullptr));
+	ESP_ERROR_CHECK(wifi_prov_mgr_start_provisioning(WIFI_PROV_SECURITY_0, nullptr, global::getDeviceName().c_str(), nullptr));
 
     wifi_prov_mgr_endpoint_register(_ENDPOINT_WIFI_MODE, &_customProvisionHandler, nullptr);
 }

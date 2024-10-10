@@ -12,6 +12,10 @@
 
 
 
+#define _DEVICE_NAME "FlowerBox"
+
+
+
 using namespace fb;
 using namespace global;
 
@@ -27,7 +31,7 @@ static sensor::SensorStorage _sensorStorage;
 
 static switches::SwitchService _swithService;
 
-static box::Box _flowerBox("TEST_NAME", "0.0.1", getUniqueId());
+static box::Box _flowerBox(_DEVICE_NAME, "0.0.1", getUniqueId());
 //TODO: made it somehow not call new in constructor, because it leads to crashes
 static box::BoxService* _boxService;
 
@@ -132,4 +136,9 @@ sensor::SensorStorage* global::getSensorStorage()
 switches::SwitchService* global::getSwitchService()
 {
 	return &_swithService;
+}
+
+std::string global::getDeviceName()
+{
+	return _DEVICE_NAME "_" + std::to_string(global::getUniqueId());
 }

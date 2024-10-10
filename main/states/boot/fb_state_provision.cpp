@@ -5,10 +5,6 @@
 
 
 
-#define _ENDPOINT_WIFI_MODE "wifi_mode"
-
-
-
 using namespace fb;
 using namespace state;
 
