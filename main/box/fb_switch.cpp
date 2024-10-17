@@ -42,3 +42,8 @@ std::string Switch::toJson() const
 
 	return result;
 }
+
+void Switch::addSensorDependency(int sensorId)
+{
+	_dependentSensors.push_back(sensorId);
+}

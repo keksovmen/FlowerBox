@@ -28,6 +28,8 @@ namespace fb
 					const ReadStateCb& stateCb);
 
 				virtual std::string toJson() const override;
+
+				void addSensorDependency(int sensorId);
 			
 			private:
 				const ReadStateCb _stateCb;

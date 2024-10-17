@@ -37,7 +37,7 @@ std::string Box::toJson() const
 	cJSON_AddItemToObject(obj, "properties_ids", cJSON_CreateIntArray(ids.data(), _properties.size()));
 
 	ids.clear();
-	std::for_each(_sensors.begin(), _sensors.end(), [&ids](const auto& p){ids.push_back(p.getId());});
+	std::for_each(_sensors.begin(), _sensors.end(), [&ids](const auto& p){ids.push_back(p->getId());});
 	cJSON_AddItemToObject(obj, "sensor_ids", cJSON_CreateIntArray(ids.data(), _sensors.size()));
 
 	ids.clear();
@@ -70,23 +70,21 @@ const PropertyIface* Box::addProperty(std::unique_ptr<PropertyIface> val)
 	return _properties.back().get();
 }
 
-Sensor& Box::addSensor(const Sensor& val)
+void Box::addSensor(Sensor* val)
 {
 	auto iter = std::find_if(_sensors.begin(), _sensors.end(),
-		[val](const Sensor& left){return left.getId() == val.getId();});
+		[val](const Sensor* left){return left->getId() == val->getId();});
 	
 	if(iter != _sensors.end()){
-		FB_DEBUG_TAG_LOG_W("Failed to add sensor with id %d, it is already exist", val.getId());
+		FB_DEBUG_TAG_LOG_W("Failed to add sensor with id %d, it is already exist", val->getId());
 		assert(0);
-		return _sensors.front();
+		return;
 	}
 
 	_sensors.push_back(val);
-	_sensors.back().setId(_sensors.size() - 1);
+	_sensors.back()->setId(_sensors.size() - 1);
 
-	FB_DEBUG_TAG_LOG_W("Added a sensor with id %d", val.getId());
-
-	return _sensors.back();
+	FB_DEBUG_TAG_LOG_W("Added a sensor with id %d", val->getId());
 }
 
 void Box::addSwitch(Switch* val)
@@ -96,6 +94,7 @@ void Box::addSwitch(Switch* val)
 	
 	if(iter != _switches.end()){
 		FB_DEBUG_TAG_LOG_W("Failed to add switch with id %d, it is already exist", val->getId());
+		assert(0);
 		return;
 	}
 
@@ -120,13 +119,13 @@ PropertyIface* Box::getProperty(int id)
 const Sensor* Box::getSensor(int id) const
 {
 	auto iter = std::find_if(_sensors.begin(), _sensors.end(),
-		[id](const Sensor& left){return left.getId() == id;});
+		[id](const Sensor* left){return left->getId() == id;});
 	
 	if(iter == _sensors.end()){
 		return nullptr;
 	}
 
-	return &(*iter);
+	return (*iter);
 }
 
 const Switch* Box::getSwitch(int id) const

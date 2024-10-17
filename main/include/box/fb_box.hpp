@@ -29,7 +29,7 @@ namespace fb
 				virtual std::string toJson() const override;
 
 				const PropertyIface* addProperty(std::unique_ptr<PropertyIface> val);
-				Sensor& addSensor(const Sensor& val);
+				void addSensor(Sensor* val);
 				void addSwitch(Switch* val);
 
 				PropertyIface* getProperty(int id);
@@ -43,7 +43,7 @@ namespace fb
 				std::string _version;
 
 				std::vector<std::unique_ptr<PropertyIface>> _properties;
-				std::vector<Sensor> _sensors;
+				std::vector<Sensor*> _sensors;
 				std::vector<Switch*> _switches;
 		};
 	} // namespace box

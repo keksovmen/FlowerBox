@@ -43,9 +43,14 @@ static switches::TimeSwitch _switchLight(clock::Time(0, 0, 0), clock::Time(0, 1,
 static switches::HeatSwitch _switchHeating(&_sensorTemperature, 0, 28.5, 29, pins::PIN_GREEN_LED);
 static switches::FanSwitch _switchFan(&_sensorTemperature, 1, 30, 31, pins::PIN_COOL_LED);
 
+static box::Sensor* _boxTempSensors[2] = {nullptr, nullptr};
+static box::Switch* _boxLightSwitch = nullptr;
+static box::Switch* _boxHeatSwitch = nullptr;
+static box::Switch* _boxFanSwitch = nullptr;
 
 
-static void _registerSwitchProperties(switches::SwitchIface* sw, box::Tid tid)
+
+static box::Switch* _registerSwitchProperties(switches::SwitchIface* sw, box::Tid tid)
 {
 	auto* forseProperty = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_FORSE,
 		[sw](int val){
@@ -63,8 +68,36 @@ static void _registerSwitchProperties(switches::SwitchIface* sw, box::Tid tid)
 		[sw](){return sw->isOn();}
 	);
 	_flowerBox.addSwitch(switchBoxWrapper);
+
+	return switchBoxWrapper;
 }
 
+static void _registerSensor()
+{
+	for(int i = 0; i < _sensorTemperature.getDeviceCount(); i++)
+	{
+		auto* sen = new box::Sensor(box::Tid::SENSOR_DS18B20);
+		_flowerBox.addSensor(sen);
+		
+		//добвить свойства: период опроса, название датчика
+		const auto* prop = _flowerBox.addProperty(std::make_unique<box::PropertyString>(
+			"Temp. sensor " + std::to_string(sen->getId()) + " description",
+			"Defines sensor description with id " + std::to_string(sen->getId()),
+			box::Tid::PROPERTY_SENSOR_DESCRIPTION,
+			[](std::string val){return true;},
+			sen->getDescription()));
+		
+		sen->addPropertyDependency(prop->getId());
+
+		_boxTempSensors[i] = sen;
+	}
+}
+
+static void _setBoxSwitchSensors()
+{
+	_boxHeatSwitch->addSensorDependency(_boxTempSensors[_switchHeating.getSensorIndex()]->getId());
+	_boxFanSwitch->addSensorDependency(_boxTempSensors[_switchFan.getSensorIndex()]->getId());
+}
 
 
 void global::init()
@@ -77,20 +110,23 @@ void global::init()
 	_swithService.addSwitch(&_switchHeating);
 	_swithService.addSwitch(&_switchFan);
 
-	//TODO: put somewhere else, in to BoxService and let it listen for events -> create properties and devices
-	_registerSwitchProperties(&_switchLight, box::Tid::SWITCH_LIGHT);
-	_registerSwitchProperties(&_switchHeating, box::Tid::SWITCH_HEAT);
-	_registerSwitchProperties(&_switchFan, box::Tid::SWITCH_FAN);
+	_registerSensor();
 
-	auto* swapProperty = new box::PropertyInt(box::Tid::PROPERTY_SWAP_TEMP_SENSOR_INDEX,
-		[](int val){
-			_switchHeating.setSensorIndex(_switchHeating.getSensorIndex() == 0 ? 1 : 0);	
-			_switchFan.setSensorIndex(_switchFan.getSensorIndex() == 0 ? 1 : 0);	
-			return true;
-		},
-		0);
-	_flowerBox.addProperty(std::unique_ptr<box::PropertyIface>(swapProperty));
-	
+	//TODO: put somewhere else, in to BoxService and let it listen for events -> create properties and devices
+	_boxLightSwitch = _registerSwitchProperties(&_switchLight, box::Tid::SWITCH_LIGHT);
+	_boxHeatSwitch = _registerSwitchProperties(&_switchHeating, box::Tid::SWITCH_HEAT);
+	_boxFanSwitch = _registerSwitchProperties(&_switchFan, box::Tid::SWITCH_FAN);
+
+	// auto* swapProperty = new box::PropertyInt(box::Tid::PROPERTY_SWAP_TEMP_SENSOR_INDEX,
+	// 	[](int val){
+	// 		_switchHeating.setSensorIndex(_switchHeating.getSensorIndex() == 0 ? 1 : 0);	
+	// 		_switchFan.setSensorIndex(_switchFan.getSensorIndex() == 0 ? 1 : 0);	
+	// 		return true;
+	// 	},
+	// 	0);
+	// _flowerBox.addProperty(std::unique_ptr<box::PropertyIface>(swapProperty));
+
+	_setBoxSwitchSensors();
 
 	_eventManager.attachListener(_boxService);
 }
