@@ -49,7 +49,7 @@ static void _registerSwitchProperties(switches::SwitchIface* sw, box::Tid tid)
 {
 	auto* forseProperty = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_FORSE,
 		[sw](int val){
-			sw->setForseFlag(static_cast<bool>(val));
+			sw->setForseFlag(static_cast<switches::SwitchForseState>(val));
 			return true;
 		}, sw->isOn()
 	);

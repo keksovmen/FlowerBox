@@ -19,12 +19,23 @@ SwitchIface::~SwitchIface()
 
 void SwitchIface::check()
 {
-	if(_forseFlag){
+	if(_forseFlag == SwitchForseState::ON){
 		if(!_state){
-			FB_DEBUG_LOG("[%s] forse flag is set -> action", getName());
+			FB_DEBUG_LOG("[%s] forse flag is ON -> action", getName());
 
 			_actionCb(this, true);
 			_state = true;		
+		}
+
+		return;
+	}
+
+	if(_forseFlag == SwitchForseState::OFF){
+		if(_state){
+			FB_DEBUG_LOG("[%s] forse flag is OFF -> action", getName());
+
+			_actionCb(this, false);
+			_state = false;		
 		}
 
 		return;
@@ -52,7 +63,7 @@ void SwitchIface::check()
 	}
 }
 
-void SwitchIface::setForseFlag(bool state)
+void SwitchIface::setForseFlag(SwitchForseState state)
 {
 	_forseFlag = state;
 }

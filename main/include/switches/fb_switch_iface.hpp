@@ -12,6 +12,15 @@ namespace fb
 {
 	namespace switches
 	{
+		enum class SwitchForseState : int
+		{
+			NONE = 0,
+			ON,
+			OFF
+		};
+
+
+
 		// template<class T>
 		class SwitchIface : public debug::Named
 		{
@@ -32,7 +41,7 @@ namespace fb
 				virtual ~SwitchIface();
 
 				void check();
-				void setForseFlag(bool state);
+				void setForseFlag(SwitchForseState state);
 
 				bool isOn() const;
 
@@ -42,7 +51,7 @@ namespace fb
 				const ActionCb _actionCb;
 
 				bool _state = false;
-				bool _forseFlag = false;
+				SwitchForseState _forseFlag = SwitchForseState::NONE;
 		};
 
 	} // namespace switches
