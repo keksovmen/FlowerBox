@@ -12,6 +12,171 @@ using namespace sensor;
 
 
 
+TemperatureSensor::TemperatureSensor(OW_t& interface)
+	: _interface(interface)
+{
+
+}
+
+const char* TemperatureSensor::getName()
+{
+	return "TemperatureSensor";
+}
+
+float TemperatureSensor::getValue() const
+{
+	return _value;
+}
+
+Id TemperatureSensor::getId() const
+{
+	return _id;
+}
+
+bool TemperatureSensor::_doInit()
+{
+	//TODO: check interface status
+
+	return getId() != InvalidId;
+}
+
+bool TemperatureSensor::_doUpdate()
+{
+	//TODO: check interface status
+
+	_temperatureMeasureRequest();
+	_value = _temperatureValueRequest();
+	FB_DEBUG_LOG("Temperature[0x%llX] = %.2f", getId(), getValue());
+
+	//TODO: drop event value changed?
+}
+
+void TemperatureSensor::_temperatureMeasureRequest()
+{
+	//TODO: user target command without skipping ROM
+	ow_reset(&_interface);
+	// ow_send(&_interface, OW_SKIP_ROM);
+	ow_send(&_interface, OW_MATCH_ROM);
+	for (int b = 0; b < 64; b += 8) {
+		ow_send(&_interface, getId() >> b);
+	}
+	ow_send(&_interface, DS18B20_CONVERT_T);
+}
+
+float TemperatureSensor::_temperatureValueRequest()
+{
+	while (ow_read(&_interface) == false)
+	{
+		portYIELD();
+	}
+	
+	ow_reset(&_interface);
+	ow_send(&_interface, OW_MATCH_ROM);
+	for (int b = 0; b < 64; b += 8) {
+		ow_send(&_interface, getId() >> b);
+	}
+	
+	ow_send(&_interface, DS18B20_READ_SCRATCHPAD);
+
+	int16_t temp = 0;
+	temp = ow_read(&_interface) | (ow_read(&_interface) << 8);
+
+	return temp / 16.0;
+}
+
+void TemperatureSensor::_resetState()
+{
+	_alive = false;
+}
+
+void TemperatureSensor::_alive()
+{
+	_alive = true;
+}
+
+
+
+TemperatureSensorArray::TemperatureSensorArray(int gpio, int expectedDevices)
+{
+	assert(ow_init(&_interface, gpio));
+	// std::fill_n(std::back_insert_iterator(_sensors.begin()), expectedDevices, TemperatureSensor{_interface});
+	for(int i = 0; i < expectedDevices; i++){
+		_sensors.push_back(TemperatureSensor{_interface});
+	}
+}
+
+TemperatureSensorArray::~TemperatureSensorArray()
+{
+	ow_deinit(&_interface);
+}
+
+const char* TemperatureSensorArray::getName()
+{
+	return "TemperatureSensorArray";
+}
+
+int TemperatureSensorArray::getDeviceCount() const
+{
+	return _sensors.size();
+}
+
+const TemperatureSensor& TemperatureSensorArray::getSensor(int index) const
+{
+	return _sensors[index];
+}
+
+bool TemperatureSensorArray::_doInit()
+{
+	if (!ow_reset(&_interface)){
+		return false;
+	}
+
+	//обнуляем состояния
+	std::for_each(_sensors.begin(), _sensors.end(), [](auto& s){s._resetState();});
+	TemperatureSensor::Id sensors[10];
+
+	const int num_devs = ow_romsearch(&_interface, sensors, sizeof(sensors) / sizeof(sensors[0]), OW_SEARCH_ROM);
+
+	//TODO: change to ranges
+	for(int i = 0; i < num_devs; i++){
+		const auto id = sensors[i];
+		auto iter = std::find_if(_sensors.begin(), _sensors.end(),
+			[id](const TemperatureSensor& s){return s.getId() == id;});
+		
+		if(iter == _sensors.end()){
+			//find first not initialized and initialize it
+			auto notInitIter = std::find_if(_sensors.begin(), _sensors.end(),
+				[id](const TemperatureSensor& s){return s.getId() == TemperatureSensor::InvalidId;});
+			
+			assert(notInitIter != _sensors.end());
+			(*notInitIter).init(id);
+
+		}else{
+			(*iter).alive();
+		}
+	}
+
+	bool result = true;
+	for(int i = 0; i < _sensors.size(); i++){
+		result &= _sensors[i].init();
+	}
+
+	return result;
+}
+
+bool TemperatureSensorArray::_doUpdate()
+{
+	bool result = true;
+	for(int i = 0; i < _sensors.size(); i++){
+		result &= _sensors[i].update();
+	}
+
+	return result;
+}
+
+
+
+
 TempreatureSensorTest::TempreatureSensorTest(int gpio, int expectedDevices)
 	: _expectedDevices(expectedDevices)
 {
@@ -79,11 +244,11 @@ bool TempreatureSensorTest::_doInit()
 
 bool TempreatureSensorTest::_doUpdate()
 {
-	_temperatureMesureRequest();
+	_temperatureMeasureRequest();
 	//TODO: change to ranges
 	std::for_each(_sensors.begin(), _sensors.end(),
 		[this](auto& entry){
-			entry.value = _tempreatureValueRequest(entry.id);
+			entry.value = _temperatureValueRequest(entry.id);
 			FB_DEBUG_LOG("Temperature[0x%llX] = %.2f", entry.id, entry.value);
 		});
 	
@@ -91,14 +256,14 @@ bool TempreatureSensorTest::_doUpdate()
 	return true;
 }
 
-void TempreatureSensorTest::_temperatureMesureRequest()
+void TempreatureSensorTest::_temperatureMeasureRequest()
 {
 	ow_reset(&_interface);
 	ow_send(&_interface, OW_SKIP_ROM);
 	ow_send(&_interface, DS18B20_CONVERT_T);
 }
 
-float TempreatureSensorTest::_tempreatureValueRequest(TemperatureSensor::Id id)
+float TempreatureSensorTest::_temperatureValueRequest(TemperatureSensor::Id id)
 {
 	while (ow_read(&_interface) == false)
 	{
