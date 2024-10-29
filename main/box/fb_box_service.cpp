@@ -33,10 +33,11 @@ void BoxService::handleEvent(const event::Event& event)
 
 		}else if(event.eventId == sensor::SensorEvent::SENSOR_VALUE_CHANGED){
 			//TODO: move it somehwere else maybe?
-			auto* sensor = reinterpret_cast<sensor::TempreatureSensorTest*>(event.data);
-			for(int i = 0; i < sensor->getDeviceCount(); i++)
+			auto* sensorArray = reinterpret_cast<sensor::TemperatureSensorArrayI*>(event.data);
+			for(int i = 0; i < sensorArray->getDeviceCount(); i++)
 			{
-				_storage.addSensorValue(i, sensor->getValue(i));
+				auto* s = sensorArray->getSensor(i);
+				_storage.addSensorValue(i, s->getValue());
 			}
 
 			// for check working purposes only

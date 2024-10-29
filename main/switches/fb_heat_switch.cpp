@@ -9,11 +9,11 @@ using namespace switches;
 
 
 
-HeatSwitch::HeatSwitch(sensor::TempreatureSensorTest* sensor, int sensorIndex,
+HeatSwitch::HeatSwitch(sensor::TemperatureSensor* sensor,
 	float onTemp, float offTemp, int gpio
 )
 	: SwitchIface(&HeatSwitch::_condition, &HeatSwitch::_action),
-	_sensor(sensor), _sensorIndex(sensorIndex),
+	_sensor(sensor),
 	_lowTemp(onTemp), _highTemp(offTemp), _gpio(gpio)
 {
 	gpio_config_t cfg = {
@@ -36,16 +36,6 @@ const char* HeatSwitch::getName()
 	return "HeatSwitch";
 }
 
-void HeatSwitch::setSensorIndex(int index)
-{
-	_sensorIndex = index;
-}
-
-int HeatSwitch::getSensorIndex() const
-{
-	return _sensorIndex;
-}
-
 float HeatSwitch::getLowTemp() const
 {
 	return _lowTemp;
@@ -61,14 +51,14 @@ int HeatSwitch::getGpio() const
 	return _gpio;
 }
 
-const sensor::TempreatureSensorTest* HeatSwitch::getSensor() const
+const sensor::TemperatureSensor* HeatSwitch::getSensor() const
 {
 	return _sensor;
 }
 
 bool HeatSwitch::_checkTemperature()
 {
-	if(_getSensorValue() == sensor::TempreatureSensorTest::InvalidValue){
+	if(_getSensorValue() == sensor::TemperatureSensor::InvalidValue){
 		//пока просто ждем когда сенсор инициализируется
 		return false;
 	}
@@ -96,7 +86,7 @@ bool HeatSwitch::_isColling() const
 
 float HeatSwitch::_getSensorValue() const
 {
-	return getSensor()->getValue(getSensorIndex());
+	return getSensor()->getValue();
 }
 
 bool HeatSwitch::_condition(SwitchIface* me)
@@ -115,9 +105,9 @@ void HeatSwitch::_action(SwitchIface* me, bool value)
 
 
 
-FanSwitch::FanSwitch(sensor::TempreatureSensorTest* sensor, int sensorIndex,
+FanSwitch::FanSwitch(sensor::TemperatureSensor* sensor,
 						float lowTemp, float highTemp, int gpio)
-	: HeatSwitch(sensor, sensorIndex, lowTemp, highTemp, gpio)
+	: HeatSwitch(sensor, lowTemp, highTemp, gpio)
 {
 
 }

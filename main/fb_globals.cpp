@@ -36,12 +36,14 @@ static box::Box _flowerBox(_DEVICE_NAME, "0.0.1", getUniqueId());
 static box::BoxService* _boxService;
 
 //сенсоры туть
-static sensor::TempreatureSensorTest _sensorTemperature(pins::PIN_SENSOR_TEMPERATURE, 2);
+static sensor::TemperatureSensorArray<2> _sensorArrayTemp(pins::PIN_SENSOR_TEMPERATURE);
+static sensor::TemperatureSensor* _sensorTemperatureInside = _sensorArrayTemp.getSensor(0);
+static sensor::TemperatureSensor* _sensorTemperatureOutside = _sensorArrayTemp.getSensor(1);
 
 //переключатели туть
 static switches::TimeSwitch _switchLight(clock::Time(0, 0, 0), clock::Time(0, 1, 0), pins::PIN_BLUE_LED);
-static switches::HeatSwitch _switchHeating(&_sensorTemperature, 0, 28.5, 29, pins::PIN_GREEN_LED);
-static switches::FanSwitch _switchFan(&_sensorTemperature, 1, 30, 31, pins::PIN_COOL_LED);
+static switches::HeatSwitch _switchHeating(_sensorTemperatureInside, 28.5, 29, pins::PIN_GREEN_LED);
+static switches::FanSwitch _switchFan(_sensorTemperatureOutside, 30, 31, pins::PIN_COOL_LED);
 
 static box::Sensor* _boxTempSensors[2] = {nullptr, nullptr};
 static box::Switch* _boxLightSwitch = nullptr;
@@ -74,7 +76,7 @@ static box::Switch* _registerSwitchProperties(switches::SwitchIface* sw, box::Ti
 
 static void _registerSensor()
 {
-	for(int i = 0; i < _sensorTemperature.getDeviceCount(); i++)
+	for(int i = 0; i < _sensorArrayTemp.getDeviceCount(); i++)
 	{
 		auto* sen = new box::Sensor(box::Tid::SENSOR_DS18B20);
 		_flowerBox.addSensor(sen);
@@ -95,8 +97,8 @@ static void _registerSensor()
 
 static void _setBoxSwitchSensors()
 {
-	_boxHeatSwitch->addSensorDependency(_boxTempSensors[_switchHeating.getSensorIndex()]->getId());
-	_boxFanSwitch->addSensorDependency(_boxTempSensors[_switchFan.getSensorIndex()]->getId());
+	_boxHeatSwitch->addSensorDependency(_boxTempSensors[0]->getId());
+	_boxFanSwitch->addSensorDependency(_boxTempSensors[1]->getId());
 }
 
 
@@ -104,7 +106,7 @@ void global::init()
 {
 	_boxService = new box::BoxService(_flowerBox, _sensorStorage);
 
-	_sensorService.addSensor(&_sensorTemperature);
+	_sensorService.addSensor(&_sensorArrayTemp);
 
 	_swithService.addSwitch(&_switchLight);
 	_swithService.addSwitch(&_switchHeating);

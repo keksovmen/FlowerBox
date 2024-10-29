@@ -1,8 +1,7 @@
 #pragma once
 
 
-
-#include <vector>
+#include <array>
 
 #include "fb_sensor_iface.hpp"
 
@@ -14,18 +13,14 @@ namespace fb
 {
 	namespace sensor
 	{
+		template<int N>
 		class TemperatureSensorArray;
 
 
 
 		class TemperatureSensor : public SensorIface
-		// struct TemperatureSensor
 		{
 			public:
-				friend class TemperatureSensorArray;
-
-
-
 				using Id = unsigned long long;
 
 
@@ -35,54 +30,54 @@ namespace fb
 
 
 
-				TemperatureSensor(OW_t& interface);
-
 				virtual const char* getName() override;
+
+				void lateInit(Id id, OW_t* interface);
 
 				float getValue() const;
 				Id getId() const;
 
-				void init(Id id);
-
-				bool alive = false;
-				float value = InvalidValue;
-				Id id = InvalidId;
-
 			private:
-				OW_t& _interface;
+				OW_t* _interface;
 				Id _id = InvalidId;
 				float _value = InvalidValue;
-				bool _alive = false;
 
 
-				//check _id field
 				virtual bool _doInit() override;
-				//make value request
 				virtual bool _doUpdate() override;
 
 				void _temperatureMeasureRequest();
 				float _temperatureValueRequest();
-
-				void _resetState();
-				void _alive();
 		};
 
 
 
-		class TemperatureSensorArray : public SensorIface
+		class TemperatureSensorArrayI : public SensorIface
 		{
 			public:
-				TemperatureSensorArray(int gpio, int expectedDevices);
+				virtual int getDeviceCount() const = 0;
+				virtual TemperatureSensor* getSensor(int index) = 0;
+		};
+
+
+
+		template<int N>
+		class TemperatureSensorArray : public TemperatureSensorArrayI
+		{
+			public:
+				TemperatureSensorArray(int gpio);
 				~TemperatureSensorArray();
 
 				virtual const char* getName() override;
 
-				int getDeviceCount() const;
+				virtual int getDeviceCount() const override;
+				virtual TemperatureSensor* getSensor(int index) override;
+
 				const TemperatureSensor& getSensor(int index) const;
 
 			private:
 				OW_t _interface;
-				std::vector<TemperatureSensor> _sensors;
+				std::array<TemperatureSensor, N> _sensors;
 
 
 
@@ -92,37 +87,6 @@ namespace fb
 
 
 
-		//TODO: made it accept OW_t interface as bus, and index of sensor on that bus, to have
-		//2 instances for ease of BOX api providing
-		class TempreatureSensorTest : public SensorIface
-		{
-			public:
-				constexpr static float InvalidValue = -255.0f;
-
-
-
-				TempreatureSensorTest(int gpio, int expectedDevices);
-				~TempreatureSensorTest();
-
-				virtual const char* getName() override;
-				
-				float getValue(int index) const;
-				int getDeviceCount() const;
-				const TemperatureSensor& getSensor(int index) const;
-
-			private:
-				OW_t _interface;
-				int _expectedDevices;
-				std::vector<TemperatureSensor> _sensors;
-
-
-				virtual bool _doInit() override;
-				virtual bool _doUpdate() override;
-
-				void _temperatureMeasureRequest();
-				//считывает ответ
-				float _temperatureValueRequest(TemperatureSensor::Id id);
-		};
-
+		template class TemperatureSensorArray<2>;
 	} // namespace sensor
 } // namespace fb

@@ -15,19 +15,16 @@ namespace fb
 		class HeatSwitch : public SwitchIface
 		{
 			public:
-				HeatSwitch(sensor::TempreatureSensorTest* sensor, int sensorIndex,
+				HeatSwitch(sensor::TemperatureSensor* sensor,
 					float lowTemp, float highTemp, int gpio);
 				virtual ~HeatSwitch();
 
 				virtual const char* getName() override;
 
-				void setSensorIndex(int index);
-				int getSensorIndex() const;
-
 				float getLowTemp() const;
 				float getHighTemp() const;
 				int getGpio() const;
-				const sensor::TempreatureSensorTest* getSensor() const;
+				const sensor::TemperatureSensor* getSensor() const;
 
 
 			protected:
@@ -38,8 +35,7 @@ namespace fb
 				float _getSensorValue() const;
 
 			private:
-				const sensor::TempreatureSensorTest* _sensor;
-				int _sensorIndex;
+				const sensor::TemperatureSensor* _sensor;
 
 				float _lowTemp;
 				float _highTemp;
@@ -58,7 +54,7 @@ namespace fb
 		class FanSwitch : public HeatSwitch
 		{
 			public:
-				FanSwitch(sensor::TempreatureSensorTest* sensor, int sensorIndex,
+				FanSwitch(sensor::TemperatureSensor* sensor,
 						float lowTemp, float highTemp, int gpio);
 
 				virtual const char* getName() override;
