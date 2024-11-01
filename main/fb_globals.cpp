@@ -119,14 +119,6 @@ void global::init()
 	_boxHeatSwitch = _registerSwitchProperties(&_switchHeating, box::Tid::SWITCH_HEAT);
 	_boxFanSwitch = _registerSwitchProperties(&_switchFan, box::Tid::SWITCH_FAN);
 
-	// auto* swapProperty = new box::PropertyInt(box::Tid::PROPERTY_SWAP_TEMP_SENSOR_INDEX,
-	// 	[](int val){
-	// 		_switchHeating.setSensorIndex(_switchHeating.getSensorIndex() == 0 ? 1 : 0);	
-	// 		_switchFan.setSensorIndex(_switchFan.getSensorIndex() == 0 ? 1 : 0);	
-	// 		return true;
-	// 	},
-	// 	0);
-	// _flowerBox.addProperty(std::unique_ptr<box::PropertyIface>(swapProperty));
 
 	_setBoxSwitchSensors();
 

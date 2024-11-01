@@ -31,6 +31,7 @@ namespace fb
 				const PropertyIface* addProperty(std::unique_ptr<PropertyIface> val);
 				void addSensor(Sensor* val);
 				void addSwitch(Switch* val);
+				void addPropertyDependency(int propertyId);
 
 				PropertyIface* getProperty(int id);
 				const Sensor* getSensor(int id) const;
@@ -45,6 +46,8 @@ namespace fb
 				std::vector<std::unique_ptr<PropertyIface>> _properties;
 				std::vector<Sensor*> _sensors;
 				std::vector<Switch*> _switches;
+				ObjectIface::PropertyArray _boxProperties;
+				
 		};
 	} // namespace box
 	

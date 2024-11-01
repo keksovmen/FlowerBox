@@ -16,13 +16,15 @@ BoxService::BoxService(Box& box, sensor::SensorStorage& storage)
 {
 	//TODO: put somehere else
 	//TODO: add property action cb
-	_box.addProperty(std::make_unique<PropertyInt>(
+	const auto* prop = _box.addProperty(std::make_unique<PropertyInt>(
 		Tid::PROPERTY_SENSOR_PERIOD_GLOBAL,
 		[](int val){
 			global::getSensorService()->setTimerPeriod(val * 1000);
 			return true;
 		},
 		3));//TODO: fix it, service has not been stated here so timer is not exists
+		
+	_box.addPropertyDependency(prop->getId());
 }
 
 void BoxService::handleEvent(const event::Event& event)

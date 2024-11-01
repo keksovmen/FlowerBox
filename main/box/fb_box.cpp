@@ -34,15 +34,19 @@ std::string Box::toJson() const
 
 	std::vector<int> ids;
 	std::for_each(_properties.begin(), _properties.end(), [&ids](const auto& p){ids.push_back(p->getId());});
-	cJSON_AddItemToObject(obj, "properties_ids", cJSON_CreateIntArray(ids.data(), _properties.size()));
+	cJSON_AddItemToObject(obj, "properties_ids", cJSON_CreateIntArray(ids.data(), ids.size()));
 
 	ids.clear();
 	std::for_each(_sensors.begin(), _sensors.end(), [&ids](const auto& p){ids.push_back(p->getId());});
-	cJSON_AddItemToObject(obj, "sensor_ids", cJSON_CreateIntArray(ids.data(), _sensors.size()));
+	cJSON_AddItemToObject(obj, "sensor_ids", cJSON_CreateIntArray(ids.data(), ids.size()));
 
 	ids.clear();
 	std::for_each(_switches.begin(), _switches.end(), [&ids](const auto* p){ids.push_back(p->getId());});
-	cJSON_AddItemToObject(obj, "switch_ids", cJSON_CreateIntArray(ids.data(), _switches.size()));
+	cJSON_AddItemToObject(obj, "switch_ids", cJSON_CreateIntArray(ids.data(), ids.size()));
+
+	ids.clear();
+	std::for_each(_boxProperties.begin(), _boxProperties.end(), [&ids](auto p){ids.push_back(p);});
+	cJSON_AddItemToObject(obj, "box_properties_ids", cJSON_CreateIntArray(ids.data(), ids.size()));
 
 	std::string result(cJSON_PrintUnformatted(obj));
 
@@ -102,6 +106,11 @@ void Box::addSwitch(Switch* val)
 	_switches.back()->setId(_switches.size() - 1);
 
 	FB_DEBUG_TAG_LOG_W("Added a switch with id %d", val->getId());
+}
+
+void Box::addPropertyDependency(int propertyId)
+{
+	_boxProperties.push_back(propertyId);
 }
 
 PropertyIface* Box::getProperty(int id)
