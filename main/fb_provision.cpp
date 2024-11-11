@@ -47,10 +47,12 @@ static void _eventHandler(void* arg, esp_event_base_t eventBase, int32_t eventId
 
 		if(settings::getWifiMode() == settings::WifiMode::AP)
 		{
+			settings::setWifiMode(settings::WifiMode::AP);
 			settings::setApSsid(reinterpret_cast<char*>(cfg->ssid));
 			settings::setApPass(reinterpret_cast<char*>(cfg->password));
 		}else
 		{
+			settings::setWifiMode(settings::WifiMode::STA);
 			settings::setStaSsid(reinterpret_cast<char*>(cfg->ssid));
 			settings::setStaPass(reinterpret_cast<char*>(cfg->password));
 		}
@@ -138,7 +140,12 @@ static void _initManager()
 
     wifi_prov_mgr_endpoint_create(_ENDPOINT_WIFI_MODE);
 
-	ESP_ERROR_CHECK(wifi_prov_mgr_start_provisioning(WIFI_PROV_SECURITY_0, nullptr, global::getDeviceName().c_str(), nullptr));
+	ESP_ERROR_CHECK(wifi_prov_mgr_start_provisioning(
+		WIFI_PROV_SECURITY_0,
+		nullptr,
+		global::getDeviceName().c_str(),
+		std::to_string(global::getUniqueId()).c_str()
+	));
 
     wifi_prov_mgr_endpoint_register(_ENDPOINT_WIFI_MODE, &_customProvisionHandler, nullptr);
 }

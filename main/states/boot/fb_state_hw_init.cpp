@@ -46,7 +46,7 @@ void StateHwInit::enter()
 	global::getSwitchService()->start();
 	assert(wifi::init());
 
-	getContext().transition(std::make_unique<StateProvision>(getContext()));
+	// getContext().transition(std::make_unique<StateProvision>(getContext()));
 }
 
 void StateHwInit::exit()

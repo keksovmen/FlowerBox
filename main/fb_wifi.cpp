@@ -149,12 +149,12 @@ static void _init()
 static bool _checkWifiConfig(const WifiConfig& cfg)
 {
 	if(cfg.apSsid.length() < 8){
-		FB_DEBUG_TAG_LOG_E("Invalid AP ssid length must be >= 8");
+		FB_DEBUG_TAG_LOG_E("Invalid AP ssid length must be >= 8, %s", cfg.apSsid.c_str());
 		return false;
 	}
 
 	if(cfg.staSsid.length() < 8){
-		FB_DEBUG_TAG_LOG_E("Invalid STA ssid length must be >= 8");
+		FB_DEBUG_TAG_LOG_E("Invalid STA ssid length must be >= 8, %s", cfg.staSsid.c_str());
 		return false;
 	}
 

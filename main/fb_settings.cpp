@@ -5,8 +5,8 @@
 
 
 #define _DEFAULT_WIFI_MODE WifiMode::STA
-#define _DEFAULT_AP_SSID "TEST_FLOWER_BOX"
 #define _DEFAULT_AP_PASS "12345678"
+#define _DEFAULT_AP_SSID "FlowerBox_" _DEFAULT_AP_PASS
 #define _DEFAULT_STA_SSID CONFIG_EXAMPLE_WIFI_SSID
 #define _DEFAULT_STA_PASS CONFIG_EXAMPLE_WIFI_PASSWORD
 #define _DEFAULT_URL_SNTP CONFIG_SNTP_TIME_SERVER
@@ -16,7 +16,7 @@
 #define _KEY_WIFI_MODE "wifi_mode"
 #define _KEY_WIFI_AP_SSID "ap_ssid"
 #define _KEY_WIFI_AP_PASS "ap_pass"
-#define _KEY_WIFI_STA_SSID "sta_pass"
+#define _KEY_WIFI_STA_SSID "sta_ssid"
 #define _KEY_WIFI_STA_PASS "sta_pass"
 #define _KEY_URL_SNTP "url_sntp"
 
