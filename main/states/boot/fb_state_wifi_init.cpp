@@ -17,7 +17,7 @@ StateWifiInit::StateWifiInit(StateManager& context)
 
 }
 
-const char* StateWifiInit::getName()
+const char* StateWifiInit::getName() const
 {
 	return "StateWifiInit";
 }

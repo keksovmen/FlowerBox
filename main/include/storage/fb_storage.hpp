@@ -3,7 +3,8 @@
 
 
 /**
- * @brief must provide nvs partitions and keys
+ * @brief interface to read and write
+ * 		key value pairs to somewhere
  */
 
 
@@ -11,7 +12,6 @@
 #include <string>
 
 #include "fb_debug.hpp"
-// #include "fb_settings.hpp"
 
 
 
@@ -25,7 +25,7 @@ namespace fb
 				static constexpr int MAX_STRING_SIZE = 64;
 
 
-				
+
 				virtual ~StorageIface(){}
 
 				/**
@@ -73,8 +73,6 @@ namespace fb
 
 				virtual bool readValue(const std::string& partition, const std::string& key, std::string& out) const = 0;
 				virtual bool readValue(const std::string& partition, const std::string& key, int& out) const = 0;
-
-				virtual const char* getName() = 0;
 		};
 	}
 }

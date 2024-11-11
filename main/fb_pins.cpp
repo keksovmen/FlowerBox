@@ -10,7 +10,7 @@ using namespace pins;
 
 
 
-const char* PinManager::getName()
+const char* PinManager::getName() const
 {
 	return "PinManager";
 }

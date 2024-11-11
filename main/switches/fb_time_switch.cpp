@@ -29,7 +29,7 @@ TimeSwitch::TimeSwitch(
 	assert(gpio_config(&cfg) == ESP_OK);
 }
 
-const char* TimeSwitch::getName()
+const char* TimeSwitch::getName() const
 {
 	return "TimeSwitch";
 }

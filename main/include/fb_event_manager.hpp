@@ -55,7 +55,7 @@ namespace fb
 				explicit EventManager(int queueSize = 10);
 				virtual ~EventManager();
 
-				virtual const char* getName() override;
+				virtual const char* getName() const override;
 
 				void pushEvent(const Event& e);
 				void dispatchEvent();

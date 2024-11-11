@@ -18,7 +18,7 @@ using namespace sensor;
 
 // }
 
-const char* TemperatureSensor::getName()
+const char* TemperatureSensor::getName() const
 {
 	return "TemperatureSensor";
 }
@@ -112,7 +112,7 @@ TemperatureSensorArray<N>::~TemperatureSensorArray()
 }
 
 template<int N>
-const char* TemperatureSensorArray<N>::getName()
+const char* TemperatureSensorArray<N>::getName() const
 {
 	return "TemperatureSensorArray";
 }
@@ -197,7 +197,7 @@ bool TemperatureSensorArray<N>::_doUpdate()
 // 	ow_deinit(&_interface);
 // }
 
-// const char* TempreatureSensorTest::getName()
+// const char* TempreatureSensorTest::getName() const
 // {
 // 	return "TempreatureSensor";
 // }

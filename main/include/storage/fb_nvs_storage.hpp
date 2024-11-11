@@ -15,7 +15,7 @@ namespace fb
 			public:
 				~NvsStorage();
 
-				virtual const char* getName() override;
+				virtual const char* getName() const override;
 
 				virtual bool init() override;
 

@@ -19,7 +19,7 @@ namespace fb
 		class SensorService : public util::ServiceIface
 		{
 			public:
-				virtual const char* getName() override;
+				virtual const char* getName() const override;
 
 				void addSensor(SensorIface* entry);
 			

@@ -38,7 +38,7 @@ StateManager::~StateManager()
 	deinit();
 }
 
-const char* StateManager::getName()
+const char* StateManager::getName() const
 {
 	return _name.c_str();
 }

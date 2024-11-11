@@ -19,7 +19,7 @@ namespace fb
 					float lowTemp, float highTemp, int gpio);
 				virtual ~HeatSwitch();
 
-				virtual const char* getName() override;
+				virtual const char* getName() const override;
 
 				float getLowTemp() const;
 				float getHighTemp() const;
@@ -57,7 +57,7 @@ namespace fb
 				FanSwitch(sensor::TemperatureSensor* sensor,
 						float lowTemp, float highTemp, int gpio);
 
-				virtual const char* getName() override;
+				virtual const char* getName() const override;
 			
 			protected:
 				virtual bool _checkTemperature();

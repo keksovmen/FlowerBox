@@ -16,7 +16,7 @@ namespace fb
 		{
 			public:
 
-				virtual const char* getName() override;
+				virtual const char* getName() const override;
 
 				virtual bool init() override;
 

@@ -19,7 +19,7 @@ namespace fb
 					const clock::Time& duration,
 					int gpio);
 
-				virtual const char* getName() override;
+				virtual const char* getName() const override;
 
 			
 			private:

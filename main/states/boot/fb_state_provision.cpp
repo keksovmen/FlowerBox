@@ -16,7 +16,7 @@ StateProvision::StateProvision(StateManager& context)
 
 }
 
-const char* StateProvision::getName()
+const char* StateProvision::getName() const
 {
 	return "StateProvision";
 }

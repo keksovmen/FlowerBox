@@ -7,7 +7,7 @@ using namespace switches;
 
 
 
-const char* SwitchService::getName()
+const char* SwitchService::getName() const
 {
 	return "SwitchService";
 }

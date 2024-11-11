@@ -17,7 +17,7 @@ NvsStorage::~NvsStorage()
 	FB_DEBUG_LOG("NVS deinit result: %d", static_cast<int>(result));
 }
 
-const char* NvsStorage::getName()
+const char* NvsStorage::getName() const
 {
 	return "NvsStorage";
 }

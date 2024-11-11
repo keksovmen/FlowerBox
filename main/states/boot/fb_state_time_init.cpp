@@ -18,7 +18,7 @@ StateTimeInit::StateTimeInit(StateManager& context)
 
 }
 
-const char* StateTimeInit::getName()
+const char* StateTimeInit::getName() const
 {
 	return "StateTimeInit";
 }

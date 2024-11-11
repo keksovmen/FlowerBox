@@ -19,7 +19,7 @@ namespace fb
 			public:
 				StateWifiLost(StateManager& context);
 
-				virtual const char* getName() override;
+				virtual const char* getName() const override;
 
 				virtual void handleEvent(const event::Event& event) override;
 

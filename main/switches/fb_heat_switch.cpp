@@ -31,7 +31,7 @@ HeatSwitch::~HeatSwitch()
 
 }
 
-const char* HeatSwitch::getName()
+const char* HeatSwitch::getName() const
 {
 	return "HeatSwitch";
 }
@@ -112,7 +112,7 @@ FanSwitch::FanSwitch(sensor::TemperatureSensor* sensor,
 
 }
 
-const char* FanSwitch::getName()
+const char* FanSwitch::getName() const
 {
 	return "FanSwitch";
 }

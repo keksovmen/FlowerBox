@@ -24,7 +24,7 @@ namespace fb
 
 				virtual void handleEvent(const event::Event& event) override;
 
-				virtual const char* getName() override;
+				virtual const char* getName() const override;
 		};
 	}
 }

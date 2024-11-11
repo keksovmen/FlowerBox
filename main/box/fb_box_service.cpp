@@ -57,7 +57,7 @@ void BoxService::handleEvent(const event::Event& event)
 	}
 }
 
-const char* BoxService::getName()
+const char* BoxService::getName() const
 {
 	return "BoxService";
 }

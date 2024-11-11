@@ -21,7 +21,7 @@ StateHwInit::StateHwInit(StateManager& context)
 
 }
 
-const char* StateHwInit::getName()
+const char* StateHwInit::getName() const
 {
 	return "StateHwInit";
 }

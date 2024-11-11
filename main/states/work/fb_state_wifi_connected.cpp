@@ -19,7 +19,7 @@ StateWifiConnected::StateWifiConnected(StateManager& context)
 
 }
 
-const char* StateWifiConnected::getName()
+const char* StateWifiConnected::getName() const
 {
 	return "StateWifiConnected";
 }

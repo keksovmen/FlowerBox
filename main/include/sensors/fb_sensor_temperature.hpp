@@ -30,7 +30,7 @@ namespace fb
 
 
 
-				virtual const char* getName() override;
+				virtual const char* getName() const override;
 
 				void lateInit(Id id, OW_t* interface);
 
@@ -68,7 +68,7 @@ namespace fb
 				TemperatureSensorArray(int gpio);
 				~TemperatureSensorArray();
 
-				virtual const char* getName() override;
+				virtual const char* getName() const override;
 
 				virtual int getDeviceCount() const override;
 				virtual TemperatureSensor* getSensor(int index) override;

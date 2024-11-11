@@ -7,7 +7,7 @@ using namespace storage;
 
 
 
-const char* RamStorage::getName()
+const char* RamStorage::getName() const
 {
 	return "RamStorage";
 }

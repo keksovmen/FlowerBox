@@ -41,7 +41,7 @@ void StateSensorInit::handleEvent(const event::Event& event)
 
 }
 
-const char* StateSensorInit::getName()
+const char* StateSensorInit::getName() const
 {
 	return "StateSensorInit";
 }

@@ -16,7 +16,7 @@ namespace fb
 		class SwitchService : public util::ServiceIface
 		{
 			public:
-				virtual const char* getName() override;
+				virtual const char* getName() const override;
 
 				void addSwitch(SwitchIface* entry);
 			

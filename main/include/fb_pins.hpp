@@ -21,7 +21,7 @@ namespace fb
 		class PinManager : public debug::Named, public event::EventListener
 		{
 			public:
-				virtual const char* getName() override;
+				virtual const char* getName() const override;
 				virtual void handleEvent(const event::Event& event) override;
 			
 			private:

@@ -20,7 +20,7 @@ EventManager::~EventManager()
 	vQueueDelete(_queue);
 }
 
-const char* EventManager::getName()
+const char* EventManager::getName() const
 {
 	return "EventManager";
 }

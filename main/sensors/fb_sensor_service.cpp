@@ -20,7 +20,7 @@ using namespace sensor;
 
 
 
-const char* SensorService::getName()
+const char* SensorService::getName() const
 {
 	return "SensorService";
 }
