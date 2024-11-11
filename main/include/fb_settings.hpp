@@ -2,7 +2,10 @@
 
 
 
+#include <memory>
 #include <string>
+
+#include "fb_storage.hpp"
 
 
 
@@ -38,6 +41,8 @@ namespace fb
 		};
 
 
+
+		void init(std::unique_ptr<storage::StorageIface> storage);
 
 		//getters
 		std::string getApSsid();

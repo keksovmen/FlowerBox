@@ -20,6 +20,8 @@ idf_component_register(
 		"box/fb_box_service.cpp"
 		"box/fb_object_base.cpp"
 		"box/fb_tid.cpp"
+		"storage/fb_ram_storage.cpp"
+		"storage/fb_nvs_storage.cpp"
 		"sensors/fb_sensor_iface.cpp"
 		"sensors/fb_sensor_temperature.cpp"
 		"sensors/fb_sensor_service.cpp"
@@ -48,6 +50,7 @@ idf_component_register(
     INCLUDE_DIRS
 		"include"
 		"include/box"
+		"include/storage"
 		"include/sensors"
 		"include/switches"
 		"include/servers"

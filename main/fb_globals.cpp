@@ -9,6 +9,9 @@
 #include "fb_box_service.hpp"
 #include "fb_heat_switch.hpp"
 #include "fb_time_switch.hpp"
+#include "fb_nvs_storage.hpp"
+#include "fb_ram_storage.hpp"
+#include "fb_settings.hpp"
 
 
 
@@ -18,6 +21,10 @@
 
 using namespace fb;
 using namespace global;
+
+
+
+static const char* TAG = "globals";
 
 
 
@@ -101,9 +108,25 @@ static void _setBoxSwitchSensors()
 	_boxFanSwitch->addSensorDependency(_boxTempSensors[1]->getId());
 }
 
+static void _init_settings()
+{
+	std::unique_ptr<storage::StorageIface> store(std::make_unique<storage::NvsStorage>());
+	if(!store->init()){
+		FB_DEBUG_TAG_LOG("Failed to init NVS storage -> RAM will be used");
+
+		store.reset(new storage::RamStorage());
+		store->init();
+	}
+
+	settings::init(std::move(store));
+}
+
+
 
 void global::init()
 {
+	_init_settings();
+
 	_boxService = new box::BoxService(_flowerBox, _sensorStorage);
 
 	_sensorService.addSensor(&_sensorArrayTemp);
