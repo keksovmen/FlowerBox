@@ -25,6 +25,13 @@ Switch::Switch(Tid tid,
 		});
 }
 
+Switch::Switch(Tid tid, const ReadStateCb& stateCb)
+	: ObjectStaticTid(tid),
+	_stateCb(stateCb)
+{
+
+}
+
 std::string Switch::toJson() const
 {
 	cJSON* obj = cJSON_CreateObject();

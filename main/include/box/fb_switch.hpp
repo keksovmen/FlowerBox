@@ -26,6 +26,8 @@ namespace fb
 					std::vector<int> dependentProperties,
 					std::vector<int> dependentSensors,
 					const ReadStateCb& stateCb);
+				
+				Switch(Tid tid, const ReadStateCb& stateCb);
 
 				virtual std::string toJson() const override;
 

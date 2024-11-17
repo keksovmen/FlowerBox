@@ -9,6 +9,27 @@ using namespace box;
 
 
 
+ObjectIface::ObjectIface()
+{
+
+}
+
+ObjectIface::ObjectIface(
+	Tid tid,
+	const std::string& name,
+	const std::string& description,
+	const std::string& valueType,
+	const std::string& minValue,
+	const std::string& maxValue
+)
+	: _tid(tid),
+	_name(name), _description(description),
+	_valueType(valueType),
+	_minValue(minValue), _maxValue(maxValue)
+{
+
+}
+
 ObjectIface::~ObjectIface()
 {
 
@@ -99,13 +120,14 @@ const ObjectIface::PropertyArray& ObjectIface::getPropertyDependencies() const
 
 
 ObjectStaticTid::ObjectStaticTid(Tid tid)
+	: ObjectIface(
+		tid,
+		tidToName(tid), tidToDescription(tid),
+		tidToValueType(tid),
+		tidToMinValue(tid), tidToMaxValue(tid)
+	)
 {
-	setTid(tid);
-	setName(tidToName(tid));
-	setDescription(tidToDescription(tid));
-	setValueType(tidToValueType(tid));
-	setMinValueStr(tidToMinValue(tid));
-	setMaxValueStr(tidToMaxValue(tid));
+	
 }
 
 ObjectStaticTid::~ObjectStaticTid()

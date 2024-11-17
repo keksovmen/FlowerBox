@@ -20,7 +20,15 @@ namespace fb
 				using PropertyArray = std::vector<int>;
 
 
-
+				ObjectIface();
+				ObjectIface(
+					Tid tid,
+					const std::string& name,
+					const std::string& description,
+					const std::string& valueType,
+					const std::string& minValue,
+					const std::string& maxValue
+				);
 				virtual ~ObjectIface();
 
 				void setTid(Tid tid);

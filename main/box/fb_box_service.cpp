@@ -16,15 +16,15 @@ BoxService::BoxService(Box& box, sensor::SensorStorage& storage)
 {
 	//TODO: put somehere else
 	//TODO: add property action cb
-	const auto* prop = _box.addProperty(std::make_unique<PropertyInt>(
-		Tid::PROPERTY_SENSOR_PERIOD_GLOBAL,
-		[](int val){
-			global::getSensorService()->setTimerPeriod(val * 1000);
-			return true;
-		},
-		3));//TODO: fix it, service has not been stated here so timer is not exists
+	// const auto* prop = _box.addProperty(std::make_unique<PropertyInt>(
+	// 	Tid::PROPERTY_SENSOR_PERIOD_GLOBAL,
+	// 	[](int val){
+	// 		global::getSensorService()->setTimerPeriod(val * 1000);
+	// 		return true;
+	// 	},
+	// 	3));//TODO: fix it, service has not been stated here so timer is not exists
 		
-	_box.addPropertyDependency(prop->getId());
+	// _box.addPropertyDependency(prop->getId());
 }
 
 void BoxService::handleEvent(const event::Event& event)
@@ -41,6 +41,8 @@ void BoxService::handleEvent(const event::Event& event)
 				auto* s = sensorArray->getSensor(i);
 				_storage.addSensorValue(i, s->getValue());
 			}
+			//для того чтобы хранить данные надо их както доставать нужен индекс по которому храним,
+			//а так же перевод ид бокса в ид хранения для доставания
 
 			// for check working purposes only
 			// {

@@ -36,6 +36,10 @@ namespace fb
 				PropertyIface* getProperty(int id);
 				const Sensor* getSensor(int id) const;
 				const Switch* getSwitch(int id) const;
+
+				int generateSensorId();
+				int generateSwitchId();
+				int generatePropertyId();
 			
 			private:
 				const id::UniqueId _uniqueId;
