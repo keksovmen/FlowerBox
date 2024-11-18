@@ -21,6 +21,23 @@ static box::Sensor _outsideSensor(box::Tid::SENSOR_DS18B20);
 
 
 
+static void _create_register_description_prop(box::ObjectIface& obj)
+{
+	const auto *prop = _flowerBox.addProperty(std::make_unique<box::PropertyString>(
+		box::Tid::PROPERTY_SENSOR_DESCRIPTION,
+		[&obj](std::string val)
+		{ 
+			obj.setDescription(val);
+			return true;
+		},
+		obj.getDescription())
+	);
+	assert(prop);
+
+	obj.addPropertyDependency(prop->getId());
+}
+
+
 void project::initBoxObjs()
 {
 	//change to box get sensor id???
@@ -28,20 +45,8 @@ void project::initBoxObjs()
 	_flowerBox.addSensor(&_outsideSensor);
 
 	// change to static somehow
-	const auto* prop = _flowerBox.addProperty(std::make_unique<box::PropertyString>(
-			box::Tid::PROPERTY_SENSOR_DESCRIPTION,
-			[](std::string val){return true;},
-			_insideSensor.getDescription()));
-
-	_insideSensor.addPropertyDependency(prop->getId());
-
-
-	prop = _flowerBox.addProperty(std::make_unique<box::PropertyString>(
-			box::Tid::PROPERTY_SENSOR_DESCRIPTION,
-			[](std::string val){return true;},
-			_outsideSensor.getDescription()));
-
-	_outsideSensor.addPropertyDependency(prop->getId());
+	_create_register_description_prop(_insideSensor);
+	_create_register_description_prop(_outsideSensor);
 }
 
 box::Box& project::getBox()

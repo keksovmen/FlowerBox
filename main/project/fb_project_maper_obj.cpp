@@ -14,11 +14,26 @@ using namespace project;
 static box::Switch _boxLightSwitch(box::Tid::SWITCH_LIGHT,
 	[](){return getHwLightSwitch().isOn();});
 
-static box::Switch _boxHeatSwitch(box::Tid::SWITCH_LIGHT,
+static box::Switch _boxHeatSwitch(box::Tid::SWITCH_HEAT,
 	[](){return getHwHeatSwitch().isOn();});
 
-static box::Switch _boxFanSwitch(box::Tid::SWITCH_LIGHT,
+static box::Switch _boxFanSwitch(box::Tid::SWITCH_FAN,
 	[](){return getHwFanSwitch().isOn();});
+
+
+
+static void _create_and_register_forse_property(switches::SwitchIface& obj, box::Switch& dependy)
+{
+	auto* forseProperty = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_FORSE,
+		[&obj](int val){
+			obj.setForseFlag(static_cast<switches::SwitchForseState>(val));
+			return true;
+		}, obj.isOn()
+	);
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(forseProperty));
+	dependy.addPropertyDependency(forseProperty->getId());
+}
 
 
 
@@ -29,42 +44,16 @@ void project::initMaperObjs()
 	getBox().addSwitch(&_boxFanSwitch);
 
 
-	auto* forseProperty = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_FORSE,
-		[](int val){
-			getHwLightSwitch().setForseFlag(static_cast<switches::SwitchForseState>(val));
-			return true;
-		}, getHwLightSwitch().isOn()
-	);
+	_create_and_register_forse_property(getHwLightSwitch(), _boxLightSwitch);
 
-	getBox().addProperty(std::unique_ptr<box::PropertyIface>(forseProperty));
-	_boxLightSwitch.addPropertyDependency(forseProperty->getId());
-
-
-	forseProperty = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_FORSE,
-		[](int val){
-			getHwHeatSwitch().setForseFlag(static_cast<switches::SwitchForseState>(val));
-			return true;
-		}, getHwHeatSwitch().isOn()
-	);
-
-	getBox().addProperty(std::unique_ptr<box::PropertyIface>(forseProperty));
-	_boxHeatSwitch.addPropertyDependency(forseProperty->getId());
+	_create_and_register_forse_property(getHwHeatSwitch(), _boxHeatSwitch);
 	_boxHeatSwitch.addSensorDependency(getBoxInsideSensor().getId());
 
-
-	forseProperty = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_FORSE,
-		[](int val){
-			getHwFanSwitch().setForseFlag(static_cast<switches::SwitchForseState>(val));
-			return true;
-		}, getHwFanSwitch().isOn()
-	);
-
-	getBox().addProperty(std::unique_ptr<box::PropertyIface>(forseProperty));
-	_boxFanSwitch.addPropertyDependency(forseProperty->getId());
+	_create_and_register_forse_property(getHwFanSwitch(), _boxFanSwitch);
 	_boxFanSwitch.addSensorDependency(getBoxInsideSensor().getId());
 
 
-	getBox().addProperty(std::make_unique<box::PropertyInt>(
+	const auto* prop = getBox().addProperty(std::make_unique<box::PropertyInt>(
 		box::Tid::PROPERTY_SENSOR_PERIOD_GLOBAL,
 		[](int val){
 			getHwSensorService().setTimerPeriod(val * 1000);
@@ -72,6 +61,7 @@ void project::initMaperObjs()
 		},
 		3));	//TODO: made it not die in assert
 		// getHwSensorService().getTimerPeriod()));
+	getBox().addPropertyDependency(prop->getId());
 		
 
 	//TODO: add sensor service property and etc

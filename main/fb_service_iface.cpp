@@ -34,6 +34,8 @@ void ServiceIface::start()
 
 	err = xTaskCreate(&ServiceIface::_task, getName(), _TASK_STACK_SIZE, this, _TASK_PRIORITY, NULL);
 	assert(err == pdPASS);
+
+	forcePullAction();
 }
 
 void ServiceIface::stop()
