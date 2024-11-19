@@ -66,3 +66,43 @@ void project::initMaperObjs()
 
 	//TODO: add sensor service property and etc
 }
+
+int project::mapBoxSensorIdToAddres(int id)
+{
+	if(id == getBoxInsideSensor().getId())
+	{
+		return reinterpret_cast<int>(&getHwInsideTempSensor());
+	}
+	else if(id == getBoxOutsideSensor().getId())
+	{
+		return reinterpret_cast<int>(&getHwOutsideTempSensor());
+	}
+
+	//TODO: add proper error returning
+
+	assert(0);
+	// switch(id)
+	// {
+		//try constexpr here
+	// 	case getBoxInsideSensor().getId():
+
+	// }
+}
+
+int project::mapBoxSwitchIdToAddres(int id)
+{
+	if(id == _boxLightSwitch.getId())
+	{
+		return reinterpret_cast<int>(&_boxLightSwitch);
+	}
+	else if(id == _boxHeatSwitch.getId())
+	{
+		return reinterpret_cast<int>(&_boxHeatSwitch);
+	}
+	else if(id == _boxFanSwitch.getId())
+	{
+		return reinterpret_cast<int>(&_boxFanSwitch);
+	}
+
+	assert(0);
+}

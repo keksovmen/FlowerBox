@@ -29,10 +29,10 @@ namespace fb
 				bool init();
 
 				/**
-				 * @brief reads data from any physical inteface
+				 * @brief reads data from any physical inteface, can break sensor to init state
 				 * 
-				 * @return true no error detected, sensor status is okay
-				 * @return false error detected, and sensor must be called for init()
+				 * @return true value changed
+				 * @return false value remained the same
 				 */
 
 				bool update();
@@ -44,14 +44,22 @@ namespace fb
 				 */
 				
 				bool isInit() const;
-			
+
+			protected:
+				enum class UpdateResult : int
+				{
+					OK,
+					VALUE_CHANGED,
+					FAIL
+				};
+				
 			private:
 				bool _initFlag = false;
 
 
 
 				virtual bool _doInit() = 0;
-				virtual bool _doUpdate() = 0;
+				virtual UpdateResult _doUpdate() = 0;
 		};
 	}
 }

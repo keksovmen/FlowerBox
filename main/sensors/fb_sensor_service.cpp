@@ -52,7 +52,9 @@ void SensorService::_onPull()
 		if(s->update()){
 			_dropEvent(SensorEvent::SENSOR_VALUE_CHANGED, s);
 		}else{
-			_dropEvent(SensorEvent::SENSOR_LOST, s);
+			if(!s->isInit()){
+				_dropEvent(SensorEvent::SENSOR_LOST, s);
+			}
 		}
 	}
 }

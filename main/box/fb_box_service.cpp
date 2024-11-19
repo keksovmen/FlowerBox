@@ -35,14 +35,18 @@ void BoxService::handleEvent(const event::Event& event)
 
 		}else if(event.eventId == sensor::SensorEvent::SENSOR_VALUE_CHANGED){
 			//TODO: move it somehwere else maybe?
-			auto* sensorArray = reinterpret_cast<sensor::TemperatureSensorArrayI*>(event.data);
-			for(int i = 0; i < sensorArray->getDeviceCount(); i++)
-			{
-				auto* s = sensorArray->getSensor(i);
-				_storage.addSensorValue(i, s->getValue());
+			const auto* sen = reinterpret_cast<sensor::TemperatureSensor*>(event.data);
+			if(sen){
+				_storage.addSensorValue(reinterpret_cast<int>(sen), sen->getValue());
 			}
+
+			// for(int i = 0; i < sensorArray->getDeviceCount(); i++)
+			// {
+				// auto* s = sensorArray->getSensor(i);
+			// }
 			//для того чтобы хранить данные надо их както доставать нужен индекс по которому храним,
 			//а так же перевод ид бокса в ид хранения для доставания
+			
 
 			// for check working purposes only
 			// {

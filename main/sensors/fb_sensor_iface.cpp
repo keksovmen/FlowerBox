@@ -1,5 +1,7 @@
 #include "fb_sensor_iface.hpp"
 
+#include <utility>
+
 
 
 using namespace fb;
@@ -22,14 +24,27 @@ bool SensorIface::init()
 
 bool SensorIface::update()
 {
-	const bool result = _doUpdate();
-	FB_DEBUG_LOG("update() = %d", result);
+	const UpdateResult result = _doUpdate();
+	FB_DEBUG_LOG("update() = %d", std::to_underlying(result));
 
-	if(!result){
-		_initFlag = false;
+	switch(result)
+	{
+		case UpdateResult::OK:
+			return false;
+		
+		case UpdateResult::VALUE_CHANGED:
+			return true;
+		
+		case UpdateResult::FAIL:
+		{
+			_initFlag = false;
+			return false;
+		}
+
+		default:
+			assert(0);
+			return false;
 	}
-
-	return result;
 }
 
 bool SensorIface::isInit() const

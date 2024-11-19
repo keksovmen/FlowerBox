@@ -46,17 +46,24 @@ bool TemperatureSensor::_doInit()
 	return getId() != InvalidId;
 }
 
-bool TemperatureSensor::_doUpdate()
+SensorIface::UpdateResult TemperatureSensor::_doUpdate()
 {
-	//TODO: check interface status
-
 	_temperatureMeasureRequest();
-	_value = _temperatureValueRequest();
-	FB_DEBUG_LOG("Temperature[0x%llX] = %.2f", getId(), getValue());
+	const float current = _temperatureValueRequest();
 
-	//TODO: drop event value changed?
+	if(current == TemperatureSensor::InvalidValue){
+		FB_DEBUG_LOG("Temperature[0x%llX] lost detected", getId());
+		return SensorIface::UpdateResult::FAIL;
+	}
 
-	return true;
+	if(current != _value){
+		FB_DEBUG_LOG("Temperature[0x%llX] changed %.2f -> %.2f", getId(), _value, current);
+		_value = current;
+
+		return SensorIface::UpdateResult::VALUE_CHANGED;
+	}
+
+	return SensorIface::UpdateResult::OK;
 }
 
 void TemperatureSensor::_temperatureMeasureRequest()
@@ -73,9 +80,10 @@ void TemperatureSensor::_temperatureMeasureRequest()
 
 float TemperatureSensor::_temperatureValueRequest()
 {
-	while (ow_read(_interface) == false)
+	if (!ow_read(_interface) == false)
 	{
-		portYIELD();
+		// portYIELD();
+		return TemperatureSensor::InvalidValue;
 	}
 	
 	ow_reset(_interface);
@@ -89,7 +97,7 @@ float TemperatureSensor::_temperatureValueRequest()
 	int16_t temp = 0;
 	temp = ow_read(_interface) | (ow_read(_interface) << 8);
 
-	return temp / 16.0;
+	return temp > 0 ? temp / 16.0 : TemperatureSensor::InvalidValue;
 }
 
 
@@ -99,10 +107,10 @@ TemperatureSensorArray<N>::TemperatureSensorArray(int gpio)
 {
 	assert(ow_init(&_interface, gpio));
 	// std::fill_n(std::back_insert_iterator(_sensors.begin()), expectedDevices, TemperatureSensor{_interface});
-	for(int i = 0; i < N; i++){
+	// for(int i = 0; i < N; i++){
 		// _sensors[i]
 	// 	_sensors.push_back(TemperatureSensor{_interface});
-	}
+	// }
 }
 
 template<int N>
@@ -173,14 +181,14 @@ bool TemperatureSensorArray<N>::_doInit()
 }
 
 template<int N>
-bool TemperatureSensorArray<N>::_doUpdate()
+SensorIface::UpdateResult TemperatureSensorArray<N>::_doUpdate()
 {
 	bool result = true;
 	for(int i = 0; i < _sensors.size(); i++){
-		result &= _sensors[i].update();
+		result &= _sensors[i].isInit();
 	}
 
-	return result;
+	return result ? SensorIface::UpdateResult::OK : SensorIface::UpdateResult::FAIL;
 }
 
 

@@ -32,6 +32,8 @@ static sensor::SensorStorage _sensorStorage;
 void project::initHwObjs()
 {
 	_sensorService.addSensor(&getHwTempSensors());
+	_sensorService.addSensor(&getHwInsideTempSensor());
+	_sensorService.addSensor(&getHwOutsideTempSensor());
 
 	_swithService.addSwitch(&getHwLightSwitch());
 	_swithService.addSwitch(&getHwHeatSwitch());

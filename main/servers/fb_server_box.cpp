@@ -3,6 +3,7 @@
 #include "fb_debug.hpp"
 #include "fb_globals.hpp"
 #include "fb_data_entry.hpp"
+#include "fb_project_maper_obj.hpp"
 
 
 
@@ -211,13 +212,15 @@ static esp_err_t _sensor_data_cb(httpd_req_t* r)
 
 	httpd_resp_set_type(r, HTTPD_TYPE_JSON);
 
-	auto iter = global::getSensorStorage()->getSensorValues(id, timestamp);
+	//map id to address and check if such exists, it will help with error handling
+	auto iter = global::getSensorStorage()->getSensorValues(project::mapBoxSensorIdToAddres(id), timestamp);
 	if(!iter){
 		err = httpd_resp_send(r, "[]", HTTPD_RESP_USE_STRLEN);
 		return err; 
 	}
 
-	const auto end = global::getSensorStorage()->getSensorValuesEnd(id);
+	//map id to address and check if such exists, it will help with error handling
+	const auto end = global::getSensorStorage()->getSensorValuesEnd(project::mapBoxSensorIdToAddres(id));
 
 	err |= httpd_resp_sendstr_chunk(r, "[");
 	bool comaFlag = false;

@@ -44,7 +44,7 @@ namespace fb
 
 
 				virtual bool _doInit() override;
-				virtual bool _doUpdate() override;
+				virtual SensorIface::UpdateResult _doUpdate() override;
 
 				void _temperatureMeasureRequest();
 				float _temperatureValueRequest();
@@ -82,7 +82,7 @@ namespace fb
 
 
 				virtual bool _doInit() override;
-				virtual bool _doUpdate() override;
+				virtual SensorIface::UpdateResult _doUpdate() override;
 		};
 
 

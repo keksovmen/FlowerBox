@@ -7,35 +7,66 @@ using namespace sensor;
 
 
 
-void SensorStorage::addSensorValue(TemperatureSensor::Id id, float value)
+void SensorStorage::addSensorValue(int address, float value)
 {
+	_addAddres(address);
 
 	//если полседнее значение точно такое же, то не добавляем
-	if(_sensorData[id].last() && _sensorData[id].last()->value == value){
+	if(_getSensorValueBuffer(address).last() && _getSensorValueBuffer(address).last()->value == value){
 		return;
 	}
 
-	_sensorData[id].pushValue(SensorStorageEntry{value, clock::currentTimeStamp()});
+	_getSensorValueBuffer(address).pushValue(SensorStorageEntry{value, clock::currentTimeStamp()});
 }
 
-void SensorStorage::addSensorState(TemperatureSensor::Id id, bool state)
+void SensorStorage::addSensorState(int address, bool state)
 {
 
 }
 
-SensorStorage::Iterator SensorStorage::getSensorValues(TemperatureSensor::Id id, clock::Timestamp from) const
+SensorStorage::Iterator SensorStorage::getSensorValues(int address, clock::Timestamp from) const
 {
-	return _sensorData[id].findValueIndex([&from](const SensorStorageEntry& e){
+	return _getSensorValueBuffer(address).findValueIndex([&from](const SensorStorageEntry& e){
 		return e.timestamp > from;
 	});
 }
 
-SensorStorage::Iterator SensorStorage::getSensorValuesEnd(TemperatureSensor::Id id) const
+SensorStorage::Iterator SensorStorage::getSensorValuesEnd(int address) const
 {
-	return _sensorData[id].end();
+	return _getSensorValueBuffer(address).end();
 }
 
-SensorStorage::Buffer& SensorStorage::_getSensorValueBuffer(TemperatureSensor::Id id)
+SensorStorage::Buffer& SensorStorage::_getSensorValueBuffer(int address)
 {
-	return _sensorData[id];
+	const int index = _mapAddresToIndex(address);
+	assert(index != SensorStorage::_ILLEGAL_INDEX);
+
+	return _sensorData.at(index);
+}
+
+const SensorStorage::Buffer& SensorStorage::_getSensorValueBuffer(int address) const
+{
+	const int index = _mapAddresToIndex(address);
+	assert(index != SensorStorage::_ILLEGAL_INDEX);
+
+	return _sensorData.at(index);
+}
+
+int SensorStorage::_mapAddresToIndex(int address) const
+{
+	return _addressMap.contains(address) ? _addressMap.at(address) : SensorStorage::_ILLEGAL_INDEX;
+}
+
+int SensorStorage::_addAddres(int address)
+{
+	if(_addressMap.contains(address)){
+		return _addressMap.at(address);
+	}
+
+	assert(_addressMap.size() < _sensorData.size());
+
+	const int result = _addressMap.size();
+	_addressMap[address] = result;
+
+	return result;
 }
