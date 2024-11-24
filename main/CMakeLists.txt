@@ -1,5 +1,30 @@
+set(_PROJECT MINE)
+# set(_PROJECT DIPLOM)
+
+message(STATUS "Selected project: " ${_PROJECT})
+
+if(${_PROJECT} STREQUAL "MINE")
+	set(_ADD_SRC 
+		"project/fb_project_box_obj.cpp"
+		"project/fb_project_hw_obj.cpp"
+		"project/fb_project_maper_obj.cpp")
+	set(_ADD_INCLUDES
+		"include/project")
+else()
+	set(_ADD_SRC 
+		"project2/fb_project_box_obj.cpp"
+		"project2/fb_project_hw_obj.cpp"
+		"project2/fb_project_maper_obj.cpp")
+	set(_ADD_INCLUDES
+		"include/project2")
+endif()
+
+message(STATUS "ADD SRC: " ${_ADD_SRC})
+
+
 idf_component_register(
 	SRCS 
+		${_ADD_SRC}
 		"fb_clock.cpp"
 		"fb_event_manager.cpp"
 		"fb_file_system.cpp"
@@ -13,9 +38,6 @@ idf_component_register(
 		"fb_provision.cpp"
 		"main.cpp"
 		"box/fb_box.cpp"
-		"project/fb_project_box_obj.cpp"
-		"project/fb_project_hw_obj.cpp"
-		"project/fb_project_maper_obj.cpp"
 		"box/fb_property.cpp"
 		"box/fb_sensor.cpp"
 		"box/fb_switch.cpp"
@@ -50,9 +72,9 @@ idf_component_register(
 		"switches/fb_switch_service.cpp"
 
     INCLUDE_DIRS
+		${_ADD_INCLUDES}
 		"include"
 		"include/box"
-		"include/project"
 		"include/sensors"
 		"include/servers"
 		"include/states"
@@ -62,5 +84,11 @@ idf_component_register(
 		"include/states/update"
 		"include/states/work"
 		)
+
+# if(${_PROJECT} STREQUAL "MINE")
+# 	target_compile_options(${COMPONENT_LIB} PRIVATE -D_PROJECT=0)
+# else()
+# 	target_compile_options(${COMPONENT_LIB} PRIVATE -D_PROJECT=1)
+# endif()
 
 spiffs_create_partition_image(storage ../spiffs_image FLASH_IN_PROJECT)
