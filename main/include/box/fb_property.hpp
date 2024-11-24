@@ -17,7 +17,7 @@ namespace fb
 		{
 			public:
 				PropertyIface(Tid tid);
-				~PropertyIface();
+				virtual ~PropertyIface() = default;
 
 				virtual bool setFromJson(const std::string& json) = 0;
 		};

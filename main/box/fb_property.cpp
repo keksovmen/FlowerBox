@@ -15,11 +15,6 @@ PropertyIface::PropertyIface(Tid tid)
 
 }
 
-PropertyIface::~PropertyIface()
-{
-
-}
-
 
 
 template<class T>

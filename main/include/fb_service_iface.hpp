@@ -25,7 +25,7 @@ namespace fb
 
 
 
-				virtual ~ServiceIface();
+				virtual ~ServiceIface() = default;
 
 				void start();
 				void stop();

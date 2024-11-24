@@ -12,11 +12,6 @@ SwitchIface::SwitchIface(const ConditionCb &conditionCb, const ActionCb actionCb
 {
 }
 
-SwitchIface::~SwitchIface()
-{
-
-}
-
 void SwitchIface::check()
 {
 	if(_forseFlag == SwitchForseState::ON){

@@ -26,11 +26,6 @@ HeatSwitch::HeatSwitch(sensor::TemperatureSensor* sensor,
 	assert(gpio_config(&cfg) == ESP_OK);
 }
 
-HeatSwitch::~HeatSwitch()
-{
-
-}
-
 const char* HeatSwitch::getName() const
 {
 	return "HeatSwitch";

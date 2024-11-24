@@ -16,21 +16,16 @@ ObjectIface::ObjectIface()
 
 ObjectIface::ObjectIface(
 	Tid tid,
-	const std::string& name,
-	const std::string& description,
-	const std::string& valueType,
-	const std::string& minValue,
-	const std::string& maxValue
+	std::string name,
+	std::string description,
+	std::string valueType,
+	std::string minValue,
+	std::string maxValue
 )
 	: _tid(tid),
 	_name(name), _description(description),
 	_valueType(valueType),
 	_minValue(minValue), _maxValue(maxValue)
-{
-
-}
-
-ObjectIface::~ObjectIface()
 {
 
 }
@@ -128,9 +123,4 @@ ObjectStaticTid::ObjectStaticTid(Tid tid)
 	)
 {
 	
-}
-
-ObjectStaticTid::~ObjectStaticTid()
-{
-
 }

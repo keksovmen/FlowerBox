@@ -16,7 +16,7 @@ namespace fb
 		{
 			public:
 
-				virtual ~SensorIface();
+				virtual ~SensorIface() = default;
 
 				/**
 				 * @brief 

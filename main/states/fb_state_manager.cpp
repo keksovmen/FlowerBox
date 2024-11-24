@@ -15,11 +15,6 @@ State::State(StateManager& context)
 
 }
 
-State::~State()
-{
-
-}
-
 StateManager& State::getContext()
 {
 	return _context;

@@ -9,10 +9,6 @@ using namespace sensor;
 
 
 
-SensorIface::~SensorIface()
-{
-}
-
 bool SensorIface::init()
 {
 	const bool result = _doInit();

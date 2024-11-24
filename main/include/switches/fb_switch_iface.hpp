@@ -38,7 +38,7 @@ namespace fb
 
 
 				SwitchIface(const ConditionCb& conditionCb, const ActionCb actionCb);
-				virtual ~SwitchIface();
+				virtual ~SwitchIface() = default;
 
 				void check();
 				void setForseFlag(SwitchForseState state);

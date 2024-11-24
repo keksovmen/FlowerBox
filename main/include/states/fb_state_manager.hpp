@@ -21,7 +21,7 @@ namespace fb
 		{
 			public:
 				State(StateManager& context);
-				~State();
+				virtual ~State() = default;
 
 				virtual void enter() = 0;
 				virtual void exit() = 0;

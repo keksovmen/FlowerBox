@@ -26,7 +26,7 @@ namespace fb
 
 
 
-				virtual ~StorageIface(){}
+				virtual ~StorageIface() = default;
 
 				/**
 				 * @brief must be called once

@@ -17,7 +17,7 @@ namespace fb
 			public:
 				HeatSwitch(sensor::TemperatureSensor* sensor,
 					float lowTemp, float highTemp, int gpio);
-				virtual ~HeatSwitch();
+				virtual ~HeatSwitch() = default;
 
 				virtual const char* getName() const override;
 

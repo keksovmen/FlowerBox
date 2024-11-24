@@ -16,11 +16,6 @@ using namespace util;
 
 
 
-ServiceIface::~ServiceIface()
-{
-
-}
-
 void ServiceIface::start()
 {
 	_actionQueue = xQueueCreate(_QUEUE_SIZE, sizeof(ServiceIface::Action));

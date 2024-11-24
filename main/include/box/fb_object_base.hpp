@@ -23,13 +23,13 @@ namespace fb
 				ObjectIface();
 				ObjectIface(
 					Tid tid,
-					const std::string& name,
-					const std::string& description,
-					const std::string& valueType,
-					const std::string& minValue,
-					const std::string& maxValue
+					std::string name,
+					std::string description,
+					std::string valueType,
+					std::string minValue,
+					std::string maxValue
 				);
-				virtual ~ObjectIface();
+				virtual ~ObjectIface() = default;
 
 				void setTid(Tid tid);
 				Tid getTid() const;
@@ -72,7 +72,7 @@ namespace fb
 		{
 			public:
 				ObjectStaticTid(Tid tid);
-				virtual ~ObjectStaticTid();
+				virtual ~ObjectStaticTid() = default;
 		};
 	}
 }
