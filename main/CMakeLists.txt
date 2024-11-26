@@ -1,5 +1,5 @@
-set(_PROJECT MINE)
-# set(_PROJECT DIPLOM)
+# set(_PROJECT MINE)
+set(_PROJECT DIPLOM)
 
 message(STATUS "Selected project: " ${_PROJECT})
 
@@ -14,7 +14,8 @@ else()
 	set(_ADD_SRC 
 		"project2/fb_project_box_obj.cpp"
 		"project2/fb_project_hw_obj.cpp"
-		"project2/fb_project_maper_obj.cpp")
+		"project2/fb_project_maper_obj.cpp"
+		"switches/fb_rgb_switch.cpp")
 	set(_ADD_INCLUDES
 		"include/project2")
 endif()

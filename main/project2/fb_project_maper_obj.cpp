@@ -11,8 +11,8 @@ using namespace project;
 
 
 
-// static box::Switch _boxLightSwitch(box::Tid::SWITCH_LIGHT,
-// 	[](){return getHwLightSwitch().isOn();});
+static box::Switch _boxRgbSwitch(box::Tid::SWITCH_RGB,
+	[](){return getHwRgbSwitch().isOn();});
 
 // static box::Switch _boxHeatSwitch(box::Tid::SWITCH_HEAT,
 // 	[](){return getHwHeatSwitch().isOn();});
@@ -22,29 +22,38 @@ using namespace project;
 
 
 
-// static void _create_and_register_forse_property(switches::SwitchIface& obj, box::Switch& dependy)
-// {
-// 	auto* forseProperty = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_FORSE,
-// 		[&obj](int val){
-// 			obj.setForseFlag(static_cast<switches::SwitchForseState>(val));
-// 			return true;
-// 		}, obj.isOn()
-// 	);
+static void _create_and_register_forse_property(switches::SwitchIface& obj, box::Switch& dependy)
+{
+	auto* forseProperty = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_FORSE,
+		[&obj](int val){
+			obj.setForseFlag(static_cast<switches::SwitchForseState>(val));
+			return true;
+		}, obj.isOn()
+	);
 
-// 	getBox().addProperty(std::unique_ptr<box::PropertyIface>(forseProperty));
-// 	dependy.addPropertyDependency(forseProperty->getId());
-// }
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(forseProperty));
+	dependy.addPropertyDependency(forseProperty->getId());
+}
 
 
 
 void project::initMaperObjs()
 {
+	getBox().addSwitch(&_boxRgbSwitch);
 	// getBox().addSwitch(&_boxLightSwitch);
 	// getBox().addSwitch(&_boxHeatSwitch);
-	// getBox().addSwitch(&_boxFanSwitch);
 
 
-	// _create_and_register_forse_property(getHwLightSwitch(), _boxLightSwitch);
+	_create_and_register_forse_property(getHwRgbSwitch(), _boxRgbSwitch);
+	auto* colorProperty = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_RGB_VALUE,
+		[](int val){
+			getHwRgbSwitch().setColor(val);
+			return true;
+		}, getHwRgbSwitch().getColor()
+	);
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(colorProperty));
+	_boxRgbSwitch.addPropertyDependency(colorProperty->getId());
 
 	// _create_and_register_forse_property(getHwHeatSwitch(), _boxHeatSwitch);
 	// _boxHeatSwitch.addSensorDependency(getBoxInsideSensor().getId());
@@ -53,15 +62,23 @@ void project::initMaperObjs()
 	// _boxFanSwitch.addSensorDependency(getBoxInsideSensor().getId());
 
 
-	const auto* prop = getBox().addProperty(std::make_unique<box::PropertyInt>(
-		box::Tid::PROPERTY_SENSOR_PERIOD_GLOBAL,
-		[](int val){
-			getHwSensorService().setTimerPeriod(val * 1000);
-			return true;
-		},
-		3));	//TODO: made it not die in assert
-		// getHwSensorService().getTimerPeriod()));
-	getBox().addPropertyDependency(prop->getId());
+	// const auto* prop = getBox().addProperty(std::make_unique<box::PropertyInt>(
+	// 	box::Tid::PROPERTY_SENSOR_PERIOD_GLOBAL,
+	// 	[](int val){
+	// 		getHwSensorService().setTimerPeriod(val * 1000);
+	// 		return true;
+	// 	},
+	// 	3));	//TODO: made it not die in assert
+	// 	// getHwSensorService().getTimerPeriod()));
+
+	// const auto* prop = getBox().addProperty(std::make_unique<box::PropertyInt>(
+	// 	box::Tid::PROPERTY_SENSOR_PERIOD_GLOBAL,
+	// 	[](int val){
+	// 		getHwSensorService().setTimerPeriod(val * 1000);
+	// 		return true;
+	// 	},
+	// 	3));	//TODO: made it not die in assert
+	// getBox().addPropertyDependency(prop->getId());
 		
 
 	//TODO: add sensor service property and etc
@@ -91,10 +108,10 @@ int project::mapBoxSensorIdToAddres(int id)
 
 int project::mapBoxSwitchIdToAddres(int id)
 {
-	// if(id == _boxLightSwitch.getId())
-	// {
-	// 	return reinterpret_cast<int>(&_boxLightSwitch);
-	// }
+	if(id == _boxRgbSwitch.getId())
+	{
+		return reinterpret_cast<int>(&_boxRgbSwitch);
+	}
 	// else if(id == _boxHeatSwitch.getId())
 	// {
 	// 	return reinterpret_cast<int>(&_boxHeatSwitch);

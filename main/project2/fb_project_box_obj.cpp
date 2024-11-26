@@ -5,7 +5,7 @@
 
 
 
-#define _DEVICE_NAME "FlowerBox"
+#define _DEVICE_NAME "Diploma"
 #define _DEVICE_VERSION "0.0.1"
 
 
@@ -15,7 +15,7 @@ using namespace project;
 
 
 
-static box::Box _flowerBox(_DEVICE_NAME, _DEVICE_VERSION, global::getUniqueId());
+static box::Box _flowerBox(_DEVICE_NAME, _DEVICE_VERSION, 1);
 // static box::Sensor _insideSensor(box::Tid::SENSOR_DS18B20);
 // static box::Sensor _outsideSensor(box::Tid::SENSOR_DS18B20);
 

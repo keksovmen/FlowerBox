@@ -18,7 +18,7 @@ using namespace project;
 // static switches::TimeSwitch _switchLight(clock::Time(0, 0, 0), clock::Time(0, 1, 0), pins::PIN_BLUE_LED);
 // //change to reference instead of a pointer senor argument
 // static switches::HeatSwitch _switchHeating(_sensorTemperatureInside, 28.5, 29, pins::PIN_GREEN_LED);
-// static switches::FanSwitch _switchFan(_sensorTemperatureOutside, 30, 31, pins::PIN_COOL_LED);
+static switches::RgbSwitch _rgbSwitch(0, 0, 0);
 
 // //сервисы туть
 static sensor::SensorService _sensorService;
@@ -37,7 +37,7 @@ void project::initHwObjs()
 
 	// _swithService.addSwitch(&getHwLightSwitch());
 	// _swithService.addSwitch(&getHwHeatSwitch());
-	// _swithService.addSwitch(&getHwFanSwitch());
+	_swithService.addSwitch(&getHwRgbSwitch());
 }
 
 // sensor::TemperatureSensorArrayI& project::getHwTempSensors()
@@ -69,6 +69,11 @@ void project::initHwObjs()
 // {
 // 	return _switchFan;
 // }
+
+switches::RgbSwitch& project::getHwRgbSwitch()
+{
+	return _rgbSwitch;
+}
 
 sensor::SensorService& project::getHwSensorService()
 {

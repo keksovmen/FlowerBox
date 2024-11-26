@@ -8,6 +8,7 @@ namespace fb
 	{
 		enum class SensorEvent : int
 		{
+			ALL_SENSORS_INIT,					//все сенсоры успешно инициализированы, будет создано один раз за жизнь
 			SENSOR_INITIALIZED,					//сенсор инициализирован, аргумент есть сенсор
 			SENSOR_LOST,						//сенсор потерян, по какой либо причине
 			SENSOR_VALUE_CHANGED,				//сенсор изменил свое значение

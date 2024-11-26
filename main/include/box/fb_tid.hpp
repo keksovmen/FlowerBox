@@ -18,10 +18,13 @@ namespace fb
 			SWITCH_LIGHT = 256,
 			SWITCH_HEAT,
 			SWITCH_FAN,
+			SWITCH_RGB,
 
 			PROPERTY_SENSOR_PERIOD_GLOBAL = 512,
 			PROPERTY_SENSOR_DESCRIPTION,
 			PROPERTY_SWITCH_FORSE,
+
+			PROPERTY_SWITCH_RGB_VALUE,
 
 			MAX
 		};
@@ -67,6 +70,9 @@ namespace fb
 						return {"Fun switch", "", "bool", "0", "1"};
 						// return _TidHolder("Fun switch", "", "bool", "0", "1");
 
+					case Tid::SWITCH_RGB:
+						return {"RGB switch", "", "bool", "0", "1"};
+
 					case Tid::PROPERTY_SENSOR_PERIOD_GLOBAL:
 						return {"Sensor mesure period", "measured in SEC", "int", "1", "600"};
 						// return _TidHolder("Sensor mesure period", "measured in SEC", "int", "1", "600");
@@ -78,6 +84,9 @@ namespace fb
 					case Tid::PROPERTY_SWITCH_FORSE:
 						return {"Forses state", "", "int", "0", "2"};
 						// return _TidHolder("Forses state", "", "int", "0", "2");
+
+					case Tid::PROPERTY_SWITCH_RGB_VALUE:
+						return {"RGB", "Send in decimals not hex", "int", "0", "16777215"};
 
 					default:
 						// abort();

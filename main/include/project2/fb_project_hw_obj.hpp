@@ -7,7 +7,7 @@
 #include "fb_sensor_storage.hpp"
 #include "fb_sensor_temperature.hpp"
 #include "fb_switch_service.hpp"
-#include "fb_time_switch.hpp"
+#include "fb_rgb_switch.hpp"
 
 
 
@@ -23,7 +23,7 @@ namespace fb
 
 		// switches::TimeSwitch& getHwLightSwitch();
 		// switches::HeatSwitch& getHwHeatSwitch();
-		// switches::FanSwitch& getHwFanSwitch();
+		switches::RgbSwitch& getHwRgbSwitch();
 
 		sensor::SensorService& getHwSensorService();
 		switches::SwitchService& getHwSwitchService();
