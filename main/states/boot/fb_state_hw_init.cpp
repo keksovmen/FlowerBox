@@ -29,7 +29,7 @@ const char* StateHwInit::getName() const
 void StateHwInit::handleEvent(const event::Event& event)
 {
 	if(event.groupId == event::EventGroup::SENSOR){
-		if(event.eventId == sensor::SensorEvent::SENSOR_INITIALIZED){
+		if(event.eventId == sensor::SensorEvent::ALL_SENSORS_INIT){
 			if(settings::isWifiProvided()){
 				getContext().transition(std::make_unique<StateWifiInit>(getContext()));
 			}else{

@@ -2,9 +2,7 @@
 
 #include <ranges>
 
-#include "ds18b20.h"
 #include "fb_globals.hpp"
-#include "fb_pins.hpp"
 
 
 
@@ -43,6 +41,13 @@ void SensorService::_onPull()
 	for(auto* s : _sensors | std::views::filter(notInitFilter)){
 		if(s->init()){
 			_dropEvent(SensorEvent::SENSOR_INITIALIZED, s);
+		}
+	}
+
+	if(!_initFlag){
+		if(_sensors.empty() || std::ranges::all_of(_sensors, [](const auto* s){return s->isInit();})){
+			_initFlag = true;
+			_dropEvent(SensorEvent::ALL_SENSORS_INIT, NULL);
 		}
 	}
 

@@ -23,11 +23,13 @@ namespace fb
 
 				void addSensor(SensorIface* entry);
 			
+				//TODO: made const reference for returning type
 				std::vector<SensorIface*> getSensors() const;
 			
 			private:
 				std::vector<SensorIface*> _sensors;
 				SemaphoreHandle_t _mutex;
+				bool _initFlag = false;
 
 
 
