@@ -30,7 +30,7 @@ int RgbSwitch::getColor() const
 
 bool RgbSwitch::_condition(SwitchIface* me)
 {
-	return true;
+	return false;
 }
 
 void RgbSwitch::_action(SwitchIface* me, bool value)

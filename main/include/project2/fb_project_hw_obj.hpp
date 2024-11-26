@@ -2,12 +2,11 @@
 
 
 
-#include "fb_heat_switch.hpp"
 #include "fb_sensor_service.hpp"
 #include "fb_sensor_storage.hpp"
-#include "fb_sensor_temperature.hpp"
 #include "fb_switch_service.hpp"
 #include "fb_rgb_switch.hpp"
+#include "fb_mp3_switch.hpp"
 
 
 
@@ -24,6 +23,7 @@ namespace fb
 		// switches::TimeSwitch& getHwLightSwitch();
 		// switches::HeatSwitch& getHwHeatSwitch();
 		switches::RgbSwitch& getHwRgbSwitch();
+		switches::Mp3Switch& getHwMp3Switch();
 
 		sensor::SensorService& getHwSensorService();
 		switches::SwitchService& getHwSwitchService();

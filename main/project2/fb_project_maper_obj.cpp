@@ -14,6 +14,9 @@ using namespace project;
 static box::Switch _boxRgbSwitch(box::Tid::SWITCH_RGB,
 	[](){return getHwRgbSwitch().isOn();});
 
+static box::Switch _boxMp3Switch(box::Tid::SWITCH_MP3,
+	[](){return getHwMp3Switch().isOn();});
+
 // static box::Switch _boxHeatSwitch(box::Tid::SWITCH_HEAT,
 // 	[](){return getHwHeatSwitch().isOn();});
 
@@ -37,13 +40,8 @@ static void _create_and_register_forse_property(switches::SwitchIface& obj, box:
 
 
 
-void project::initMaperObjs()
+static void _initRgbSwitch()
 {
-	getBox().addSwitch(&_boxRgbSwitch);
-	// getBox().addSwitch(&_boxLightSwitch);
-	// getBox().addSwitch(&_boxHeatSwitch);
-
-
 	_create_and_register_forse_property(getHwRgbSwitch(), _boxRgbSwitch);
 	auto* colorProperty = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_RGB_VALUE,
 		[](int val){
@@ -54,6 +52,40 @@ void project::initMaperObjs()
 
 	getBox().addProperty(std::unique_ptr<box::PropertyIface>(colorProperty));
 	_boxRgbSwitch.addPropertyDependency(colorProperty->getId());
+}
+
+static void _initMp3Switch()
+{
+	auto* playProperty = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_MP3_PLAY,
+		[](int val){
+			return getHwMp3Switch().play(val);
+		}, getHwMp3Switch().getTrack()
+	);
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(playProperty));
+	_boxMp3Switch.addPropertyDependency(playProperty->getId());
+
+	auto* stopProperty = new box::PropertyNone(
+		box::Tid::PROPERTY_SWITCH_MP3_STOP,
+		[](std::string val){
+			getHwMp3Switch().stop();
+			return true;
+		});
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(stopProperty));
+	_boxMp3Switch.addPropertyDependency(stopProperty->getId());
+}
+
+void project::initMaperObjs()
+{
+	getBox().addSwitch(&_boxRgbSwitch);
+	getBox().addSwitch(&_boxMp3Switch);
+	// getBox().addSwitch(&_boxLightSwitch);
+	// getBox().addSwitch(&_boxHeatSwitch);
+
+
+	_initRgbSwitch();
+	_initMp3Switch();
 
 	// _create_and_register_forse_property(getHwHeatSwitch(), _boxHeatSwitch);
 	// _boxHeatSwitch.addSensorDependency(getBoxInsideSensor().getId());

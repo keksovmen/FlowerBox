@@ -19,6 +19,7 @@ using namespace project;
 // //change to reference instead of a pointer senor argument
 // static switches::HeatSwitch _switchHeating(_sensorTemperatureInside, 28.5, 29, pins::PIN_GREEN_LED);
 static switches::RgbSwitch _rgbSwitch(0, 0, 0);
+static switches::Mp3Switch _mp3Switch;
 
 // //сервисы туть
 static sensor::SensorService _sensorService;
@@ -38,6 +39,7 @@ void project::initHwObjs()
 	// _swithService.addSwitch(&getHwLightSwitch());
 	// _swithService.addSwitch(&getHwHeatSwitch());
 	_swithService.addSwitch(&getHwRgbSwitch());
+	_swithService.addSwitch(&getHwMp3Switch());
 }
 
 // sensor::TemperatureSensorArrayI& project::getHwTempSensors()
@@ -73,6 +75,11 @@ void project::initHwObjs()
 switches::RgbSwitch& project::getHwRgbSwitch()
 {
 	return _rgbSwitch;
+}
+
+switches::Mp3Switch& project::getHwMp3Switch()
+{
+	return _mp3Switch;
 }
 
 sensor::SensorService& project::getHwSensorService()

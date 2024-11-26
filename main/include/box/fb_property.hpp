@@ -33,10 +33,10 @@ namespace fb
 
 
 				PropertyBase(
-					const std::string& name,
-					const std::string& description,
+					std::string name,
+					std::string description,
 					Tid tid,
-					const ActionSet& action,
+					ActionSet action,
 					T value);
 				
 				virtual void setMinValueStr(const std::string& val) override;
@@ -64,16 +64,16 @@ namespace fb
 		{
 			public:
 				PropertyInt(
-					const std::string& name,
-					const std::string& description,
+					std::string name,
+					std::string description,
 					Tid tid,
-					const ActionSet& action,
+					ActionSet action,
 					int value,
 					int minValue,
 					int maxValue
 				);
 
-				PropertyInt(Tid tid, const ActionSet& action, int value);
+				PropertyInt(Tid tid, ActionSet action, int value);
 
 			private:
 				const int _minValue;
@@ -106,18 +106,26 @@ namespace fb
 		class PropertyString : public PropertyBase<std::string>
 		{
 			public:
-				PropertyString(const std::string& name,
-					const std::string& description,
+				PropertyString(std::string name,
+					std::string description,
 					Tid tid,
-					const ActionSet& action,
-					const std::string& value);
+					ActionSet action,
+					std::string value);
 
-				PropertyString(Tid tid, const ActionSet& action, const std::string& value);
+				PropertyString(Tid tid, ActionSet action, std::string value);
 
 
 			private:
 				std::pair<bool, std::string> _strToValue(const std::string& str) const override;
 				std::string _valueToString(std::string val) const override;
+		};
+
+
+
+		class PropertyNone : public PropertyString
+		{
+			public:
+				PropertyNone(Tid tid, ActionSet action);
 		};
 
 

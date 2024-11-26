@@ -19,12 +19,15 @@ namespace fb
 			SWITCH_HEAT,
 			SWITCH_FAN,
 			SWITCH_RGB,
+			SWITCH_MP3,
 
 			PROPERTY_SENSOR_PERIOD_GLOBAL = 512,
 			PROPERTY_SENSOR_DESCRIPTION,
 			PROPERTY_SWITCH_FORSE,
 
 			PROPERTY_SWITCH_RGB_VALUE,
+			PROPERTY_SWITCH_MP3_PLAY,
+			PROPERTY_SWITCH_MP3_STOP,
 
 			MAX
 		};
@@ -73,6 +76,9 @@ namespace fb
 					case Tid::SWITCH_RGB:
 						return {"RGB switch", "", "bool", "0", "1"};
 
+					case Tid::SWITCH_MP3:
+						return {"Mp3 player switch", "", "bool", "0", "1"};
+
 					case Tid::PROPERTY_SENSOR_PERIOD_GLOBAL:
 						return {"Sensor mesure period", "measured in SEC", "int", "1", "600"};
 						// return _TidHolder("Sensor mesure period", "measured in SEC", "int", "1", "600");
@@ -87,6 +93,12 @@ namespace fb
 
 					case Tid::PROPERTY_SWITCH_RGB_VALUE:
 						return {"RGB", "Send in decimals not hex", "int", "0", "16777215"};
+
+					case Tid::PROPERTY_SWITCH_MP3_PLAY:
+						return {"Mp3 play", "Accepts track id and starts to play", "int", "0", "65535"};
+
+					case Tid::PROPERTY_SWITCH_MP3_STOP:
+						return {"Mp3 stop", "Stop playing", "none", "0", "0"};
 
 					default:
 						// abort();

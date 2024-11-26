@@ -19,10 +19,10 @@ PropertyIface::PropertyIface(Tid tid)
 
 template<class T>
 PropertyBase<T>::PropertyBase(
-			const std::string& name,
-			const std::string& description,
+			std::string name,
+			std::string description,
 			Tid tid,
-			const ActionSet& action,
+			ActionSet action,
 			T value)
 	: PropertyIface(tid),
 	_action(action), _value(value)
@@ -82,10 +82,10 @@ bool PropertyBase<T>::setFromJson(const std::string& str)
 
 
 PropertyInt::PropertyInt(
-			const std::string& name,
-			const std::string& description,
+			std::string name,
+			std::string description,
 			Tid tid,
-			const ActionSet& action,
+			ActionSet action,
 			int value,
 			int minValue,
 			int maxValue)
@@ -95,7 +95,7 @@ PropertyInt::PropertyInt(
 	setValueType("int");
 }
 
-PropertyInt::PropertyInt(Tid tid, const ActionSet& action, int value)
+PropertyInt::PropertyInt(Tid tid, ActionSet action, int value)
 	: PropertyBase(tidToName(tid), tidToDescription(tid), tid, action, value),
 	_minValue(std::atoi(tidToMinValue(tid))),
 	_maxValue(std::atoi(tidToMaxValue(tid)))
@@ -116,17 +116,17 @@ std::string PropertyInt::_valueToString(int val) const
 
 
 PropertyString::PropertyString(
-			const std::string& name,
-			const std::string& description,
+			std::string name,
+			std::string description,
 			Tid tid,
-			const ActionSet& action,
-			const std::string& value)
+			ActionSet action,
+			std::string value)
 	: PropertyBase(name, description, tid, action, value)
 {
 	setValueType("str");
 }
 
-PropertyString::PropertyString(Tid tid, const ActionSet& action, const std::string& value)
+PropertyString::PropertyString(Tid tid, ActionSet action, std::string value)
 	: PropertyBase(tidToName(tid), tidToDescription(tid), tid, action, value)
 {
 	setValueType("str");
@@ -140,4 +140,12 @@ std::pair<bool, std::string> PropertyString::_strToValue(const std::string& str)
 std::string PropertyString::_valueToString(std::string val) const
 {
 	return val;
+}
+
+
+
+PropertyNone::PropertyNone(Tid tid, ActionSet action)
+	: PropertyString(tid, action, "")
+{
+	setValueType("none");
 }
