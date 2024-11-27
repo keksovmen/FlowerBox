@@ -12,6 +12,7 @@ namespace fb
 	namespace pins
 	{
 		static constexpr int PIN_SENSOR_TEMPERATURE = 10;
+		static constexpr int PIN_RED_LED = 3;
 		static constexpr int PIN_GREEN_LED = 4;
 		static constexpr int PIN_BLUE_LED = 5;
 		static constexpr int PIN_COOL_LED = 19;

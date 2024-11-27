@@ -18,7 +18,9 @@ using namespace project;
 // static switches::TimeSwitch _switchLight(clock::Time(0, 0, 0), clock::Time(0, 1, 0), pins::PIN_BLUE_LED);
 // //change to reference instead of a pointer senor argument
 // static switches::HeatSwitch _switchHeating(_sensorTemperatureInside, 28.5, 29, pins::PIN_GREEN_LED);
-static switches::RgbSwitch _rgbSwitch(0, 0, 0);
+static switches::RgbSwitch _rgbSwitch(LEDC_TIMER_0, LEDC_CHANNEL_0,
+			pins::PIN_RED_LED, pins::PIN_GREEN_LED, pins::PIN_BLUE_LED);
+			
 static switches::Mp3Switch _mp3Switch;
 
 // //сервисы туть
