@@ -5,6 +5,7 @@
 #include "fb_server_builder.hpp"
 #include "fb_server_update.hpp"
 #include "fb_server_html.hpp"
+#include "fb_server_box.hpp"
 
 
 
@@ -42,8 +43,9 @@ void server::startProvision()
 	auto builder = Builder();
 	builder.setPort(80);
 
-	registerServerUpdate(builder);
+	// registerServerUpdate(builder);
 	registerServerHtml(builder);
+	registerServerBox(builder);
 
 	_server = builder.build();
 }

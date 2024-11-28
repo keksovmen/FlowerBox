@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <cstring>
 #include <string>
+#include <string_view>
 
 #include "fb_debug.hpp"
 #include "fb_update.hpp"
@@ -10,10 +11,7 @@
 
 
 #define _PATH_PREFIX "/spiffs/"
-#define _FILE_INDEX "index.html"
-#define _FILE_STYLE "style.css"
-#define _FILE_UPDATE "update.html"
-
+#define _HTML_PATH "/html/"
 
 
 using namespace fb;
@@ -25,23 +23,30 @@ static const char* TAG = "fb_server_html";
 
 
 
-static std::string _composeFileName(const char* base, const char* uri)
+static std::string _composeFileName(std::string_view base, std::string_view uri)
 {
 	//must skip all preceding / in uri
-	auto tmp = std::string(uri);
-	const auto beginning = tmp.find_first_not_of('/');
+	// auto tmp = std::string(uri);
+	const auto beginning = uri.find_first_not_of('/');
 
-	return std::string(base) + tmp.substr(beginning == std::string::npos ? 0 : beginning);
+	return std::string(base) + std::string(uri.substr(beginning == std::string::npos ? 0 : beginning));
+}
+
+static std::string_view _removePathPreffix(std::string_view uri)
+{
+	assert(uri.starts_with(_HTML_PATH));
+
+	return uri.substr(strlen(_HTML_PATH));
 }
 
 static esp_err_t _fileCb(httpd_req_t *r)
 {
 	FB_DEBUG_TAG_ENTER();
-	const std::string file = _composeFileName(static_cast<const char*>(r->user_ctx), r->uri);
+	const std::string file = _composeFileName(static_cast<const char*>(r->user_ctx), _removePathPreffix(r->uri));
 	const char* fileName = file.c_str();
-	FB_DEBUG_TAG_LOG("uri: %s\nfile name: %s", r->uri, fileName);
+	FB_DEBUG_TAG_LOG("uri: %s\n\tfile name: %s", r->uri, fileName);
 
-	FB_DEBUG_TAG_LOG("File: %s", fileName);
+	// FB_DEBUG_TAG_LOG("File: %s", fileName);
 
 	auto* f = std::fopen(fileName, "rb");
 	if(!f){
@@ -93,5 +98,5 @@ static esp_err_t _fileCb(httpd_req_t *r)
 void server::registerServerHtml(Builder& builder)
 {
     //TODO: use request->uri to define what file you need in file handler, so you can make uri as =/* everything, and remuve user_ctx
-    builder.addEndpoint(Endpoint{"/*", EndpointMethod::GET, reinterpret_cast<void*>(const_cast<char*>(_PATH_PREFIX)), &_fileCb});
+    builder.addEndpoint(Endpoint{_HTML_PATH "*", EndpointMethod::GET, reinterpret_cast<void*>(const_cast<char*>(_PATH_PREFIX)), &_fileCb});
 }
