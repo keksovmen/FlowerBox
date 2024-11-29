@@ -34,6 +34,7 @@ std::unique_ptr<Server> Builder::build()
 	cfg.uri_match_fn = httpd_uri_match_wildcard;
 	cfg.max_open_sockets = 1;
 	cfg.lru_purge_enable = true;
+	cfg.stack_size = 4 * 1024;
 
 	ESP_ERROR_CHECK(httpd_start(&server, &cfg));
 

@@ -11,5 +11,6 @@ namespace fb
 	namespace server
 	{
 		void registerServerBox(Builder& builder);
+		
 	} // namespace server
 }

@@ -7,7 +7,9 @@ if(${_PROJECT} STREQUAL "MINE")
 	set(_ADD_SRC 
 		"project/fb_project_box_obj.cpp"
 		"project/fb_project_hw_obj.cpp"
-		"project/fb_project_maper_obj.cpp")
+		"project/fb_project_maper_obj.cpp"
+		"project/fb_project_core.cpp"
+		)
 	set(_ADD_INCLUDES
 		"include/project")
 else()
@@ -15,6 +17,7 @@ else()
 		"project2/fb_project_box_obj.cpp"
 		"project2/fb_project_hw_obj.cpp"
 		"project2/fb_project_maper_obj.cpp"
+		"project2/fb_project_core.cpp"
 		"switches/fb_rgb_switch.cpp"
 		"switches/fb_mp3_switch.cpp"
 		)

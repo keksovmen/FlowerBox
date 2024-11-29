@@ -3,7 +3,7 @@
 #include <cstdio>
 #include <cstring>
 #include <string>
-#include <string_view>
+#include <unordered_map>
 
 #include "fb_debug.hpp"
 #include "fb_update.hpp"
@@ -23,6 +23,10 @@ static const char* TAG = "fb_server_html";
 
 
 
+static std::unordered_map<std::string, HtmlFileCb> _fileMap;
+
+
+
 static std::string _composeFileName(std::string_view base, std::string_view uri)
 {
 	//must skip all preceding / in uri
@@ -39,14 +43,9 @@ static std::string_view _removePathPreffix(std::string_view uri)
 	return uri.substr(strlen(_HTML_PATH));
 }
 
-static esp_err_t _fileCb(httpd_req_t *r)
+static esp_err_t _staticHandler(httpd_req_t *r, const char* fileName)
 {
 	FB_DEBUG_TAG_ENTER();
-	const std::string file = _composeFileName(static_cast<const char*>(r->user_ctx), _removePathPreffix(r->uri));
-	const char* fileName = file.c_str();
-	FB_DEBUG_TAG_LOG("uri: %s\n\tfile name: %s", r->uri, fileName);
-
-	// FB_DEBUG_TAG_LOG("File: %s", fileName);
 
 	auto* f = std::fopen(fileName, "rb");
 	if(!f){
@@ -88,6 +87,46 @@ static esp_err_t _fileCb(httpd_req_t *r)
 
 	std::fclose(f);
 
+	return err;
+}
+
+static esp_err_t _templateHandler(httpd_req_t *r, const char* fileName, HtmlFileCb& cb)
+{
+	FB_DEBUG_TAG_ENTER();
+
+	char buffer[512];
+
+	templates::Engine engine(buffer, sizeof(buffer), 
+		[r](const char* data, int size){
+			httpd_resp_send_chunk(r, data, size);
+		});
+
+	std::invoke(cb, engine);
+	
+	if(engine.process(fileName)){
+		return httpd_resp_send_chunk(r, buffer, 0);
+	}else{
+		return httpd_resp_send_500(r);
+	}
+}
+
+static esp_err_t _fileCb(httpd_req_t *r)
+{
+	FB_DEBUG_TAG_ENTER();
+	const std::string file = _composeFileName(static_cast<const char*>(r->user_ctx), _removePathPreffix(r->uri));
+	const char* fileName = file.c_str();
+	FB_DEBUG_TAG_LOG("uri: %s\n\tfile name: %s", r->uri, fileName);
+
+	std::string tmp = std::string(_removePathPreffix(r->uri));
+	FB_DEBUG_TAG_LOG("Crash cause: %s", tmp.c_str());
+
+	esp_err_t err = ESP_OK;
+	if(_fileMap.contains(tmp)){
+		err = _templateHandler(r, fileName, _fileMap.at(std::string(_removePathPreffix(r->uri))));
+	}else{
+		err = _staticHandler(r, fileName);
+	}
+
 	FB_DEBUG_TAG_EXIT();
 
 	return err;
@@ -97,6 +136,10 @@ static esp_err_t _fileCb(httpd_req_t *r)
 
 void server::registerServerHtml(Builder& builder)
 {
-    //TODO: use request->uri to define what file you need in file handler, so you can make uri as =/* everything, and remuve user_ctx
     builder.addEndpoint(Endpoint{_HTML_PATH "*", EndpointMethod::GET, reinterpret_cast<void*>(const_cast<char*>(_PATH_PREFIX)), &_fileCb});
+}
+
+void server::htmlAddFileHandler(std::string_view fileName, HtmlFileCb fileCb)
+{
+	_fileMap[std::string(fileName)] = fileCb;
 }

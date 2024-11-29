@@ -20,7 +20,9 @@ namespace fb
 				StateBooted(StateManager& context);
 
 			protected:
-				virtual bool _onCompositeEventHandler(const event::Event& event);
+				virtual void _onCompositeEnter() override;
+
+				virtual bool _onCompositeEventHandler(const event::Event& event) override;
 			
 			private:
 				virtual std::unique_ptr<State> _createInitialState() override;
