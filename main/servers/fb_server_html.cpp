@@ -117,11 +117,8 @@ static esp_err_t _fileCb(httpd_req_t *r)
 	const char* fileName = file.c_str();
 	FB_DEBUG_TAG_LOG("uri: %s\n\tfile name: %s", r->uri, fileName);
 
-	std::string tmp = std::string(_removePathPreffix(r->uri));
-	FB_DEBUG_TAG_LOG("Crash cause: %s", tmp.c_str());
-
 	esp_err_t err = ESP_OK;
-	if(_fileMap.contains(tmp)){
+	if(_fileMap.contains(std::string(_removePathPreffix(r->uri)))){
 		err = _templateHandler(r, fileName, _fileMap.at(std::string(_removePathPreffix(r->uri))));
 	}else{
 		err = _staticHandler(r, fileName);
