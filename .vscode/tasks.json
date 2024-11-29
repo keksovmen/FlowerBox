@@ -7,9 +7,13 @@
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",
-                "${file}",
+                "${workspaceFolder}\\main\\tests\\test_engine.cpp",
+                "${workspaceFolder}\\main\\templates\\fb_templates.cpp",
                 "-o",
-                "${fileDirname}\\${fileBasenameNoExtension}.exe"
+                "${workspaceFolder}\\main\\tests\\a.exe",
+				"-I",
+				"${workspaceFolder}\\main\\include\\templates\\",
+				"--std=c++17"
             ],
             "options": {
                 "cwd": "${fileDirname}"

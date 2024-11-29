@@ -1,0 +1,5 @@
+- memory manager on half of given buffer, to allocate parameters for arguments
+- command: put string, include file (header, footer), 
+- parser of arguments, depends on keyword, due to name.name.name possibility
+- proper parser for words (Excludes special symbols)
+- error state to display some info

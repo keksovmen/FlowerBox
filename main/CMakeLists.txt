@@ -73,6 +73,7 @@ idf_component_register(
 		"switches/fb_heat_switch.cpp"
 		"switches/fb_time_switch.cpp"
 		"switches/fb_switch_service.cpp"
+		"templates/fb_templates.cpp"
 
     INCLUDE_DIRS
 		${_ADD_INCLUDES}
@@ -86,6 +87,7 @@ idf_component_register(
 		"include/states/boot"
 		"include/states/update"
 		"include/states/work"
+		"include/templates"
 		)
 
 # if(${_PROJECT} STREQUAL "MINE")

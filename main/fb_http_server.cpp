@@ -21,6 +21,7 @@
 
 #include "fb_debug.hpp"
 #include "fb_update.hpp"
+#include "fb_templates.hpp"
 
 #include "esp_http_server.h"
 
@@ -201,6 +202,9 @@ static std::string _composeFileName(const char* base, const char* uri)
 
 static esp_err_t _fileHandler(httpd_req_t *r)
 {
+	// templates::Engine e(nullptr, 0, [](auto data, auto size){});
+	// e.process("123");
+
 	FB_DEBUG_TAG_ENTER();
 	const std::string file = _composeFileName(static_cast<const char*>(r->user_ctx), r->uri);
 	const char* fileName = file.c_str();
