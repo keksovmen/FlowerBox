@@ -16,7 +16,7 @@ void SwitchIface::check()
 {
 	if(_forseFlag == SwitchForseState::ON){
 		if(!_state){
-			FB_DEBUG_LOG("[%s] forse flag is ON -> action", getName());
+			FB_DEBUG_LOG_I_OBJ("[%s] forse flag is ON -> action", getName());
 
 			_actionCb(this, true);
 			_state = true;		
@@ -27,7 +27,7 @@ void SwitchIface::check()
 
 	if(_forseFlag == SwitchForseState::OFF){
 		if(_state){
-			FB_DEBUG_LOG("[%s] forse flag is OFF -> action", getName());
+			FB_DEBUG_LOG_I_OBJ("[%s] forse flag is OFF -> action", getName());
 
 			_actionCb(this, false);
 			_state = false;		
@@ -40,7 +40,7 @@ void SwitchIface::check()
 	{
 		if (!_state)
 		{
-			FB_DEBUG_LOG("[%s] condition met -> action", getName());
+			FB_DEBUG_LOG_I_OBJ("[%s] condition met -> action", getName());
 
 			_state = true;
 			_actionCb(this, true);
@@ -50,7 +50,7 @@ void SwitchIface::check()
 	{
 		if (_state)
 		{
-			FB_DEBUG_LOG("[%s] condition NOT met -> action", getName());
+			FB_DEBUG_LOG_I_OBJ("[%s] condition NOT met -> action", getName());
 
 			_state = false;
 			_actionCb(this, false);

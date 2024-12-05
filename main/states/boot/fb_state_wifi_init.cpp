@@ -30,7 +30,7 @@ void StateWifiInit::handleEvent(const event::Event& event)
 			getContext().transition(std::make_unique<StateTimeInit>(getContext()));
 
 		}else if(event.eventId == wifi::WifiEventId::FAILED_TO_CONNECT){
-			FB_DEBUG_LOG("Failed to connect");
+			FB_DEBUG_LOG_I_OBJ("Failed to connect");
 			abort();
 			//TODO:
 			//go to provision state

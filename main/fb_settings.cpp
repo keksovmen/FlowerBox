@@ -48,18 +48,18 @@ static std::string _getStrOrDefault(const std::string& partition,
 			const std::string& def)
 {
 	if(!_storage){
-		FB_DEBUG_TAG_LOG("Has no store: %s, ret default %s", key.c_str(), def.c_str());
+		FB_DEBUG_LOG_I_TAG("Has no store: %s, ret default %s", key.c_str(), def.c_str());
 		return def;
 	}
 
 	if(!_storage->hasKey(partition, key)){
-		FB_DEBUG_TAG_LOG("Has no key: %s, ret default %s", key.c_str(), def.c_str());
+		FB_DEBUG_LOG_I_TAG("Has no key: %s, ret default %s", key.c_str(), def.c_str());
 		return def;
 	}
 
 	std::string result;
 	if(!_storage->readValue(partition, key, result)){
-		FB_DEBUG_TAG_LOG("Failed to read key: %s, ret default %s", key.c_str(), def.c_str());
+		FB_DEBUG_LOG_I_TAG("Failed to read key: %s, ret default %s", key.c_str(), def.c_str());
 		return def;
 	}
 
@@ -71,18 +71,18 @@ static int _getIntOrDefault(const std::string& partition,
 			int def)
 {
 	if(!_storage){
-		FB_DEBUG_TAG_LOG("Has no store: %s, ret default %d", key.c_str(), def);
+		FB_DEBUG_LOG_I_TAG("Has no store: %s, ret default %d", key.c_str(), def);
 		return def;
 	}
 
 	if(!_storage->hasKey(partition, key)){
-		FB_DEBUG_TAG_LOG("Has no key: %s, ret default %d", key.c_str(), def);
+		FB_DEBUG_LOG_I_TAG("Has no key: %s, ret default %d", key.c_str(), def);
 		return def;
 	}
 
 	int result;
 	if(!_storage->readValue(partition, key, result)){
-		FB_DEBUG_TAG_LOG("Failed to read key: %s, ret default %d", key.c_str(), def);
+		FB_DEBUG_LOG_I_TAG("Failed to read key: %s, ret default %d", key.c_str(), def);
 		return def;
 	}
 
@@ -94,16 +94,16 @@ static void _setStr(const std::string& partion,
 			const std::string& val)
 {
 	if(!_storage){
-		FB_DEBUG_TAG_LOG_E("No storage");
+		FB_DEBUG_LOG_E_TAG("No storage");
 		return;
 	}
 
 	if(!_storage->writeValue(partion, key, val)){
-		FB_DEBUG_TAG_LOG_E("Failed to set key: %s, val: %s", key.c_str(), val.c_str());
+		FB_DEBUG_LOG_E_TAG("Failed to set key: %s, val: %s", key.c_str(), val.c_str());
 		return;
 	}
 
-	FB_DEBUG_TAG_LOG("Set key: %s, val: %s", key.c_str(), val.c_str());
+	FB_DEBUG_LOG_I_TAG("Set key: %s, val: %s", key.c_str(), val.c_str());
 }
 
 static void _setInt(const std::string& partion,
@@ -111,16 +111,16 @@ static void _setInt(const std::string& partion,
 			int val)
 {
 	if(!_storage){
-		FB_DEBUG_TAG_LOG_E("No storage");
+		FB_DEBUG_LOG_E_TAG("No storage");
 		return;
 	}
 
 	if(!_storage->writeValue(partion, key, val)){
-		FB_DEBUG_TAG_LOG_E("Failed to set key: %s, val: %d", key.c_str(), val);
+		FB_DEBUG_LOG_E_TAG("Failed to set key: %s, val: %d", key.c_str(), val);
 		return;
 	}
 
-	FB_DEBUG_TAG_LOG("Set key: %s, val: %d", key.c_str(), val);
+	FB_DEBUG_LOG_I_TAG("Set key: %s, val: %d", key.c_str(), val);
 }
 
 

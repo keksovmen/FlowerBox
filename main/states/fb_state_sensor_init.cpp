@@ -26,7 +26,7 @@ void StateSensorInit::enter()
 		// vTaskDelay(pdMS_TO_TICKS(1000));
 		// for(const auto& v : service.getSensors())
 		// {
-		// 	FB_DEBUG_LOG("Sensor[%s]: %llX, value = %.2f", v.alive ? "+" : "-", v.id, v.value)
+		// 	FB_DEBUG_LOG_I_OBJ("Sensor[%s]: %llX, value = %.2f", v.alive ? "+" : "-", v.id, v.value)
 		// }
 	// }
 }

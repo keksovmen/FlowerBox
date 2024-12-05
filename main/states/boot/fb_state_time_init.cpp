@@ -28,7 +28,7 @@ void StateTimeInit::handleEvent(const event::Event& event)
 	if(event.groupId == event::EventGroup::CLOCK){
 		if(event.eventId == clock::ClockEventId::SYNCED){
 			//transition to working state
-			FB_DEBUG_LOG("Time synced, ready to work");
+			FB_DEBUG_LOG_I_OBJ("Time synced, ready to work");
 			global::getEventManager()->pushEvent(event::Event{fb::event::EventGroup::TRANSITION, 0, nullptr});
 		}
 	}else if(event.groupId == event::EventGroup::WIFI){

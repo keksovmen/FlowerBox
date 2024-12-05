@@ -12,7 +12,7 @@ using namespace sensor;
 bool SensorIface::init()
 {
 	const bool result = _doInit();
-	FB_DEBUG_LOG("init() = %d", result);
+	FB_DEBUG_LOG_I_OBJ("init() = %d", result);
 	_initFlag = result;
 
 	return result;
@@ -21,7 +21,7 @@ bool SensorIface::init()
 bool SensorIface::update()
 {
 	const UpdateResult result = _doUpdate();
-	FB_DEBUG_LOG("update() = %d", std::to_underlying(result));
+	FB_DEBUG_LOG_I_OBJ("update() = %d", std::to_underlying(result));
 
 	switch(result)
 	{

@@ -149,27 +149,27 @@ static void _init()
 static bool _checkWifiConfig(const WifiConfig& cfg)
 {
 	if(cfg.apSsid.length() < 8){
-		FB_DEBUG_TAG_LOG_E("Invalid AP ssid length must be >= 8, %s", cfg.apSsid.c_str());
+		FB_DEBUG_LOG_E_TAG("Invalid AP ssid length must be >= 8, %s", cfg.apSsid.c_str());
 		return false;
 	}
 
 	if(cfg.staSsid.length() < 8){
-		FB_DEBUG_TAG_LOG_E("Invalid STA ssid length must be >= 8, %s", cfg.staSsid.c_str());
+		FB_DEBUG_LOG_E_TAG("Invalid STA ssid length must be >= 8, %s", cfg.staSsid.c_str());
 		return false;
 	}
 
 	if(cfg.apPass.length() > 0 && cfg.apPass.length() < 8){
-		FB_DEBUG_TAG_LOG_E("Invalid AP pass length must be >= 8 or 0");
+		FB_DEBUG_LOG_E_TAG("Invalid AP pass length must be >= 8 or 0");
 		return false;
 	}
 
 	if(cfg.staPass.length() > 0 && cfg.staPass.length() < 8){
-		FB_DEBUG_TAG_LOG_E("Invalid AP pass length must be >= 8 or 0");
+		FB_DEBUG_LOG_E_TAG("Invalid AP pass length must be >= 8 or 0");
 		return false;
 	}
 
 	if(cfg.state != WifiState::AP && cfg.state != WifiState::STA){
-		FB_DEBUG_TAG_LOG_E("Invalid wifi mode for initialization: %d", static_cast<int>(cfg.state));
+		FB_DEBUG_LOG_E_TAG("Invalid wifi mode for initialization: %d", static_cast<int>(cfg.state));
 		return false;
 	}
 
@@ -210,19 +210,18 @@ bool wifi::operator==(int val, WifiEventId id)
 
 bool wifi::init()
 {
-	FB_DEBUG_TAG_ENTER();
+	FB_DEBUG_ENTER_I_TAG();
 
 	static std::once_flag flag;
 	std::call_once(flag, &_init);
-
-	FB_DEBUG_TAG_EXIT();
 
 	return true;
 }
 
 bool wifi::start(const WifiConfig& cfg)
 {
-	FB_DEBUG_TAG_ENTER();
+	FB_DEBUG_ENTER_I_TAG();
+
 	esp_err_t result = ESP_OK;
 
 	if(!_checkWifiConfig(cfg)){
@@ -260,8 +259,6 @@ bool wifi::start(const WifiConfig& cfg)
 	}else{
 		assert(0);
 	}
-
-	FB_DEBUG_TAG_EXIT();
 
 	return result == ESP_OK;
 }

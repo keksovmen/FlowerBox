@@ -39,7 +39,7 @@ static esp_netif_t* _apNetif = nullptr;
 
 static void _eventHandler(void* arg, esp_event_base_t eventBase, int32_t eventId, void* eventData)
 {
-	FB_DEBUG_TAG_LOG("Provision event %ld", eventId);
+	FB_DEBUG_LOG_I_TAG("Provision event %ld", eventId);
 
 	if(eventId == static_cast<int32_t>(WIFI_PROV_CRED_RECV))
 	{
@@ -73,17 +73,17 @@ static void _eventHandler(void* arg, esp_event_base_t eventBase, int32_t eventId
 static esp_err_t _customProvisionHandler(uint32_t sessionId, const uint8_t* inBuf, ssize_t inLen,
 			uint8_t** outBuf, ssize_t* outLen, void* arg)
 {
-	FB_DEBUG_TAG_ENTER();
+	FB_DEBUG_ENTER_I_TAG();
 
 	if(!inBuf){
 		return ESP_FAIL;
 	}
 
-	FB_DEBUG_TAG_LOG("%.*s", inLen, reinterpret_cast<const char*>(inBuf));
+	FB_DEBUG_LOG_I_TAG("%.*s", inLen, reinterpret_cast<const char*>(inBuf));
 	
 	cJSON* root = cJSON_ParseWithLength(reinterpret_cast<const char*>(inBuf), inLen);
 	if(root == NULL){
-		FB_DEBUG_TAG_LOG_E("Invalid JSON");
+		FB_DEBUG_LOG_E_TAG("Invalid JSON");
 		
 		return ESP_FAIL;
 	}
@@ -96,21 +96,19 @@ static esp_err_t _customProvisionHandler(uint32_t sessionId, const uint8_t* inBu
 
 	cJSON* item = cJSON_GetObjectItem(root, _JSON_KEY_WIFI_MODE);
 	if(item == NULL){
-		FB_DEBUG_TAG_LOG_W("NOT FOUND JSON KEY: " _JSON_KEY_WIFI_MODE);
+		FB_DEBUG_LOG_W_TAG("NOT FOUND JSON KEY: " _JSON_KEY_WIFI_MODE);
 	}else{
 		int wifiMode = static_cast<int>(cJSON_GetNumberValue(item));
-		FB_DEBUG_TAG_LOG("WIFI mode %d", wifiMode);
+		FB_DEBUG_LOG_I_TAG("WIFI mode %d", wifiMode);
 
 		if(wifiMode < 0 || wifiMode >= std::to_underlying(settings::WifiMode::MAX)){
-			FB_DEBUG_TAG_LOG_E("WIFI mode ILLEGAL");
+			FB_DEBUG_LOG_E_TAG("WIFI mode ILLEGAL");
 		}else{
 			settings::setWifiMode(static_cast<settings::WifiMode>(wifiMode));
 		}
 	}
 
 	cJSON_Delete(root);
-
-	FB_DEBUG_TAG_EXIT();
 
 	return ESP_OK;
 }
@@ -169,20 +167,16 @@ static void _deinitManager()
 
 void provision::init()
 {
-	FB_DEBUG_TAG_ENTER();
+	FB_DEBUG_ENTER_I_TAG();
 
 	_initWifi();
 	_initManager();
-
-	FB_DEBUG_TAG_EXIT();
 }
 
 void provision::deinit()
 {
-	FB_DEBUG_TAG_ENTER();
+	FB_DEBUG_ENTER_I_TAG();
 
 	_deinitManager();
 	_deinitWifi();
-
-	FB_DEBUG_TAG_EXIT();
 }

@@ -30,17 +30,17 @@ static std::string _serverAddress;
 
 static void _print_servers(void)
 {
-	FB_DEBUG_TAG_LOG("List of configured NTP servers:");
+	FB_DEBUG_LOG_I_TAG("List of configured NTP servers:");
 
 	for (uint8_t i = 0; i < SNTP_MAX_SERVERS; ++i){
 		if (esp_sntp_getservername(i)){
-			FB_DEBUG_TAG_LOG("server %d: %s", i, esp_sntp_getservername(i));
+			FB_DEBUG_LOG_I_TAG("server %d: %s", i, esp_sntp_getservername(i));
 		} else {
 			// we have either IPv4 or IPv6 address, let's print it
 			char buff[128];
 			ip_addr_t const *ip = esp_sntp_getserver(i);
 			if (ipaddr_ntoa_r(ip, buff, sizeof(buff)) != NULL)
-				FB_DEBUG_TAG_LOG("server %d: %s", i, buff);
+				FB_DEBUG_LOG_I_TAG("server %d: %s", i, buff);
 		}
 	}
 }
@@ -49,11 +49,9 @@ static void _print_servers(void)
 
 static void _on_sntp_sync_event(struct timeval *tv)
 {
-	FB_DEBUG_TAG_ENTER();
+	FB_DEBUG_ENTER_I_TAG();
 
 	global::getEventManager()->pushEvent({event::EventGroup::CLOCK, static_cast<int>(clock::ClockEventId::SYNCED), nullptr});
-
-	FB_DEBUG_TAG_EXIT();
 }
 
 
@@ -109,8 +107,7 @@ Time::operator Timestamp() const
 
 void clock::initClock()
 {
-	FB_DEBUG_TAG_ENTER();
-
+	FB_DEBUG_ENTER_I_TAG();
 
 	if(settings::getWifiMode() == settings::WifiMode::STA){
 		_serverAddress = settings::getSntpServerUrl();
@@ -127,26 +124,20 @@ void clock::initClock()
 	esp_netif_sntp_init(&config);
 
 	_print_servers();
-
-	FB_DEBUG_TAG_EXIT();
 }
 
 void clock::syncRequest()
 {
-	FB_DEBUG_TAG_ENTER();
+	FB_DEBUG_ENTER_I_TAG();
 
 	esp_netif_sntp_start();
-
-	FB_DEBUG_TAG_EXIT();
 }
 
 void clock::deinitClock()
 {
-	FB_DEBUG_TAG_ENTER();
+	FB_DEBUG_ENTER_I_TAG();
 
 	esp_netif_sntp_deinit();
-
-	FB_DEBUG_TAG_EXIT();
 }
 
 Time clock::getCurrentTime()

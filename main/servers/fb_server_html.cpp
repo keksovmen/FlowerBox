@@ -45,11 +45,11 @@ static std::string_view _removePathPreffix(std::string_view uri)
 
 static esp_err_t _staticHandler(httpd_req_t *r, const char* fileName)
 {
-	FB_DEBUG_TAG_ENTER();
+	FB_DEBUG_ENTER_I_TAG();
 
 	auto* f = std::fopen(fileName, "rb");
 	if(!f){
-		FB_DEBUG_TAG_LOG_E("Failed to open: %s", fileName);
+		FB_DEBUG_LOG_E_TAG("Failed to open: %s", fileName);
 		return httpd_resp_send_404(r);
 	}
 
@@ -62,27 +62,27 @@ static esp_err_t _staticHandler(httpd_req_t *r, const char* fileName)
 	int count;
 
 	while((count = std::fread(buffer, sizeof(*buffer), sizeof(buffer), f)) != 0){
-		FB_DEBUG_TAG_LOG("Read %d bytes", count);
+		FB_DEBUG_LOG_I_TAG("Read %d bytes", count);
 		if(std::ferror(f)){
-			FB_DEBUG_TAG_LOG_W("File error occurred!");
+			FB_DEBUG_LOG_W_TAG("File error occurred!");
 			break;
 		}
 
 		err = httpd_resp_send_chunk(r, buffer, count);
 		if(err != ESP_OK){
-			FB_DEBUG_TAG_LOG_E("Http send chunk error occurred! %d", err);
+			FB_DEBUG_LOG_E_TAG("Http send chunk error occurred! %d", err);
 			break;
 		}
 
 		if(std::feof(f)){
-			FB_DEBUG_TAG_LOG("File EOF occurred");
+			FB_DEBUG_LOG_I_TAG("File EOF occurred");
 			break;
 		}
 	}
 
 	err = httpd_resp_send_chunk(r, buffer, 0);
 	if(err != ESP_OK){
-		FB_DEBUG_TAG_LOG_E("Http send chunk error occurred! %d", err);
+		FB_DEBUG_LOG_E_TAG("Http send chunk error occurred! %d", err);
 	}
 
 	std::fclose(f);
@@ -92,7 +92,7 @@ static esp_err_t _staticHandler(httpd_req_t *r, const char* fileName)
 
 static esp_err_t _templateHandler(httpd_req_t *r, const char* fileName, HtmlFileCb& cb)
 {
-	FB_DEBUG_TAG_ENTER();
+	FB_DEBUG_ENTER_I_TAG();
 
 	char buffer[512];
 
@@ -112,10 +112,11 @@ static esp_err_t _templateHandler(httpd_req_t *r, const char* fileName, HtmlFile
 
 static esp_err_t _fileCb(httpd_req_t *r)
 {
-	FB_DEBUG_TAG_ENTER();
+	FB_DEBUG_ENTER_I_TAG();
+	
 	const std::string file = _composeFileName(static_cast<const char*>(r->user_ctx), _removePathPreffix(r->uri));
 	const char* fileName = file.c_str();
-	FB_DEBUG_TAG_LOG("uri: %s\n\tfile name: %s", r->uri, fileName);
+	FB_DEBUG_LOG_I_TAG("uri: %s\n\tfile name: %s", r->uri, fileName);
 
 	esp_err_t err = ESP_OK;
 	if(_fileMap.contains(std::string(_removePathPreffix(r->uri)))){
@@ -123,8 +124,6 @@ static esp_err_t _fileCb(httpd_req_t *r)
 	}else{
 		err = _staticHandler(r, fileName);
 	}
-
-	FB_DEBUG_TAG_EXIT();
 
 	return err;
 }

@@ -42,9 +42,9 @@ static bool _composeSeparator(httpd_req_t* r, char* separator, int size)
 
 static esp_err_t _multipartFileInputHandler(httpd_req_t* r, DataCb cb)
 {
-	FB_DEBUG_TAG_ENTER();
+	FB_DEBUG_ENTER_I_TAG();
 
-	FB_DEBUG_TAG_LOG("Content length = %d", r->content_len);
+	FB_DEBUG_LOG_I_TAG("Content length = %d", r->content_len);
 
 	char separator[128];
 
@@ -54,7 +54,7 @@ static esp_err_t _multipartFileInputHandler(httpd_req_t* r, DataCb cb)
 	}
 
 	const int separator_len = strlen(separator);
-	FB_DEBUG_TAG_LOG("Found separator: %s, length: %d", separator, separator_len);
+	FB_DEBUG_LOG_I_TAG("Found separator: %s, length: %d", separator, separator_len);
 
 	char buffer[512];
 	//0 - looking for data beginning
@@ -77,7 +77,7 @@ static esp_err_t _multipartFileInputHandler(httpd_req_t* r, DataCb cb)
 				continue;
 			}else{
 				//handle unexpected client lost
-				FB_DEBUG_TAG_LOG_W("Unexpected error in receiving data");
+				FB_DEBUG_LOG_W_TAG("Unexpected error in receiving data");
 				httpd_resp_send_500(r);
 
 	            return ESP_FAIL;
@@ -95,7 +95,7 @@ static esp_err_t _multipartFileInputHandler(httpd_req_t* r, DataCb cb)
 			assert(at);
 			out = at + strlen(_DATA_DELIMETER);
 
-			FB_DEBUG_TAG_LOG("Found data at offset: %u", at - buffer);
+			FB_DEBUG_LOG_I_TAG("Found data at offset: %u", at - buffer);
 			
 			/* fall through */
 			state = 1;
@@ -128,10 +128,10 @@ static esp_err_t _multipartFileInputHandler(httpd_req_t* r, DataCb cb)
 			}
 
 			actual_data += valid_len;
-			// FB_DEBUG_TAG_LOG("Received [%d / %d], actual data [%d/%d]", received, remaining, valid_len, actual_data);
+			// FB_DEBUG_LOG_I_TAG("Received [%d / %d], actual data [%d/%d]", received, remaining, valid_len, actual_data);
 
 			if(!cb(out, valid_len)){
-				FB_DEBUG_TAG_LOG("Callback returned false, so aborting file input");
+				FB_DEBUG_LOG_I_TAG("Callback returned false, so aborting file input");
 				httpd_resp_send_err(r, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to consume data in callback");
 				return ESP_FAIL;
 			}
@@ -141,7 +141,7 @@ static esp_err_t _multipartFileInputHandler(httpd_req_t* r, DataCb cb)
 		
 		case 2:
 			{
-				FB_DEBUG_TAG_LOG("Received [%d / %d], no actual data in this block", received, remaining);
+				FB_DEBUG_LOG_I_TAG("Received [%d / %d], no actual data in this block", received, remaining);
 				break;
 
 			}
@@ -152,8 +152,6 @@ static esp_err_t _multipartFileInputHandler(httpd_req_t* r, DataCb cb)
 		}
 	}
 
-	FB_DEBUG_TAG_EXIT();
-
 	return ESP_OK;
 }
 
@@ -161,7 +159,7 @@ static esp_err_t _multipartFileInputHandler(httpd_req_t* r, DataCb cb)
 
 static esp_err_t _update_cb(httpd_req_t* r)
 {
-	FB_DEBUG_TAG_ENTER();
+	FB_DEBUG_ENTER_I_TAG();
 
 	if(!update::begin()){
 		httpd_resp_send_err(r, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to start ota");
@@ -169,7 +167,7 @@ static esp_err_t _update_cb(httpd_req_t* r)
 	}
 
 	esp_err_t err = _multipartFileInputHandler(r, [](const char* data, int size){
-		// FB_DEBUG_TAG_LOG("Data block of size %d:\n%.*s", size, size, data);
+		// FB_DEBUG_LOG_I_TAG("Data block of size %d:\n%.*s", size, size, data);
 		return update::writeSequential(data, size);
 	});
 
@@ -180,8 +178,6 @@ static esp_err_t _update_cb(httpd_req_t* r)
 			err |= httpd_resp_send_err(r, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to end ota update");
 		}
 	}
-
-	FB_DEBUG_TAG_EXIT();
 
 	return err;
 }

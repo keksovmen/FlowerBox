@@ -67,7 +67,7 @@ void RgbSwitch::_applyColor(int color)
 	const int green = (color >> 8) & 0xFF;
 	const int blue = (color >> 16) & 0xFF;
 
-	FB_DEBUG_LOG("Apply color: R = %d, G = %d, B = %d", red, green, blue);
+	FB_DEBUG_LOG_I_OBJ("Apply color: R = %d, G = %d, B = %d", red, green, blue);
 
 	ESP_ERROR_CHECK(ledc_set_duty(LEDC_LOW_SPEED_MODE, _startChannel, red));
 	ESP_ERROR_CHECK(ledc_set_duty(LEDC_LOW_SPEED_MODE, static_cast<ledc_channel_t>(_startChannel + 1), green));

@@ -30,26 +30,25 @@ bool update::operator==(int val, UpdateEventId id)
 
 bool update::begin()
 {
-	FB_DEBUG_TAG_ENTER();
+	FB_DEBUG_ENTER_I_TAG();
+
 	assert(!_otaHndl);
 	assert(!_partition);
 
 	_partition = esp_ota_get_next_update_partition(NULL);
 	if(_partition == NULL){
-		FB_DEBUG_TAG_LOG_E("Update partition is not found!")
+		FB_DEBUG_LOG_E_TAG("Update partition is not found!")
 		return false;
 	}
 
 	esp_err_t err = esp_ota_begin(_partition, OTA_WITH_SEQUENTIAL_WRITES, &_otaHndl);
 	if(err != ESP_OK){
-		FB_DEBUG_TAG_LOG_E("Failed to start ota! %d", err);
+		FB_DEBUG_LOG_E_TAG("Failed to start ota! %d", err);
 		return false;
 	}
 
 	//drop event
 	global::getEventManager()->pushEvent({event::EventGroup::UPDATE, static_cast<int>(UpdateEventId::START), NULL});
-
-	FB_DEBUG_TAG_EXIT();
 
 	return true;
 }
@@ -58,7 +57,7 @@ bool update::writeSequential(const char* data, int size)
 {
 	const esp_err_t err = esp_ota_write(_otaHndl, data, size);
 	if(err != ESP_OK){
-		FB_DEBUG_TAG_LOG_E("Failed to write ota, must abort! %d", err);
+		FB_DEBUG_LOG_E_TAG("Failed to write ota, must abort! %d", err);
 		global::getEventManager()->pushEvent({event::EventGroup::UPDATE, static_cast<int>(UpdateEventId::FAILURE), NULL});
 
 		esp_ota_abort(_otaHndl);
@@ -71,12 +70,12 @@ bool update::writeSequential(const char* data, int size)
 
 bool update::end()
 {
-	FB_DEBUG_TAG_ENTER();
+	FB_DEBUG_ENTER_I_TAG();
 
 	esp_err_t err = esp_ota_end(_otaHndl);
 	_otaHndl = 0;
 	if(err != ESP_OK){
-		FB_DEBUG_TAG_LOG_E("Failed to end ota! %d", err);
+		FB_DEBUG_LOG_E_TAG("Failed to end ota! %d", err);
 		_partition = NULL;
 
 		global::getEventManager()->pushEvent({event::EventGroup::UPDATE, static_cast<int>(UpdateEventId::FAILURE), NULL});
@@ -87,7 +86,7 @@ bool update::end()
 	err = esp_ota_set_boot_partition(_partition);
 	_partition = NULL;
 	if(err != ESP_OK){
-		FB_DEBUG_TAG_LOG_E("Failed to change start up partition! %d", err);
+		FB_DEBUG_LOG_E_TAG("Failed to change start up partition! %d", err);
 
 		global::getEventManager()->pushEvent({event::EventGroup::UPDATE, static_cast<int>(UpdateEventId::FAILURE), NULL});
 
@@ -95,8 +94,6 @@ bool update::end()
 	}
 
 	global::getEventManager()->pushEvent({event::EventGroup::UPDATE, static_cast<int>(UpdateEventId::END), NULL});
-
-	FB_DEBUG_TAG_EXIT();
 
 	return true;
 }

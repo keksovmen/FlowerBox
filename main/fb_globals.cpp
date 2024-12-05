@@ -47,7 +47,7 @@ static void _init_settings()
 {
 	std::unique_ptr<storage::StorageIface> store(std::make_unique<storage::NvsStorage>());
 	if(!store->init()){
-		FB_DEBUG_TAG_LOG("Failed to init NVS storage -> RAM will be used");
+		FB_DEBUG_LOG_I_TAG("Failed to init NVS storage -> RAM will be used");
 
 		store.reset(new storage::RamStorage());
 		store->init();

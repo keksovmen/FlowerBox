@@ -61,7 +61,7 @@ const PropertyIface* Box::addProperty(std::unique_ptr<PropertyIface> val)
 		[&val](const auto& left){return left->getId() == val->getId();});
 	
 	if(iter != _properties.end()){
-		FB_DEBUG_TAG_LOG_W("Failed to add property with id %d, it is already exist", val->getId());
+		FB_DEBUG_LOG_W_TAG("Failed to add property with id %d, it is already exist", val->getId());
 		assert(0);
 		return nullptr;
 	}
@@ -69,7 +69,7 @@ const PropertyIface* Box::addProperty(std::unique_ptr<PropertyIface> val)
 	_properties.push_back(std::move(val));
 	_properties.back()->setId(_properties.size() - 1);
 
-	FB_DEBUG_TAG_LOG_W("Added a property with id %d", _properties.back()->getId());
+	FB_DEBUG_LOG_W_TAG("Added a property with id %d", _properties.back()->getId());
 
 	return _properties.back().get();
 }
@@ -80,7 +80,7 @@ void Box::addSensor(Sensor* val)
 		[val](const Sensor* left){return left->getId() == val->getId();});
 	
 	if(iter != _sensors.end()){
-		FB_DEBUG_TAG_LOG_W("Failed to add sensor with id %d, it is already exist", val->getId());
+		FB_DEBUG_LOG_W_TAG("Failed to add sensor with id %d, it is already exist", val->getId());
 		assert(0);
 		return;
 	}
@@ -88,7 +88,7 @@ void Box::addSensor(Sensor* val)
 	_sensors.push_back(val);
 	_sensors.back()->setId(_sensors.size() - 1);
 
-	FB_DEBUG_TAG_LOG_W("Added a sensor with id %d", val->getId());
+	FB_DEBUG_LOG_W_TAG("Added a sensor with id %d", val->getId());
 }
 
 void Box::addSwitch(Switch* val)
@@ -97,7 +97,7 @@ void Box::addSwitch(Switch* val)
 		[val](const Switch* left){return left->getId() == val->getId();});
 	
 	if(iter != _switches.end()){
-		FB_DEBUG_TAG_LOG_W("Failed to add switch with id %d, it is already exist", val->getId());
+		FB_DEBUG_LOG_W_TAG("Failed to add switch with id %d, it is already exist", val->getId());
 		assert(0);
 		return;
 	}
@@ -105,7 +105,7 @@ void Box::addSwitch(Switch* val)
 	_switches.push_back(val);
 	_switches.back()->setId(_switches.size() - 1);
 
-	FB_DEBUG_TAG_LOG_W("Added a switch with id %d", val->getId());
+	FB_DEBUG_LOG_W_TAG("Added a switch with id %d", val->getId());
 }
 
 void Box::addPropertyDependency(int propertyId)

@@ -52,12 +52,12 @@ SensorIface::UpdateResult TemperatureSensor::_doUpdate()
 	const float current = _temperatureValueRequest();
 
 	if(current == TemperatureSensor::InvalidValue){
-		FB_DEBUG_LOG("Temperature[0x%llX] lost detected", getId());
+		FB_DEBUG_LOG_I_OBJ("Temperature[0x%llX] lost detected", getId());
 		return SensorIface::UpdateResult::FAIL;
 	}
 
 	if(current != _value){
-		FB_DEBUG_LOG("Temperature[0x%llX] changed %.2f -> %.2f", getId(), _value, current);
+		FB_DEBUG_LOG_I_OBJ("Temperature[0x%llX] changed %.2f -> %.2f", getId(), _value, current);
 		_value = current;
 
 		return SensorIface::UpdateResult::VALUE_CHANGED;
@@ -266,7 +266,7 @@ SensorIface::UpdateResult TemperatureSensorArray<N>::_doUpdate()
 // 	std::for_each(_sensors.begin(), _sensors.end(),
 // 		[this](auto& entry){
 // 			entry.value = _temperatureValueRequest(entry.id);
-// 			FB_DEBUG_LOG("Temperature[0x%llX] = %.2f", entry.id, entry.value);
+// 			FB_DEBUG_LOG_I_OBJ("Temperature[0x%llX] = %.2f", entry.id, entry.value);
 // 		});
 	
 // 	//TODO: made some checks if sensor was lost through some of operations

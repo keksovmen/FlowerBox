@@ -40,59 +40,51 @@ const char* StateManager::getName() const
 
 void StateManager::handleEvent(const event::Event& event)
 {
-	FB_DEBUG_ENTER();
+	FB_DEBUG_ENTER_I_OBJ();
 
 	//TODO: put mutex because on transition call will change ptr
-	FB_DEBUG_LOG("%s->handleEvent()", _currentState->getName());
+	FB_DEBUG_LOG_I_OBJ("%s->handleEvent()", _currentState->getName());
 	_currentState->handleEvent(event);
-	
-	FB_DEBUG_EXIT();
 }
 
 void StateManager::init(std::unique_ptr<State>&& initialState)
 {
-	FB_DEBUG_ENTER();
+	FB_DEBUG_ENTER_I_OBJ();
 
 	assert(initialState);
 	_currentState = std::move(initialState);
 
-	FB_DEBUG_LOG("%s->enter()", _currentState->getName());
+	FB_DEBUG_LOG_I_OBJ("%s->enter()", _currentState->getName());
 	_currentState->enter();
-
-	FB_DEBUG_EXIT();
 }
 
 void StateManager::transition(std::unique_ptr<State>&& nextState)
 {
-	FB_DEBUG_ENTER();
+	FB_DEBUG_ENTER_I_OBJ();
 
 	assert(_currentState);
 	assert(nextState);
 
 	//TODO: put mutex because on transition call will change ptr
 
-	FB_DEBUG_LOG("%s->exit()", _currentState->getName());
+	FB_DEBUG_LOG_I_OBJ("%s->exit()", _currentState->getName());
 	_currentState->exit();
 
 	_currentState = std::move(nextState);
 
-	FB_DEBUG_LOG("%s->enter()", _currentState->getName());
+	FB_DEBUG_LOG_I_OBJ("%s->enter()", _currentState->getName());
 	_currentState->enter();
-
-	FB_DEBUG_EXIT();
 }
 
 void StateManager::deinit()
 {
-	FB_DEBUG_ENTER();
+	FB_DEBUG_ENTER_I_OBJ();
 
 	if(_currentState){
-		FB_DEBUG_LOG("%s->exit()", _currentState->getName());
+		FB_DEBUG_LOG_I_OBJ("%s->exit()", _currentState->getName());
 		_currentState->exit();
 		_currentState.reset(nullptr);
 	}
-	
-	FB_DEBUG_EXIT();
 }
 
 
@@ -106,22 +98,18 @@ CompositeState::CompositeState(StateManager& context, const std::string& name)
 
 void CompositeState::enter()
 {
-	FB_DEBUG_ENTER();
+	FB_DEBUG_ENTER_I_OBJ();
 
 	_onCompositeEnter();
 	init(_createInitialState());
-
-	FB_DEBUG_EXIT();
 }
 
 void CompositeState::exit()
 {
-	FB_DEBUG_ENTER();
+	FB_DEBUG_ENTER_I_OBJ();
 
 	_onCompositeExit();
 	deinit();
-
-	FB_DEBUG_EXIT();
 }
 
 void CompositeState::handleEvent(const event::Event& event)
