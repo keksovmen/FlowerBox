@@ -50,7 +50,7 @@ static int _id_from_info_path(const char* path)
 	return id;
 }
 
-static int _id_from_data_path(const char* path)
+static int _id_from_time_path(const char* path)
 {
 	const auto uri = std::string(path);
 	const int id = std::atoi(
@@ -59,7 +59,7 @@ static int _id_from_data_path(const char* path)
 	return id;
 }
 
-static int _timestamp_from_data_path(const char* path)
+static int _timestamp_from_time_path(const char* path)
 {
 	return _id_from_info_path(path);
 }
@@ -74,7 +74,7 @@ static esp_err_t _property_get_cb(httpd_req_t* r)
 
 	const int id = _id_from_info_path(r->uri);
 
-	FB_DEBUG_LOG_I_TAG("Requesting PropertyInfo with id: %d", id);
+	FB_DEBUG_LOG_I_TAG("Requesting %s, PropertyInfo with id: %d", r->uri, id);
 
 	const auto* prop = global::getFlowerBox()->getProperty(id);
 	const auto result = prop->toJson();
@@ -94,16 +94,9 @@ static esp_err_t _property_set_cb(httpd_req_t* r)
 
 	esp_err_t err = ESP_OK;
 
-	const int id = _id_from_data_path(r->uri);
+	const int id = _id_from_info_path(r->uri);
 
-	FB_DEBUG_LOG_I_TAG("Requesting set property value with id: %d", id);
-
-	if(strstr(r->uri, "set") == NULL){
-		FB_DEBUG_LOG_I_TAG("Not set request");
-		err = httpd_resp_send_500(r);
-
-		return err;
-	}
+	FB_DEBUG_LOG_I_TAG("Requesting %s, set property value with id: %d", r->uri, id);
 
 	char tmp[256];
 	assert(r->content_len <= sizeof(tmp));
@@ -197,8 +190,8 @@ static esp_err_t _sensor_data_cb(httpd_req_t* r)
 
 	esp_err_t err = ESP_OK;
 
-	const int id = _id_from_data_path(r->uri);
-	const clock::Timestamp timestamp = _timestamp_from_data_path(r->uri);
+	const int id = _id_from_time_path(r->uri);
+	const clock::Timestamp timestamp = _timestamp_from_time_path(r->uri);
 
 	FB_DEBUG_LOG_I_TAG("Requesting Sensor data with id: %d, and timestamp: %lld", id, timestamp);
 
@@ -240,8 +233,8 @@ static esp_err_t _switch_data_cb(httpd_req_t* r)
 
 	esp_err_t err = ESP_OK;
 
-	const int id = _id_from_data_path(r->uri);
-	const clock::Timestamp timestamp = _timestamp_from_data_path(r->uri);
+	const int id = _id_from_time_path(r->uri);
+	const clock::Timestamp timestamp = _timestamp_from_time_path(r->uri);
 
 	FB_DEBUG_LOG_I_TAG("Requesting Switch data with id: %d, and timestamp: %lld", id, timestamp);
 

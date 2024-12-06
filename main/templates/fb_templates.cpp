@@ -46,7 +46,8 @@ bool Engine::process(const std::string& fileName)
 
 bool Engine::addIntArg(int val, const std::string& key)
 {
-	_arg = std::pair{val, key};
+	_args[key] = val;
+
 	return true;
 }
 
@@ -78,11 +79,11 @@ void Engine::_flush()
 
 bool Engine::_getIntArg(int* out, const std::string& key)
 {
-	if(_arg.second != key){
+	if(!_args.contains(key)){
 		return false;
 	}
 
-	*out = _arg.first;
+	*out = _args.at(key);
 	return true;
 }
 

@@ -63,9 +63,9 @@ int RgbSwitch::getColor() const
 
 void RgbSwitch::_applyColor(int color)
 {
-	const int red = color & 0xFF;
+	const int red = (color >> 16) & 0xFF;
 	const int green = (color >> 8) & 0xFF;
-	const int blue = (color >> 16) & 0xFF;
+	const int blue = color & 0xFF;
 
 	FB_DEBUG_LOG_I_OBJ("Apply color: R = %d, G = %d, B = %d", red, green, blue);
 

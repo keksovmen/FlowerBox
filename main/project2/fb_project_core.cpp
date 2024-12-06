@@ -1,6 +1,7 @@
 #include "fb_project_core.hpp"
 
 #include "fb_server_html.hpp"
+#include "fb_project_maper_obj.hpp"
 
 
 
@@ -9,9 +10,10 @@ using namespace project;
 
 
 
-void _controlsCb(templates::Engine& engine)
+static void _controlsCb(templates::Engine& engine)
 {
-	engine.addIntArg(228, "LOH");
+	engine.addIntArg(getRgbProperty().getId(), "color_id");
+	engine.addIntArg(getRgbSwitchProperty().getId(), "switch_id");
 }
 
 

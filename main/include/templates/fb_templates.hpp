@@ -3,6 +3,7 @@
 #include <string>
 #include <functional>
 #include <utility>
+#include <unordered_map>
 
 
 
@@ -86,7 +87,8 @@ namespace fb
 				char _argBuffer[32];
 				int _currentBuffer = 0;
 
-				std::pair<int, std::string> _arg;
+				//TODO: make it work in provided buffer not in dynamic memory
+				std::unordered_map<std::string, int> _args;
 
 				StateInitial _stateInitial;
 				StateStart _stateStart;

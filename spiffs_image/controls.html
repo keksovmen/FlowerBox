@@ -1,21 +1,24 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<title>MainMenu</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<link rel="stylesheet" href="/html/style.css">
-	</head>
-	<body>
-		<div class="panel">
-			<h1 class="title">{{ puti LOH }}</h1>
-			<h2 class="title">Main menu</h2>
-			<div class="button">
-				<a href="/html/update.html">Update</a>
-			</div>
-			<div class="button">
-				<a href="/html/time.html">Set time periods</a>
-			</div>
-		</div>
-	</body>
+
+<head>
+	<title>Controls</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="/html/style.css">
+	<script src="/html/controls.js"></script>
+</head>
+
+<body>
+	<div class="panel">
+		<label for="value">RGB</label>
+		<input id="id_color" type="hidden" value="{{ puti color_id }}">
+		<input id="id_switch" type="hidden" value="{{ puti switch_id }}">
+		<input id="color" name="value" type="color" oninput="change_color(event)">
+		<input type="submit" onclick="change_color(event)" value="Change color">
+		<input type="submit" onclick="turn_on(event)" value="Turon on">
+		<input type="submit" onclick="turn_off(event)" value="Turn off">
+	</div>
+</body>
+
 </html>

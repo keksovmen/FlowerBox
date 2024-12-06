@@ -1,5 +1,7 @@
 #include "fb_project_maper_obj.hpp"
 
+#include <ranges>
+
 #include "fb_project_box_obj.hpp"
 #include "fb_project_hw_obj.hpp"
 #include "fb_switch.hpp"
@@ -154,4 +156,21 @@ int project::mapBoxSwitchIdToAddres(int id)
 	// }
 
 	assert(0);
+}
+
+box::PropertyIface& project::getRgbProperty()
+{
+	// auto res = std::ranges::find_if(
+	// 	_boxRgbSwitch.getPropertyDependencies(),
+	// 	[](const auto& val){return val.getTid() == box::Tid::PROPERTY_SWITCH_RGB_VALUE;});
+	
+	// assert(res != _boxRgbSwitch.getPropertyDependencies().end());
+
+	// return *res;
+	return *getBox().getProperty(_boxRgbSwitch.getPropertyDependencies().at(1));
+}
+
+box::PropertyIface& project::getRgbSwitchProperty()
+{
+	return *getBox().getProperty(_boxRgbSwitch.getPropertyDependencies().at(0));
 }
