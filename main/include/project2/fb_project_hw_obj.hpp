@@ -6,7 +6,7 @@
 #include "fb_sensor_storage.hpp"
 #include "fb_switch_service.hpp"
 #include "fb_rgb_switch.hpp"
-#include "fb_mp3_switch.hpp"
+#include "fb_sensor_mp3.hpp"
 
 
 
@@ -16,14 +16,9 @@ namespace fb
 	{
 		void initHwObjs();
 
-		// sensor::TemperatureSensorArrayI& getHwTempSensors();
-		// sensor::TemperatureSensor& getHwInsideTempSensor();
-		// sensor::TemperatureSensor& getHwOutsideTempSensor();
+		sensor::Mp3Sensor& getHwMp3Sensor();
 
-		// switches::TimeSwitch& getHwLightSwitch();
-		// switches::HeatSwitch& getHwHeatSwitch();
 		switches::RgbSwitch& getHwRgbSwitch();
-		switches::Mp3Switch& getHwMp3Switch();
 
 		sensor::SensorService& getHwSensorService();
 		switches::SwitchService& getHwSwitchService();

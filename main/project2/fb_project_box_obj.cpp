@@ -18,7 +18,7 @@ using namespace project;
 static box::Box _flowerBox(_DEVICE_NAME, _DEVICE_VERSION, 1);
 // static box::Sensor _insideSensor(box::Tid::SENSOR_DS18B20);
 // static box::Sensor _outsideSensor(box::Tid::SENSOR_DS18B20);
-
+static box::Sensor _boxMp3Sensor(box::Tid::SENSOR_MP3);
 
 
 // static void _create_register_description_prop(box::ObjectIface& obj)
@@ -40,6 +40,8 @@ static box::Box _flowerBox(_DEVICE_NAME, _DEVICE_VERSION, 1);
 
 void project::initBoxObjs()
 {
+	getBox().addSensor(&getBoxMp3Sensor());
+	
 	//change to box get sensor id???
 	// _flowerBox.addSensor(&_insideSensor);
 	// _flowerBox.addSensor(&_outsideSensor);
@@ -52,6 +54,11 @@ void project::initBoxObjs()
 box::Box& project::getBox()
 {
 	return _flowerBox;	
+}
+
+box::Sensor& project::getBoxMp3Sensor()
+{
+	return _boxMp3Sensor;
 }
 
 // box::Sensor& project::getBoxInsideSensor()

@@ -10,9 +10,7 @@ using namespace project;
 
 
 //сенсоры туть
-// static sensor::TemperatureSensorArray<2> _sensorArrayTemp(pins::PIN_SENSOR_TEMPERATURE);
-// static sensor::TemperatureSensor* _sensorTemperatureInside = _sensorArrayTemp.getSensor(0);
-// static sensor::TemperatureSensor* _sensorTemperatureOutside = _sensorArrayTemp.getSensor(1);
+static sensor::Mp3Sensor _mp3Sensor(16, 17);
 
 // //переключатели туть
 // static switches::TimeSwitch _switchLight(clock::Time(0, 0, 0), clock::Time(0, 1, 0), pins::PIN_BLUE_LED);
@@ -21,7 +19,6 @@ using namespace project;
 static switches::RgbSwitch _rgbSwitch(LEDC_TIMER_0, LEDC_CHANNEL_0,
 			pins::PIN_RED_LED, pins::PIN_GREEN_LED, pins::PIN_BLUE_LED);
 			
-static switches::Mp3Switch _mp3Switch;
 
 // //сервисы туть
 static sensor::SensorService _sensorService;
@@ -36,18 +33,18 @@ void project::initHwObjs()
 {
 	// _sensorService.addSensor(&getHwTempSensors());
 	// _sensorService.addSensor(&getHwInsideTempSensor());
-	// _sensorService.addSensor(&getHwOutsideTempSensor());
+	_sensorService.addSensor(&getHwMp3Sensor());
 
 	// _swithService.addSwitch(&getHwLightSwitch());
 	// _swithService.addSwitch(&getHwHeatSwitch());
 	_swithService.addSwitch(&getHwRgbSwitch());
-	_swithService.addSwitch(&getHwMp3Switch());
 }
 
-// sensor::TemperatureSensorArrayI& project::getHwTempSensors()
-// {
-// 	return _sensorArrayTemp;
-// }
+sensor::Mp3Sensor& project::getHwMp3Sensor()
+{
+	return _mp3Sensor;
+}
+
 
 // sensor::TemperatureSensor& project::getHwInsideTempSensor()
 // {
@@ -77,11 +74,6 @@ void project::initHwObjs()
 switches::RgbSwitch& project::getHwRgbSwitch()
 {
 	return _rgbSwitch;
-}
-
-switches::Mp3Switch& project::getHwMp3Switch()
-{
-	return _mp3Switch;
 }
 
 sensor::SensorService& project::getHwSensorService()

@@ -20,9 +20,13 @@ else()
 		"project2/fb_project_core.cpp"
 		"switches/fb_rgb_switch.cpp"
 		"switches/fb_mp3_switch.cpp"
+		"sensors/fb_sensor_mp3.cpp"
+		"df_player/fb_df_player.cpp"
+		"fb_uart.cpp"
 		)
 	set(_ADD_INCLUDES
-		"include/project2")
+		"include/project2"
+		"include/df_player")
 endif()
 
 message(STATUS "ADD SRC: " ${_ADD_SRC})
