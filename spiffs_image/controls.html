@@ -11,13 +11,26 @@
 
 <body>
 	<div class="panel">
+		<input id="id_color" type="hidden" value="{{ puti rgb_color_id }}">
+		<input id="id_switch" type="hidden" value="{{ puti rgb_switch_id }}">
+		<input id="id_play" type="hidden" value="{{ puti play_id }}">
+		<input id="id_stop" type="hidden" value="{{ puti stop_id }}">
+		<input id="id_volume" type="hidden" value="{{ puti volume_id }}">
+		
 		<label for="value">RGB</label>
-		<input id="id_color" type="hidden" value="{{ puti color_id }}">
-		<input id="id_switch" type="hidden" value="{{ puti switch_id }}">
 		<input id="color" name="value" type="color" oninput="change_color(event)">
 		<input type="submit" onclick="change_color(event)" value="Change color">
-		<input type="submit" onclick="turn_on(event)" value="Turon on">
-		<input type="submit" onclick="turn_off(event)" value="Turn off">
+		<input type="submit" onclick="turn_on(event)" value="Turon RGB on">
+		<input type="submit" onclick="turn_off(event)" value="Turn RGB off">
+
+		<label for="track_id">MP3</label>
+		<input id="track_id" name="track_id" type="number" value="0" min="0">
+		<input type="submit" onclick="play_track(event)" value="Play track">
+		<input type="submit" onclick="stop_audio(event)" value="Stop audio">
+		
+		<label for="volume">Volume</label>
+		<input id="volume" name="volume" value="{{ puti volume_val }}" type="number" min="0" max="30">
+		<input type="submit" onclick="set_volume(event)" value="Set volume">
 	</div>
 </body>
 

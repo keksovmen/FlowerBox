@@ -182,3 +182,18 @@ box::PropertyIface& project::getRgbSwitchProperty()
 {
 	return *getBox().getProperty(_boxRgbSwitch.getPropertyDependencies().at(0));
 }
+
+box::PropertyIface& project::getMp3PlayProperty()
+{
+	return *getBox().getProperty(getBoxMp3Sensor().getPropertyDependencies().at(0));
+}
+
+box::PropertyIface& project::getMp3StopProperty()
+{
+	return *getBox().getProperty(getBoxMp3Sensor().getPropertyDependencies().at(1));
+}
+
+box::PropertyIface& project::getMp3ValueProperty()
+{
+	return *getBox().getProperty(getBoxMp3Sensor().getPropertyDependencies().at(2));
+}

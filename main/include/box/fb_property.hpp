@@ -20,6 +20,8 @@ namespace fb
 				virtual ~PropertyIface() = default;
 
 				virtual bool setFromJson(const std::string& json) = 0;
+				
+				virtual std::string getValue() const = 0;
 		};
 
 
@@ -47,6 +49,8 @@ namespace fb
 
 				//TODO: call converter function and call calback if ok
 				bool setFromJson(const std::string& json) override;
+
+				virtual std::string getValue() const override;
 
 			private:
 				const ActionSet _action;

@@ -52,7 +52,7 @@ std::string PropertyBase<T>::toJson() const
 	cJSON_AddStringToObject(obj, "description", getDescription().c_str());
 	cJSON_AddStringToObject(obj, "value_type", getValueType().c_str());
 	cJSON_AddNumberToObject(obj, "id", getId());
-	cJSON_AddNumberToObject(obj, "tid", static_cast<double>(getTid()));
+	cJSON_AddNumberToObject(obj, "tid", std::to_underlying(getTid()));
 	cJSON_AddRawToObject(obj, "min_value", getMinValueStr().c_str());
 	cJSON_AddRawToObject(obj, "max_value", getMaxValueStr().c_str());
 	cJSON_AddStringToObject(obj, "value", _valueToString(_value).c_str());
@@ -77,6 +77,12 @@ bool PropertyBase<T>::setFromJson(const std::string& str)
 	}
 
 	return false;
+}
+
+template<class T>
+std::string PropertyBase<T>::getValue() const
+{
+	return _valueToString(_value);
 }
 
 

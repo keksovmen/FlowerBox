@@ -1,5 +1,9 @@
 #include "fb_mp3_switch.hpp"
 
+#include <mutex>
+#include "serial.h"
+#include "DFRobotDFPlayerMini.h"
+
 
 
 using namespace fb;
@@ -7,10 +11,13 @@ using namespace switches;
 
 
 
+static std::once_flag _flag;
+
+
+
 Mp3Switch::Mp3Switch()
 	: SwitchIface(&_condition, &_action)
 {
-
 }
 
 const char* Mp3Switch::getName() const
@@ -20,9 +27,14 @@ const char* Mp3Switch::getName() const
 
 bool Mp3Switch::play(int trackId)
 {
+	std::call_once(_flag, [](){
+		serial_begin(9600, 8, 9);
+	});
+
 	//write uart cmd
 	//set forse flag
 	setForseFlag(SwitchForseState::ON);
+	DF_play(0);
 	return true;
 }
 

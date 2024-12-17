@@ -33,7 +33,7 @@ namespace fb
 				
 
 				int _filesCount = 0;
-				int _volume = 0;
+				int _volume = 15;
 				// bool _loopFlag = false;
 
 

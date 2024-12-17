@@ -16,5 +16,9 @@ namespace fb
 
 		box::PropertyIface& getRgbProperty();
 		box::PropertyIface& getRgbSwitchProperty();
+
+		box::PropertyIface& getMp3PlayProperty();
+		box::PropertyIface& getMp3StopProperty();
+		box::PropertyIface& getMp3ValueProperty();
 	}
 }

@@ -53,3 +53,32 @@ async function turn_off()
 
 	alert(await response.status == 200 ? "OK" : "FAIL");
 }
+
+async function play_track()
+{
+	var id = document.getElementById("id_play").value;
+	var track_id = document.getElementById("track_id").value;
+
+	const response = await _post_property(id, track_id);
+
+	alert(await response.status == 200 ? "OK" : "FAIL");
+}
+
+async function stop_audio()
+{
+	var id = document.getElementById("id_stop").value;
+
+	const response = await _post_property(id, "");
+
+	alert(await response.status == 200 ? "OK" : "FAIL");
+}
+
+async function set_volume()
+{
+	var id = document.getElementById("id_volume").value;
+	var volume = document.getElementById("volume").value;
+
+	const response = await _post_property(id, volume);
+
+	alert(await response.status == 200 ? "OK" : "FAIL");
+}
