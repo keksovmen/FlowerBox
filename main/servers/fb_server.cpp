@@ -6,6 +6,7 @@
 #include "fb_server_update.hpp"
 #include "fb_server_html.hpp"
 #include "fb_server_box.hpp"
+#include "fb_server_debug.hpp"
 
 
 
@@ -46,6 +47,7 @@ void server::startProvision()
 	// registerServerUpdate(builder);
 	registerServerHtml(builder);
 	registerServerBox(builder);
+	registerServerDebug(builder);
 
 	_server = builder.build();
 }

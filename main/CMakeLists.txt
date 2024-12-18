@@ -65,6 +65,7 @@ idf_component_register(
 		"servers/fb_server_update.cpp"
 		"servers/fb_server_html.cpp"
 		"servers/fb_server_box.cpp"
+		"servers/fb_server_debug.cpp"
 		"states/fb_state_manager.cpp"
 		"states/fb_main_state_manager.cpp"
 		"states/fb_state_sensor_init.cpp"
