@@ -15,40 +15,15 @@ using namespace project;
 
 
 
-static box::Box _flowerBox(_DEVICE_NAME, _DEVICE_VERSION, 1);
-// static box::Sensor _insideSensor(box::Tid::SENSOR_DS18B20);
-// static box::Sensor _outsideSensor(box::Tid::SENSOR_DS18B20);
+static box::Box _flowerBox(_DEVICE_NAME, _DEVICE_VERSION, global::getUniqueId());
+
 static box::Sensor _boxMp3Sensor(box::Tid::SENSOR_MP3);
 
-
-// static void _create_register_description_prop(box::ObjectIface& obj)
-// {
-// 	const auto *prop = _flowerBox.addProperty(std::make_unique<box::PropertyString>(
-// 		box::Tid::PROPERTY_SENSOR_DESCRIPTION,
-// 		[&obj](std::string val)
-// 		{ 
-// 			obj.setDescription(val);
-// 			return true;
-// 		},
-// 		obj.getDescription())
-// 	);
-// 	assert(prop);
-
-// 	obj.addPropertyDependency(prop->getId());
-// }
 
 
 void project::initBoxObjs()
 {
 	getBox().addSensor(&getBoxMp3Sensor());
-	
-	//change to box get sensor id???
-	// _flowerBox.addSensor(&_insideSensor);
-	// _flowerBox.addSensor(&_outsideSensor);
-
-	// change to static somehow
-	// _create_register_description_prop(_insideSensor);
-	// _create_register_description_prop(_outsideSensor);
 }
 
 box::Box& project::getBox()
@@ -60,13 +35,3 @@ box::Sensor& project::getBoxMp3Sensor()
 {
 	return _boxMp3Sensor;
 }
-
-// box::Sensor& project::getBoxInsideSensor()
-// {
-// 	return _insideSensor;
-// }
-
-// box::Sensor& project::getBoxOutsideSensor()
-// {
-// 	return _outsideSensor;
-// }

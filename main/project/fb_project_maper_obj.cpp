@@ -27,6 +27,9 @@ static void _create_and_register_forse_property(switches::SwitchIface& obj, box:
 	auto* forseProperty = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_FORSE,
 		[&obj](int val){
 			obj.setForseFlag(static_cast<switches::SwitchForseState>(val));
+			//to act immediatly not on next tick
+			getHwSwitchService().forcePullAction();
+			
 			return true;
 		}, obj.isOn()
 	);

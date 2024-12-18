@@ -16,12 +16,6 @@ using namespace project;
 static box::Switch _boxRgbSwitch(box::Tid::SWITCH_RGB,
 	[](){return getHwRgbSwitch().isOn();});
 
-// static box::Switch _boxHeatSwitch(box::Tid::SWITCH_HEAT,
-// 	[](){return getHwHeatSwitch().isOn();});
-
-// static box::Switch _boxFanSwitch(box::Tid::SWITCH_FAN,
-// 	[](){return getHwFanSwitch().isOn();});
-
 
 
 static void _create_and_register_forse_property(switches::SwitchIface& obj, box::Switch& dependy)
@@ -29,6 +23,9 @@ static void _create_and_register_forse_property(switches::SwitchIface& obj, box:
 	auto* forseProperty = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_FORSE,
 		[&obj](int val){
 			obj.setForseFlag(static_cast<switches::SwitchForseState>(val));
+
+			getHwSwitchService().forcePullAction();
+
 			return true;
 		}, obj.isOn()
 	);
@@ -90,62 +87,19 @@ static void _initMp3Sensor()
 void project::initMaperObjs()
 {
 	getBox().addSwitch(&_boxRgbSwitch);
-	// getBox().addSwitch(&_boxLightSwitch);
-	// getBox().addSwitch(&_boxHeatSwitch);
 
 
 	_initRgbSwitch();
 	_initMp3Sensor();
-
-	// _create_and_register_forse_property(getHwHeatSwitch(), _boxHeatSwitch);
-	// _boxHeatSwitch.addSensorDependency(getBoxInsideSensor().getId());
-
-	// _create_and_register_forse_property(getHwFanSwitch(), _boxFanSwitch);
-	// _boxFanSwitch.addSensorDependency(getBoxInsideSensor().getId());
-
-
-	// const auto* prop = getBox().addProperty(std::make_unique<box::PropertyInt>(
-	// 	box::Tid::PROPERTY_SENSOR_PERIOD_GLOBAL,
-	// 	[](int val){
-	// 		getHwSensorService().setTimerPeriod(val * 1000);
-	// 		return true;
-	// 	},
-	// 	3));	//TODO: made it not die in assert
-	// 	// getHwSensorService().getTimerPeriod()));
-
-	// const auto* prop = getBox().addProperty(std::make_unique<box::PropertyInt>(
-	// 	box::Tid::PROPERTY_SENSOR_PERIOD_GLOBAL,
-	// 	[](int val){
-	// 		getHwSensorService().setTimerPeriod(val * 1000);
-	// 		return true;
-	// 	},
-	// 	3));	//TODO: made it not die in assert
-	// getBox().addPropertyDependency(prop->getId());
-		
-
-	//TODO: add sensor service property and etc
 }
 
 int project::mapBoxSensorIdToAddres(int id)
 {
-	// if(id == getBoxInsideSensor().getId())
-	// {
-	// 	return reinterpret_cast<int>(&getHwInsideTempSensor());
-	// }
-	// else if(id == getBoxOutsideSensor().getId())
-	// {
-	// 	return reinterpret_cast<int>(&getHwOutsideTempSensor());
-	// }
-
-	//TODO: add proper error returning
+	if(id == getBoxMp3Sensor().getId()){
+		return reinterpret_cast<int>(&getHwMp3Sensor());
+	}
 
 	assert(0);
-	// switch(id)
-	// {
-		//try constexpr here
-	// 	case getBoxInsideSensor().getId():
-
-	// }
 }
 
 int project::mapBoxSwitchIdToAddres(int id)
@@ -154,27 +108,12 @@ int project::mapBoxSwitchIdToAddres(int id)
 	{
 		return reinterpret_cast<int>(&_boxRgbSwitch);
 	}
-	// else if(id == _boxHeatSwitch.getId())
-	// {
-	// 	return reinterpret_cast<int>(&_boxHeatSwitch);
-	// }
-	// else if(id == _boxFanSwitch.getId())
-	// {
-	// 	return reinterpret_cast<int>(&_boxFanSwitch);
-	// }
 
 	assert(0);
 }
 
 box::PropertyIface& project::getRgbProperty()
 {
-	// auto res = std::ranges::find_if(
-	// 	_boxRgbSwitch.getPropertyDependencies(),
-	// 	[](const auto& val){return val.getTid() == box::Tid::PROPERTY_SWITCH_RGB_VALUE;});
-	
-	// assert(res != _boxRgbSwitch.getPropertyDependencies().end());
-
-	// return *res;
 	return *getBox().getProperty(_boxRgbSwitch.getPropertyDependencies().at(1));
 }
 
