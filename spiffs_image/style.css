@@ -29,6 +29,58 @@ body {
 }
 
 .button:hover {
-	background: #EAEAAE;
+	background: #AFAF5F;
 	border-color: gray;
+}
+
+label {
+	margin: auto;
+}
+
+#wait_dialog {
+	display: none;
+}
+
+
+
+.progress_bar_bottom,
+.progress_bar_middle,
+.progress_bar_top {
+	margin: auto;
+	width: 100px;
+	height: 100px;
+	background: #FAFAAF;
+	border-radius: 50%;
+}
+
+.progress_bar_middle {
+	position: absolute;
+	display: flex;
+	background: #AFAF5F;
+	clip-path: rect(0px 50px 100px 0px);
+
+	animation-name: spinn;
+	animation-duration: 3s;
+	animation-iteration-count: infinite;
+	animation-timing-function: linear;
+
+}
+
+.progress_bar_top {
+	background-color: #EFCFAF;
+	clip-path: circle(40px);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+}
+
+@keyframes spinn {
+	0% {
+		transform: rotate(0deg);
+	}
+
+	100% {
+		transform: rotate(360deg);
+	}
 }

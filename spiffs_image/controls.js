@@ -7,8 +7,7 @@ var request_in_progress = false;
 
 
 
-function _post_property(id, val)
-{
+function _post_property(id, val) {
 	return fetch(`/property/${id}`, {
 		method: "POST",
 		headers: {
@@ -18,67 +17,75 @@ function _post_property(id, val)
 	});
 }
 
-async function change_color()
-{
-	if(request_in_progress){
+function _show_wait_dialog() {
+	document.getElementById("wait_dialog").style.display = "block"
+	document.getElementById("controls").style.display = "none"
+}
+
+function _close_wait_dialog() {
+	document.getElementById("wait_dialog").style.display = "none"
+	document.getElementById("controls").style.display = "grid"
+}
+
+async function _post_with_dialog(id, val) {
+	_show_wait_dialog();
+
+	const response = await _post_property(id, val);
+	if (await response.status != 200) {
+		console.log("failed response, status: " + response.status)
+	}
+
+	_close_wait_dialog();
+}
+
+async function change_color(event) {
+	if (request_in_progress) {
 		return;
 	}
 
 	request_in_progress = true;
-	
+
 	var color = parseInt(document.getElementById("color").value.substr(1), 16);
 	var id = document.getElementById("id_color").value;
-	
-	const response = await _post_property(id, color);
-	
-	await response;
+
+	if (event.type == "click") {
+		_post_with_dialog(id, color);
+	} else {
+		const response = await _post_property(id, color);
+		await response.status;
+	}
 
 	request_in_progress = false;
 }
 
-async function turn_on()
-{
+async function turn_on() {
 	var id = document.getElementById("id_switch").value;
 
-	const response = await _post_property(id, 1);
-
-	alert(await response.status == 200 ? "OK" : "FAIL");
+	_post_with_dialog(id, 1);
 }
 
-async function turn_off()
-{
+async function turn_off() {
 	var id = document.getElementById("id_switch").value;
 
-	const response = await _post_property(id, 2);
-
-	alert(await response.status == 200 ? "OK" : "FAIL");
+	_post_with_dialog(id, 2);
 }
 
-async function play_track()
-{
+async function play_track() {
 	var id = document.getElementById("id_play").value;
 	var track_id = document.getElementById("track_id").value;
 
-	const response = await _post_property(id, track_id);
-
-	alert(await response.status == 200 ? "OK" : "FAIL");
+	_post_with_dialog(id, track_id);
 }
 
-async function stop_audio()
-{
+async function stop_audio() {
 	var id = document.getElementById("id_stop").value;
 
-	const response = await _post_property(id, "");
-
-	alert(await response.status == 200 ? "OK" : "FAIL");
+	_post_with_dialog(id, "");
 }
 
-async function set_volume()
-{
+async function set_volume() {
 	var id = document.getElementById("id_volume").value;
 	var volume = document.getElementById("volume").value;
 
-	const response = await _post_property(id, volume);
-
-	alert(await response.status == 200 ? "OK" : "FAIL");
+	_post_with_dialog(id, volume);
 }
