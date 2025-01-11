@@ -1,5 +1,5 @@
-# set(_PROJECT MINE)
-set(_PROJECT DIPLOM)
+set(_PROJECT MINE)
+# set(_PROJECT DIPLOM)
 
 message(STATUS "Selected project: " ${_PROJECT})
 
@@ -9,6 +9,7 @@ if(${_PROJECT} STREQUAL "MINE")
 		"project/fb_project_hw_obj.cpp"
 		"project/fb_project_maper_obj.cpp"
 		"project/fb_project_core.cpp"
+		"sensors/fb_sensor_aht20.cpp"
 		)
 	set(_ADD_INCLUDES
 		"include/project")

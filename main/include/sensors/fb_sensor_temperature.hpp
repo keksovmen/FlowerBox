@@ -87,6 +87,7 @@ namespace fb
 
 
 
-		template class TemperatureSensorArray<2>;
+		template class TemperatureSensorArray<1>;
+		// template class TemperatureSensorArray<2>;
 	} // namespace sensor
 } // namespace fb

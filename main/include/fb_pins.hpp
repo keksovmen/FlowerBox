@@ -16,6 +16,10 @@ namespace fb
 		static constexpr int PIN_GREEN_LED = 4;
 		static constexpr int PIN_BLUE_LED = 5;
 		static constexpr int PIN_COOL_LED = 19;
+		// static constexpr int PIN_IIC_SDA = 17;
+		static constexpr int PIN_IIC_SDA = 7;
+		// static constexpr int PIN_IIC_SCL = 16;
+		static constexpr int PIN_IIC_SCL = 8;
 		// static constexpr int PIN_SENSOR_TEMPERATURE = 10;
 
 

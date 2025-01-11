@@ -35,7 +35,8 @@ void BoxService::handleEvent(const event::Event& event)
 
 		}else if(event.eventId == sensor::SensorEvent::SENSOR_VALUE_CHANGED){
 			//TODO: move it somehwere else maybe?
-			const auto* sen = reinterpret_cast<sensor::TemperatureSensor*>(event.data);
+			//need a way to define what sensor it is 
+			const auto* sen = dynamic_cast<sensor::TemperatureSensor*>(reinterpret_cast<sensor::SensorIface*>(event.data));
 			if(sen){
 				_storage.addSensorValue(reinterpret_cast<int>(sen), sen->getValue());
 			}

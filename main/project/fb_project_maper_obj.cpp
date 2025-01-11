@@ -50,10 +50,10 @@ void project::initMaperObjs()
 	_create_and_register_forse_property(getHwLightSwitch(), _boxLightSwitch);
 
 	_create_and_register_forse_property(getHwHeatSwitch(), _boxHeatSwitch);
-	_boxHeatSwitch.addSensorDependency(getBoxInsideSensor().getId());
+	_boxHeatSwitch.addSensorDependency(getBoxInsideTempSensor().getId());
 
 	_create_and_register_forse_property(getHwFanSwitch(), _boxFanSwitch);
-	_boxFanSwitch.addSensorDependency(getBoxInsideSensor().getId());
+	_boxFanSwitch.addSensorDependency(getBoxInsideTempSensor().getId());
 
 
 	const auto* prop = getBox().addProperty(std::make_unique<box::PropertyInt>(
@@ -72,13 +72,17 @@ void project::initMaperObjs()
 
 int project::mapBoxSensorIdToAddres(int id)
 {
-	if(id == getBoxInsideSensor().getId())
+	if(id == getBoxInsideTempSensor().getId())
 	{
-		return reinterpret_cast<int>(&getHwInsideTempSensor());
+		return reinterpret_cast<int>(&getHwDS18Sensor());
 	}
-	else if(id == getBoxOutsideSensor().getId())
+	else if(id == getBoxOutsideTempSensor().getId())
 	{
-		return reinterpret_cast<int>(&getHwOutsideTempSensor());
+		return reinterpret_cast<int>(&getHwAhtSensor());
+	}
+	else if(id == getBoxInsideHumiditySensor().getId())
+	{
+		return reinterpret_cast<int>(&getHwAhtSensor());
 	}
 
 	//TODO: add proper error returning
@@ -87,7 +91,7 @@ int project::mapBoxSensorIdToAddres(int id)
 	// switch(id)
 	// {
 		//try constexpr here
-	// 	case getBoxInsideSensor().getId():
+	// 	case getBoxInsideTempSensor().getId():
 
 	// }
 }

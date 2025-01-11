@@ -15,7 +15,8 @@ namespace fb
 
 
 		box::Box& getBox();
-		box::Sensor& getBoxInsideSensor();
-		box::Sensor& getBoxOutsideSensor();
+		box::Sensor& getBoxInsideTempSensor();
+		box::Sensor& getBoxInsideHumiditySensor();
+		box::Sensor& getBoxOutsideTempSensor();
 	}
 }

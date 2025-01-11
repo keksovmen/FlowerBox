@@ -16,8 +16,9 @@ using namespace project;
 
 
 static box::Box _flowerBox(_DEVICE_NAME, _DEVICE_VERSION, global::getUniqueId());
-static box::Sensor _insideSensor(box::Tid::SENSOR_DS18B20);
-static box::Sensor _outsideSensor(box::Tid::SENSOR_DS18B20);
+static box::Sensor _insideTempSensor(box::Tid::SENSOR_TEMPERATURE);
+static box::Sensor _insideHumiditySensor(box::Tid::SENSOR_HUMIDITY);
+static box::Sensor _outsideTempSensor(box::Tid::SENSOR_TEMPERATURE);
 
 
 
@@ -41,12 +42,19 @@ static void _create_register_description_prop(box::ObjectIface& obj)
 void project::initBoxObjs()
 {
 	//change to box get sensor id???
-	_flowerBox.addSensor(&_insideSensor);
-	_flowerBox.addSensor(&_outsideSensor);
+	_flowerBox.addSensor(&_insideTempSensor);
+	_flowerBox.addSensor(&_outsideTempSensor);
+	_flowerBox.addSensor(&_insideHumiditySensor);
+
+	//change descriptions
+	_insideTempSensor.setDescription("Inside temperature sensor");
+	_insideHumiditySensor.setDescription("Inside humidity sensor");
+	_outsideTempSensor.setDescription("Outside temperature sensor");
 
 	// change to static somehow
-	_create_register_description_prop(_insideSensor);
-	_create_register_description_prop(_outsideSensor);
+	_create_register_description_prop(_insideTempSensor);
+	_create_register_description_prop(_outsideTempSensor);
+	_create_register_description_prop(_insideHumiditySensor);
 }
 
 box::Box& project::getBox()
@@ -54,12 +62,17 @@ box::Box& project::getBox()
 	return _flowerBox;	
 }
 
-box::Sensor& project::getBoxInsideSensor()
+box::Sensor& project::getBoxInsideTempSensor()
 {
-	return _insideSensor;
+	return _insideTempSensor;
 }
 
-box::Sensor& project::getBoxOutsideSensor()
+box::Sensor& project::getBoxInsideHumiditySensor()
 {
-	return _outsideSensor;
+	return _insideHumiditySensor;
+}
+
+box::Sensor& project::getBoxOutsideTempSensor()
+{
+	return _outsideTempSensor;
 }

@@ -15,6 +15,8 @@ namespace fb
 		{
 			SENSOR_DS18B20 = 0,
 			SENSOR_MP3,
+			SENSOR_TEMPERATURE,
+			SENSOR_HUMIDITY,
 
 			SWITCH_LIGHT = 256,
 			SWITCH_HEAT,
@@ -64,6 +66,12 @@ namespace fb
 
 					case Tid::SENSOR_MP3:
 						return {"Mp3 player", "", "int", "-1", "2000"};
+					
+					case Tid::SENSOR_TEMPERATURE:
+						return {"Temperature", "General temperature sensor", "float", "-40.0", "100.0"};
+					
+					case Tid::SENSOR_HUMIDITY:
+						return {"Humidity", "General humidity sensor", "float", "0.0", "100.0"};
 
 					case Tid::SWITCH_LIGHT:
 						return {"Light switch", "", "bool", "0", "1"};

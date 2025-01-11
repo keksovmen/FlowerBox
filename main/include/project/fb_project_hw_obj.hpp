@@ -6,6 +6,7 @@
 #include "fb_sensor_service.hpp"
 #include "fb_sensor_storage.hpp"
 #include "fb_sensor_temperature.hpp"
+#include "fb_sensor_aht20.hpp"
 #include "fb_switch_service.hpp"
 #include "fb_time_switch.hpp"
 
@@ -18,8 +19,8 @@ namespace fb
 		void initHwObjs();
 
 		sensor::TemperatureSensorArrayI& getHwTempSensors();
-		sensor::TemperatureSensor& getHwInsideTempSensor();
-		sensor::TemperatureSensor& getHwOutsideTempSensor();
+		sensor::TemperatureSensor& getHwDS18Sensor();
+		sensor::SensorAht20& getHwAhtSensor();
 
 		switches::TimeSwitch& getHwLightSwitch();
 		switches::HeatSwitch& getHwHeatSwitch();

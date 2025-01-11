@@ -10,15 +10,15 @@ using namespace project;
 
 
 //сенсоры туть
-static sensor::TemperatureSensorArray<2> _sensorArrayTemp(pins::PIN_SENSOR_TEMPERATURE);
-static sensor::TemperatureSensor* _sensorTemperatureInside = _sensorArrayTemp.getSensor(0);
-static sensor::TemperatureSensor* _sensorTemperatureOutside = _sensorArrayTemp.getSensor(1);
+static sensor::TemperatureSensorArray<1> _sensorArrayDS18(pins::PIN_SENSOR_TEMPERATURE);
+static sensor::TemperatureSensor* _sensorDS18Outside = _sensorArrayDS18.getSensor(0);
+static sensor::SensorAht20 _sensorAhtInside(I2C_NUM_0, pins::PIN_IIC_SDA, pins::PIN_IIC_SCL);
 
 //переключатели туть
-static switches::TimeSwitch _switchLight(clock::Time(0, 0, 0), clock::Time(0, 1, 0), pins::PIN_BLUE_LED);
+static switches::TimeSwitch _switchLight(clock::Time(0, 0, 0), clock::Time(0, 1, 0), pins::PIN_RED_LED);
 //change to reference instead of a pointer senor argument
-static switches::HeatSwitch _switchHeating(_sensorTemperatureInside, 28.5, 29, pins::PIN_GREEN_LED);
-static switches::FanSwitch _switchFan(_sensorTemperatureOutside, 30, 31, pins::PIN_COOL_LED);
+static switches::HeatSwitch _switchHeating(_sensorDS18Outside, 28.5, 29, pins::PIN_GREEN_LED);
+static switches::FanSwitch _switchFan(_sensorDS18Outside, 30, 31, pins::PIN_COOL_LED);
 
 //сервисы туть
 static sensor::SensorService _sensorService;
@@ -32,8 +32,8 @@ static sensor::SensorStorage _sensorStorage;
 void project::initHwObjs()
 {
 	_sensorService.addSensor(&getHwTempSensors());
-	_sensorService.addSensor(&getHwInsideTempSensor());
-	_sensorService.addSensor(&getHwOutsideTempSensor());
+	_sensorService.addSensor(&getHwDS18Sensor());
+	_sensorService.addSensor(&getHwAhtSensor());
 
 	_swithService.addSwitch(&getHwLightSwitch());
 	_swithService.addSwitch(&getHwHeatSwitch());
@@ -42,17 +42,17 @@ void project::initHwObjs()
 
 sensor::TemperatureSensorArrayI& project::getHwTempSensors()
 {
-	return _sensorArrayTemp;
+	return _sensorArrayDS18;
 }
 
-sensor::TemperatureSensor& project::getHwInsideTempSensor()
+sensor::TemperatureSensor& project::getHwDS18Sensor()
 {
-	return *_sensorTemperatureInside;
+	return *_sensorDS18Outside;
 }
 
-sensor::TemperatureSensor& project::getHwOutsideTempSensor()
+sensor::SensorAht20& project::getHwAhtSensor()
 {
-	return *_sensorTemperatureOutside;
+	return _sensorAhtInside;
 }
 
 switches::TimeSwitch& project::getHwLightSwitch()
