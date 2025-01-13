@@ -54,7 +54,7 @@ static int _id_from_time_path(const char* path)
 {
 	const auto uri = std::string(path);
 	const int id = std::atoi(
-		uri.substr(uri.find_last_of("/", uri.find_last_of("/") - 1) + 1).c_str());
+		uri.substr(uri.find_last_of("/", uri.find_last_of("/") - 1) - 1).c_str());
 
 	return id;
 }
@@ -262,11 +262,17 @@ static bool _is_data_request(httpd_req_t* r)
 
 static esp_err_t _switch_cb(httpd_req_t* r)
 {
+	FB_DEBUG_ENTER_W_TAG();
+	FB_DEBUG_LOG_I_TAG("URI: %s", r->uri);
+
 	return _is_data_request(r) ? _switch_data_cb(r) : _switch_info_cb(r);
 }
 
 static esp_err_t _sensor_cb(httpd_req_t* r)
 {
+	FB_DEBUG_ENTER_W_TAG();
+	FB_DEBUG_LOG_I_TAG("URI: %s", r->uri);
+
 	return _is_data_request(r) ? _sensor_data_cb(r) : _sensor_info_cb(r);
 }
 
