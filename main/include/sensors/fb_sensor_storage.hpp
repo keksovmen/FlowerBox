@@ -50,7 +50,7 @@ namespace fb
 				//TODO: change address to arbitrary index
 				
 				void addSensorValue(int address, float value);
-				void addSensorState(int address, bool state);
+				// void addSensorState(int address, bool state);
 
 				/**
 				 * @brief возвращаем итератор на желаеммые данные
@@ -79,7 +79,7 @@ namespace fb
 
 
 				//TODO: make universal
-				std::array<Buffer, 2> _sensorData;
+				std::array<Buffer, 3> _sensorData;
 				std::unordered_map<int, int> _addressMap;
 
 

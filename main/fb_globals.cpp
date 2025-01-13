@@ -6,7 +6,7 @@
 #include "esp_efuse_table.h"
 
 #include "fb_main_state_manager.hpp"
-#include "fb_box_service.hpp"
+#include "fb_sensor_store_service.hpp"
 #include "fb_heat_switch.hpp"
 #include "fb_time_switch.hpp"
 #include "fb_nvs_storage.hpp"
@@ -39,7 +39,7 @@ static state::StateManager _stateManager("STATE_MANAGER");
 ;
 
 //TODO: made it somehow not call new in constructor, because it leads to crashes
-static box::BoxService _boxService(project::getBox(), project::getHwSensorStorage());
+static sensor::SensorStoreService _sensorStoreService(project::getHwSensorStorage());
 
 
 
@@ -66,9 +66,7 @@ void global::init()
 	project::initBoxObjs();
 	project::initMaperObjs();
 
-	// _boxService = new box::BoxService(project::getBox(), project::getHwSensorStorage());
-
-	_eventManager.attachListener(&_boxService);
+	_eventManager.attachListener(&_sensorStoreService);
 }
 
 event::EventManager* global::getEventManager()

@@ -82,7 +82,8 @@ int project::mapBoxSensorIdToAddres(int id)
 	}
 	else if(id == getBoxInsideHumiditySensor().getId())
 	{
-		return reinterpret_cast<int>(&getHwAhtSensor());
+		//TODO: comment offset
+		return reinterpret_cast<int>(&getHwAhtSensor()) + 1;
 	}
 
 	//TODO: add proper error returning

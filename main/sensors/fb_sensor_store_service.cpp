@@ -1,18 +1,19 @@
-#include "fb_box_service.hpp"
+#include "fb_sensor_store_service.hpp"
 
 #include "fb_tid.hpp"
 #include "fb_sensor_event.hpp"
 #include "fb_globals.hpp"
+#include "fb_sensor_aht20.hpp"
 
 
 
 using namespace fb;
-using namespace box;
+using namespace sensor;
 
 
 
-BoxService::BoxService(Box& box, sensor::SensorStorage& storage)
-	: _box(box), _storage(storage)
+SensorStoreService::SensorStoreService(sensor::SensorStorage& storage)
+	: _storage(storage)
 {
 	//TODO: put somehere else
 	//TODO: add property action cb
@@ -27,20 +28,29 @@ BoxService::BoxService(Box& box, sensor::SensorStorage& storage)
 	// _box.addPropertyDependency(prop->getId());
 }
 
-void BoxService::handleEvent(const event::Event& event)
+void SensorStoreService::handleEvent(const event::Event& event)
 {
 	if(event.groupId == event::EventGroup::SENSOR){
 		if(event.eventId == sensor::SensorEvent::SENSOR_INITIALIZED){
 
 
 		}else if(event.eventId == sensor::SensorEvent::SENSOR_VALUE_CHANGED){
-			//TODO: move it somehwere else maybe?
 			//need a way to define what sensor it is 
-			const auto* sen = dynamic_cast<sensor::TemperatureSensor*>(reinterpret_cast<sensor::SensorIface*>(event.data));
-			if(sen){
-				_storage.addSensorValue(reinterpret_cast<int>(sen), sen->getValue());
+			{
+				const auto* sen = dynamic_cast<sensor::TemperatureSensor*>(reinterpret_cast<sensor::SensorIface*>(event.data));
+				if(sen){
+					_storage.addSensorValue(reinterpret_cast<int>(sen), sen->getValue());
+				}
 			}
 
+			{
+			const auto* sen = dynamic_cast<sensor::SensorAht20*>(reinterpret_cast<sensor::SensorIface*>(event.data));
+				if(sen){
+					_storage.addSensorValue(reinterpret_cast<int>(sen), sen->getTemperature());
+					//TODO: comment offset
+					_storage.addSensorValue(reinterpret_cast<int>(sen) + 1, sen->getHumidity());
+				}
+			}
 			// for(int i = 0; i < sensorArray->getDeviceCount(); i++)
 			// {
 				// auto* s = sensorArray->getSensor(i);
@@ -64,7 +74,7 @@ void BoxService::handleEvent(const event::Event& event)
 	}
 }
 
-const char* BoxService::getName() const
+const char* SensorStoreService::getName() const
 {
-	return "BoxService";
+	return "SensorStoreService";
 }

@@ -19,10 +19,10 @@ void SensorStorage::addSensorValue(int address, float value)
 	_getSensorValueBuffer(address).pushValue(SensorStorageEntry{value, clock::currentTimeStamp()});
 }
 
-void SensorStorage::addSensorState(int address, bool state)
-{
+// void SensorStorage::addSensorState(int address, bool state)
+// {
 
-}
+// }
 
 SensorStorage::Iterator SensorStorage::getSensorValues(int address, clock::Timestamp from) const
 {
