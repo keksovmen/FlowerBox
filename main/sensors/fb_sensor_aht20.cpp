@@ -52,7 +52,7 @@ float SensorAht20::getHumidity() const
 
 bool SensorAht20::_doInit()
 {
-	return true;
+	return i2c_master_probe(_bus, AHT20_ADDRRES, 500) == ESP_OK;
 }
 
 SensorIface::UpdateResult SensorAht20::_doUpdate()

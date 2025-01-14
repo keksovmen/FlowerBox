@@ -26,7 +26,7 @@ namespace fb
 
 
 				constexpr static Id InvalidId = -1;
-				constexpr static float InvalidValue = -255.0f;
+				constexpr static float InvalidValue = 85.0f;
 
 
 
