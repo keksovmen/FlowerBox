@@ -11,16 +11,27 @@ namespace fb
 {
 	namespace pins
 	{
-		static constexpr int PIN_SENSOR_TEMPERATURE = 10;
+		//data pin
+		static constexpr int PIN_SENSOR_DS18 = 10;
+
+		//red LED, controls  heating
+		static constexpr int PIN_HEATER = 3;
 		static constexpr int PIN_RED_LED = 3;
+
+		//green LED, controls light
+		static constexpr int PIN_LIGHT = 4;
 		static constexpr int PIN_GREEN_LED = 4;
+
+		//fan pin, PWM, also blue LED
+		static constexpr int PIN_FAN = 5;
 		static constexpr int PIN_BLUE_LED = 5;
+
 		static constexpr int PIN_COOL_LED = 19;
-		// static constexpr int PIN_IIC_SDA = 17;
+
+		//AHT20 IIC interface
 		static constexpr int PIN_IIC_SDA = 7;
-		// static constexpr int PIN_IIC_SCL = 16;
 		static constexpr int PIN_IIC_SCL = 8;
-		// static constexpr int PIN_SENSOR_TEMPERATURE = 10;
+
 
 
 		class PinManager : public debug::Named, public event::EventListener
