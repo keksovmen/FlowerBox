@@ -19,6 +19,7 @@ namespace fb
 		{
 			GET = 0,
 			POST,
+			WEB_SOCKET,		//special case for web sockets
 		};
 
 
