@@ -24,6 +24,7 @@
 #include "fb_state_booted.hpp"
 #include "fb_state_sensor_init.hpp"
 #include "fb_globals.hpp"
+#include "fb_server_debug.hpp"
 
 
 
@@ -35,6 +36,9 @@ static const char *TAG = "main";
 
 extern "C" void app_main(void)
 {
+	//init copy logs in to buffer for later transmiting
+	fb::server::initServerDebug();
+	
 	// ESP_LOGI(TAG, "Booting times = %d", _boot_count);
 	ESP_LOGI(TAG, "Booting");
 	//инициализируем все синглетоны

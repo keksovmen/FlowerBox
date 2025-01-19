@@ -12,6 +12,11 @@ namespace fb
 {
 	namespace server
 	{
+		/**
+		 * @brief will transfer log calls to proxy
+		 */
+		void initServerDebug();
+		
 		void registerServerDebug(Builder& builder);
 	}
 }
