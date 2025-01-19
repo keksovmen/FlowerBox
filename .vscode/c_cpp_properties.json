@@ -4,13 +4,16 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
+                "${workspaceFolder}/components/**",
                 "D:\\embeded\\esp-idf\\components\\**",
                 "C:/Users/Roma/.espressif/tools/riscv32-esp-elf/esp-13.2.0_20230928/riscv32-esp-elf/riscv32-esp-elf/include/**"
             ],
             "defines": [
                 "_DEBUG",
                 "UNICODE",
-                "_UNICODE"
+                "_UNICODE",
+				"CONFIG_HTTPD_WS_SUPPORT=1",
+				"CONFIG_LOG_COLORS"
             ],
             "cStandard": "c23",
             "cppStandard": "c++23",
