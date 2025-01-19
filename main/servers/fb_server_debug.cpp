@@ -5,13 +5,11 @@
 
 #include "fb_buffer.hpp"
 #include "fb_debug.hpp"
+#include "fb_lock_wrapper.hpp"
 
 #include "freertos/FreeRTOS.h"
-#include "freertos/queue.h"
 #include "freertos/semphr.h"
 #include "freertos/task.h"
-
-#include "esp_log.h"
 
 
 
@@ -23,10 +21,6 @@
 
 using namespace fb;
 using namespace server;
-
-
-
-using Entry = bool;
 
 
 
@@ -112,21 +106,23 @@ static int _logPrintf(const char* format, va_list args)
 	char html[256];
 	const int result = sprintf(html, "<p style=\"color: %s;\">%.*s</p>", color, clear_size, tmp + sizeof(LOG_COLOR_I));
 
-	//take mutex
-	if(xSemaphoreTakeRecursive(_buffer_mutex, pdMS_TO_TICKS(1000)) != pdPASS){
-		//original must work in any case
-		return _original(format, args);
-	};
+	{
+		//take lock
+		util::LockWrapper lock(_buffer_mutex, pdMS_TO_TICKS(1000));
 
-	_buffer.putData(std::string_view(html, result));
+		if(!lock){
+			//original must work in any case
+			return _original(format, args);
+		};
+
+		_buffer.putData(std::string_view(html, result));
+	}
 
 	//send after write is done
 	if(_task_hndl){
 		xTaskNotifyGive(_task_hndl);
 	}
 
-	//release mutex
-	xSemaphoreGiveRecursive(_buffer_mutex);
 
 	return _original(format, args);
 }
@@ -138,34 +134,36 @@ static esp_err_t _debug_cb(httpd_req_t* r)
 	//send head of HTML
 	httpd_resp_send_chunk(r, body_start, sizeof(body_start) - 1);
 
-	if(xSemaphoreTakeRecursive(_buffer_mutex, pdMS_TO_TICKS(1000)) != pdPASS){
-		httpd_resp_send_500(r);
+	{
+		util::LockWrapper lock(_buffer_mutex, pdMS_TO_TICKS(1000));
 
-		return ESP_FAIL;
-	};
-	
-	// send stored messages
-	if(_buffer.isPartitioned()){
-		//case when write looped over
+		if(!lock){
+			httpd_resp_send_500(r);
+
+			return ESP_FAIL;
+		};
+		
+		// send stored messages
+		if(_buffer.isPartitioned()){
+			//case when write looped over
+			auto data = _buffer.readPartition();
+			auto begining = data.find("<p");
+
+
+			if(!data.empty() && begining != std::string_view::npos){
+				FB_DEBUG_LOG_E_TAG("Write partition, len %d", data.length() - begining);
+				httpd_resp_send_chunk(r, data.data() + begining, data.length() - begining);
+			}
+		}
+
 		auto data = _buffer.readPartition();
 		auto begining = data.find("<p");
 
-
 		if(!data.empty() && begining != std::string_view::npos){
-			FB_DEBUG_LOG_E_TAG("Write partition, len %d", data.length() - begining);
+			FB_DEBUG_LOG_E_TAG("Write, len %d", data.length() - begining);
 			httpd_resp_send_chunk(r, data.data() + begining, data.length() - begining);
 		}
 	}
-
-	auto data = _buffer.readPartition();
-	auto begining = data.find("<p");
-
-	if(!data.empty() && begining != std::string_view::npos){
-		FB_DEBUG_LOG_E_TAG("Write, len %d", data.length() - begining);
-		httpd_resp_send_chunk(r, data.data() + begining, data.length() - begining);
-	}
-
-	xSemaphoreGiveRecursive(_buffer_mutex);
 
 	//send rest of HTML
 	httpd_resp_send_chunk(r, body_end, sizeof(body_end) - 1);
@@ -217,14 +215,16 @@ void _task(void* arg)
 			continue;
 		}
 
+		std::string_view data;
+		bool two_pass = false;
+
 		//to read data from buffer
-		assert(pdPASS == xSemaphoreTakeRecursive(_buffer_mutex, portMAX_DELAY));
-		//to read proper block
+		{
+			util::LockWrapper lock(_buffer_mutex, portMAX_DELAY);
 
-		const bool two_pass = _buffer.isPartitioned();
-		auto data = _buffer.readPartition();
-
-		xSemaphoreGiveRecursive(_buffer_mutex);
+			two_pass = _buffer.isPartitioned();
+			data = _buffer.readPartition();
+		}
 
 		if(data.empty()){
 			continue;
@@ -247,9 +247,10 @@ void _task(void* arg)
 			httpd_ws_send_data(_server_hndl, _client_socket, &frame);
 
 			//second packet
-			assert(pdPASS == xSemaphoreTakeRecursive(_buffer_mutex, portMAX_DELAY));
-			data = _buffer.readPartition();
-			xSemaphoreGiveRecursive(_buffer_mutex);
+			{
+				util::LockWrapper lock(_buffer_mutex, portMAX_DELAY);
+				data = _buffer.readPartition();
+			}
 
 			//configure second
 			frame.final = true;
