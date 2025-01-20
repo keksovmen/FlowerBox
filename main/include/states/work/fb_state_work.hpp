@@ -22,7 +22,7 @@ namespace fb
 			protected:
 				virtual void _onCompositeEnter();
 				virtual void _onCompositeExit();
-				virtual bool _onCompositeEventHandler(const event::Event& event);
+				virtual bool _onCompositeEventHandler(const event::Event& e);
 
 			private:
 				virtual std::unique_ptr<State> _createInitialState() override;

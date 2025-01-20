@@ -43,7 +43,7 @@ void server::startProvision()
 	auto builder = Builder();
 	builder.setPort(80);
 
-	// registerServerUpdate(builder);
+	registerServerUpdate(builder);
 	registerServerHtml(builder);
 	registerServerBox(builder);
 	registerServerDebug(builder);

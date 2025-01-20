@@ -44,7 +44,9 @@ static void _on_wifi_sta_disconnect(void *arg, esp_event_base_t event_base,
 	}
 	
 	ESP_LOGI(TAG, "Wi-Fi disconnected, trying to reconnect...");
-	ESP_ERROR_CHECK(esp_wifi_connect());
+	//TODO: return assert, now it crashes at esp_restart()
+	// ESP_ERROR_CHECK(esp_wifi_connect());
+	esp_wifi_connect();
 }
 
 static void _on_wifi_connect(void *esp_netif, esp_event_base_t event_base,

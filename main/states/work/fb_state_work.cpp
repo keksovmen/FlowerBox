@@ -1,8 +1,10 @@
 #include "fb_state_work.hpp"
 
-// #include "fb_http_server.hpp"
-#include "fb_state_wifi_connected.hpp"
 #include "fb_server.hpp"
+#include "fb_state_wifi_connected.hpp"
+#include "fb_update.hpp"
+
+#include "esp_system.h"
 
 
 
@@ -29,8 +31,17 @@ void StateWork::_onCompositeExit()
 	// http::stopServer();
 }
 
-bool StateWork::_onCompositeEventHandler(const event::Event& event)
+bool StateWork::_onCompositeEventHandler(const event::Event& e)
 {
+	if(e.groupId == event::EventGroup::UPDATE){
+		if(e.eventId == update::UpdateEventId::END){
+			//restart the system
+			esp_restart();
+		}
+
+		// return false;
+	}
+
 	return true;
 }
 

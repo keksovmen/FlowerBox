@@ -32,9 +32,10 @@ std::unique_ptr<Server> Builder::build()
 	cfg.server_port = _port;
 	//turning on /* syntax for uris
 	cfg.uri_match_fn = httpd_uri_match_wildcard;
-	cfg.max_open_sockets = 1;
+	cfg.max_open_sockets = 3;
 	cfg.lru_purge_enable = true;
 	cfg.stack_size = 4 * 1024;
+	cfg.max_uri_handlers = 12;
 
 	ESP_ERROR_CHECK(httpd_start(&server, &cfg));
 
