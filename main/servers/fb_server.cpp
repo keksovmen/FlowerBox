@@ -16,6 +16,7 @@ using namespace server;
 
 
 static std::unique_ptr<Server> _server;
+static std::unique_ptr<Server> _serverDebug;
 
 
 
@@ -46,9 +47,16 @@ void server::startProvision()
 	registerServerUpdate(builder);
 	registerServerHtml(builder);
 	registerServerBox(builder);
-	registerServerDebug(builder);
+	// registerServerDebug(builder);
 
 	_server = builder.build();
+
+	builder = Builder();
+	builder.setPort(8080);
+	builder.setCtrlPort(ESP_HTTPD_DEF_CTRL_PORT + 1);
+	registerServerDebug(builder);
+
+	_serverDebug = builder.build();
 }
 
 void server::startWorking()
@@ -61,5 +69,10 @@ void server::stop()
 	if(_server){
 		_server->stop();
 		_server.release();
+	}
+
+	if(_serverDebug){
+		_serverDebug->stop();
+		_serverDebug.release();
 	}
 }

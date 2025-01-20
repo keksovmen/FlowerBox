@@ -39,7 +39,7 @@ static const char body_end[] = R"(
 	</div>
 	<script>
 	// Create a WebSocket connection
-	const socket = new WebSocket('ws://192.168.0.194:80/debug/live');
+	const socket = new WebSocket(`ws://${location.host}/debug/live`);
 
 	// Handle the WebSocket connection
 	socket.onopen = function() {

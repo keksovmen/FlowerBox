@@ -44,12 +44,14 @@ namespace fb
 				// Builder();
 
 				Builder& setPort(int port);
+				Builder& setCtrlPort(int port);
 				Builder& addEndpoint(const Endpoint& endpoint);
 
 				std::unique_ptr<Server> build();
 			private:
 
 				int _port = 80;
+				int _controlPort = ESP_HTTPD_DEF_CTRL_PORT;
 				std::vector<Endpoint> _endpoints;
 
 		};

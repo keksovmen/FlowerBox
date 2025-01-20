@@ -16,6 +16,13 @@ Builder& Builder::setPort(int port)
 	return *this;
 }
 
+Builder& Builder::setCtrlPort(int port)
+{
+	_controlPort = port;
+
+	return *this;
+}
+
 Builder& Builder::addEndpoint(const Endpoint& endpoint)
 {
 	_endpoints.push_back(endpoint);
@@ -30,9 +37,10 @@ std::unique_ptr<Server> Builder::build()
 	httpd_config_t cfg = HTTPD_DEFAULT_CONFIG();
 	cfg.max_resp_headers = 32;
 	cfg.server_port = _port;
+	cfg.ctrl_port = _controlPort;
 	//turning on /* syntax for uris
 	cfg.uri_match_fn = httpd_uri_match_wildcard;
-	cfg.max_open_sockets = 3;
+	cfg.max_open_sockets = 1;
 	cfg.lru_purge_enable = true;
 	cfg.stack_size = 4 * 1024;
 	cfg.max_uri_handlers = 12;
