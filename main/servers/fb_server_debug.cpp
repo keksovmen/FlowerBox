@@ -19,6 +19,7 @@
 #define _INVALID_SOCKET -1
 
 
+
 using namespace fb;
 using namespace server;
 
@@ -29,16 +30,36 @@ static const char body_start[] = R"(
 	<!DOCTYPE html>
 	<html>
 	<head>
-	  <title>Log console</title>
+		<title>Log console</title>
+		<style type="text/css">
+			#holder {
+				width: 800px;
+				margin: auto;
+			}
+
+			#content {
+				height: 600px;
+				overflow: scroll;
+				margin: auto;
+			}
+
+			p {
+				margin: 0px;
+			}
+		</style>
 	</head>
 	<body>
-	  <div id="content">)";
+	<div id="holder">
+		<button id="button" onclick=toggleScroll()>Enable scroll</button>
+		<div id="content">)";
 
 //TODO: put in to template engine, due to dynamic IP
 static const char body_end[] = R"(
+		</div>
 	</div>
 	<script>
-	// Create a WebSocket connection
+		var scrollEnable = false;
+	
 	const socket = new WebSocket(`ws://${location.host}/debug/live`);
 
 	// Handle the WebSocket connection
@@ -53,6 +74,10 @@ static const char body_end[] = R"(
 		// Update the content div with the received HTML
 		const contentDiv = document.getElementById('content');
 		contentDiv.innerHTML += htmlContent;
+
+		if(scrollEnable){
+			contentDiv.scroll(0, contentDiv.scrollHeight);
+		}
 	};
 
 	socket.onclose = function() {
@@ -62,6 +87,12 @@ static const char body_end[] = R"(
 	socket.onerror = function(error) {
 		console.error('WebSocket error:', error);
 	};
+
+	function toggleScroll() {
+		scrollEnable = !scrollEnable;
+		const button = document.getElementById('button');
+		button.innerText = scrollEnable ? "Disable scroll" : "Enable scroll";
+	}
 	</script>
 	</body>
 	</html>)";
