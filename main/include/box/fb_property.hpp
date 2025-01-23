@@ -64,6 +64,7 @@ namespace fb
 
 
 
+		//TODO: change to int64_t
 		class PropertyInt : public PropertyBase<int>
 		{
 			public:

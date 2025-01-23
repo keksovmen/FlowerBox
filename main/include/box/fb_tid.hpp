@@ -32,6 +32,11 @@ namespace fb
 			PROPERTY_SWITCH_MP3_STOP,
 			PROPERTY_SWITCH_MP3_VOLUME,
 
+			PROPERTY_SWITCH_LIGHT_ON,
+			PROPERTY_SWITCH_LIGHT_OFF,
+
+			PROPERTY_SYSTEM_TIME,
+
 			MAX
 		};
 
@@ -111,6 +116,15 @@ namespace fb
 
 					case Tid::PROPERTY_SWITCH_MP3_VOLUME:
 						return {"Mp3 volume", "Set volume", "int", "0", "30"};
+
+					case Tid::PROPERTY_SWITCH_LIGHT_ON:
+						return {"Start time", "At what time to turn ON, in seconds", "int", "0", "86399"};
+
+					case Tid::PROPERTY_SWITCH_LIGHT_OFF:
+						return {"End time", "At what time to turn OFF, in seconds", "int", "0", "86399"};
+
+					case Tid::PROPERTY_SYSTEM_TIME:
+						return {"Current system time", "Unix time since 1970", "int", "0", "4294967295"};
 
 					default:
 						// abort();

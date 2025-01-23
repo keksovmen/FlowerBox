@@ -15,7 +15,7 @@ static sensor::TemperatureSensor* _sensorDS18Outside = _sensorArrayDS18.getSenso
 static sensor::SensorAht20 _sensorAhtInside(I2C_NUM_0, pins::PIN_IIC_SDA, pins::PIN_IIC_SCL);
 
 //переключатели туть
-static switches::TimeSwitch _switchLight(clock::Time(0, 0, 0), clock::Time(0, 1, 0), pins::PIN_RED_LED);
+static switches::TimeSwitch _switchLight(clock::Time(0, 0, 0), clock::Time(0, 0, 0), pins::PIN_LIGHT);
 //change to reference instead of a pointer senor argument
 static switches::HeatSwitch _switchHeating(_sensorDS18Outside, 28.5, 29, pins::PIN_GREEN_LED);
 static switches::FanSwitch _switchFan(_sensorDS18Outside, 30, 31, pins::PIN_FAN);

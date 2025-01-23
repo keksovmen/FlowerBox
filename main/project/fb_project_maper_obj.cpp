@@ -38,6 +38,61 @@ static void _create_and_register_forse_property(switches::SwitchIface& obj, box:
 	dependy.addPropertyDependency(forseProperty->getId());
 }
 
+static void _init_light_switch()
+{
+	_create_and_register_forse_property(getHwLightSwitch(), _boxLightSwitch);
+
+	auto* startTimeProp = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_LIGHT_ON,
+		[](int val){
+			getHwLightSwitch().setStartTime(val);
+
+			return true;
+		},
+		static_cast<int>(getHwLightSwitch().getStartTime())
+	);
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(startTimeProp));
+	_boxLightSwitch.addPropertyDependency(startTimeProp->getId());
+
+
+	auto* endTimeProp = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_LIGHT_OFF,
+		[](int val){
+			getHwLightSwitch().setEndTime(val);
+
+			return true;
+		},
+		static_cast<int>(getHwLightSwitch().getEndTime())
+	);
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(endTimeProp));
+	_boxLightSwitch.addPropertyDependency(endTimeProp->getId());
+}
+
+static void _init_box_properties()
+{
+	const auto* sensorServiceProp = getBox().addProperty(std::make_unique<box::PropertyInt>(
+		box::Tid::PROPERTY_SENSOR_PERIOD_GLOBAL,
+		[](int val){
+			getHwSensorService().setTimerPeriod(val * 1000);
+			return true;
+		},
+		3));	//TODO: made it not die in assert
+		// getHwSensorService().getTimerPeriod()));
+	getBox().addPropertyDependency(sensorServiceProp->getId());
+
+
+	//TODO: add dynamic value updates, as java beans
+	const auto* currentTimeProp = getBox().addProperty(std::make_unique<box::PropertyInt>(
+		box::Tid::PROPERTY_SYSTEM_TIME,
+		[](int millis){
+
+			return false;
+		},
+		clock::currentTimeStamp()));
+	getBox().addPropertyDependency(currentTimeProp->getId());
+
+}
+
 
 
 void project::initMaperObjs()
@@ -47,7 +102,7 @@ void project::initMaperObjs()
 	getBox().addSwitch(&_boxFanSwitch);
 
 
-	_create_and_register_forse_property(getHwLightSwitch(), _boxLightSwitch);
+	_init_light_switch();
 
 	_create_and_register_forse_property(getHwHeatSwitch(), _boxHeatSwitch);
 	_boxHeatSwitch.addSensorDependency(getBoxInsideTempSensor().getId());
@@ -56,18 +111,7 @@ void project::initMaperObjs()
 	_boxFanSwitch.addSensorDependency(getBoxInsideTempSensor().getId());
 
 
-	const auto* prop = getBox().addProperty(std::make_unique<box::PropertyInt>(
-		box::Tid::PROPERTY_SENSOR_PERIOD_GLOBAL,
-		[](int val){
-			getHwSensorService().setTimerPeriod(val * 1000);
-			return true;
-		},
-		3));	//TODO: made it not die in assert
-		// getHwSensorService().getTimerPeriod()));
-	getBox().addPropertyDependency(prop->getId());
-		
-
-	//TODO: add sensor service property and etc
+	_init_box_properties();
 }
 
 int project::mapBoxSensorIdToAddres(int id)
