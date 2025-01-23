@@ -2,6 +2,7 @@
 
 
 
+#include <stdint.h>
 #include <functional>
 
 
@@ -10,7 +11,7 @@ namespace fb
 {
 	namespace clock
 	{
-		using Timestamp = unsigned long long;
+		using Timestamp = int64_t;
 
 
 
@@ -24,12 +25,13 @@ namespace fb
 
 		struct Time
 		{
-			const int hours;
-			const int minutes;
-			const int seconds;
+			int hours;
+			int minutes;
+			int seconds;
 
 
 
+			explicit Time(Timestamp secs);
 			Time(int hours, int minutes, int seconds);
 
 			bool operator<(const Time& t) const;

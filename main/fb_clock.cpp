@@ -51,7 +51,9 @@ static void _on_sntp_sync_event(struct timeval *tv)
 {
 	FB_DEBUG_ENTER_I_TAG();
 
-	global::getEventManager()->pushEvent({event::EventGroup::CLOCK, static_cast<int>(clock::ClockEventId::SYNCED), nullptr});
+	FB_DEBUG_LOG_W_TAG("Current time: %lld, or %lld", currentTimeStamp(), tv->tv_sec);
+
+	global::getEventManager()->pushEvent({event::EventGroup::CLOCK, std::to_underlying(clock::ClockEventId::SYNCED), nullptr});
 }
 
 
@@ -62,6 +64,14 @@ bool clock::operator==(int val, ClockEventId id)
 }
 
 
+
+Time::Time(Timestamp secs)
+	: hours(secs / 3600),
+		minutes((secs - (hours * 3600)) / 60),
+		seconds(secs - (hours * 3600 + minutes * 60))
+{
+
+}
 
 Time::Time(int hours, int minutes, int seconds)
 	: hours(hours), minutes(minutes), seconds(seconds)
