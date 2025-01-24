@@ -43,121 +43,129 @@ static std::unique_ptr<storage::StorageIface> _storage;
 
 
 
-static std::string _getStrOrDefault(const std::string& partition,
-			const std::string& key,
-			const std::string& def)
-{
-	if(!_storage){
-		FB_DEBUG_LOG_I_TAG("Has no store: %s, ret default %s", key.c_str(), def.c_str());
-		return def;
-	}
-
-	if(!_storage->hasKey(partition, key)){
-		FB_DEBUG_LOG_I_TAG("Has no key: %s, ret default %s", key.c_str(), def.c_str());
-		return def;
-	}
-
-	std::string result;
-	if(!_storage->readValue(partition, key, result)){
-		FB_DEBUG_LOG_I_TAG("Failed to read key: %s, ret default %s", key.c_str(), def.c_str());
-		return def;
-	}
-
-	return result;
-}
-
-static int _getIntOrDefault(const std::string& partition,
-			const std::string& key,
-			int def)
-{
-	if(!_storage){
-		FB_DEBUG_LOG_I_TAG("Has no store: %s, ret default %d", key.c_str(), def);
-		return def;
-	}
-
-	if(!_storage->hasKey(partition, key)){
-		FB_DEBUG_LOG_I_TAG("Has no key: %s, ret default %d", key.c_str(), def);
-		return def;
-	}
-
-	int result;
-	if(!_storage->readValue(partition, key, result)){
-		FB_DEBUG_LOG_I_TAG("Failed to read key: %s, ret default %d", key.c_str(), def);
-		return def;
-	}
-
-	return result;
-}
-
-static void _setStr(const std::string& partion,
-			const std::string& key,
-			const std::string& val)
-{
-	if(!_storage){
-		FB_DEBUG_LOG_E_TAG("No storage");
-		return;
-	}
-
-	if(!_storage->writeValue(partion, key, val)){
-		FB_DEBUG_LOG_E_TAG("Failed to set key: %s, val: %s", key.c_str(), val.c_str());
-		return;
-	}
-
-	FB_DEBUG_LOG_I_TAG("Set key: %s, val: %s", key.c_str(), val.c_str());
-}
-
-static void _setInt(const std::string& partion,
-			const std::string& key,
-			int val)
-{
-	if(!_storage){
-		FB_DEBUG_LOG_E_TAG("No storage");
-		return;
-	}
-
-	if(!_storage->writeValue(partion, key, val)){
-		FB_DEBUG_LOG_E_TAG("Failed to set key: %s, val: %d", key.c_str(), val);
-		return;
-	}
-
-	FB_DEBUG_LOG_I_TAG("Set key: %s, val: %d", key.c_str(), val);
-}
-
-
 void settings::init(std::unique_ptr<storage::StorageIface> storage)
 {
 	_storage = std::move(storage);
 }
 
+storage::StorageIface* getStorage()
+{
+	return _storage.get();
+}
+
+std::string settings::getStrOrDefault(
+			std::string_view partition,
+			std::string_view key,
+			std::string_view def)
+{
+	if(!_storage){
+		FB_DEBUG_LOG_I_TAG("Has no store: %s, ret default %s", key.cbegin(), def.cbegin());
+		//TODO: remove explicit constructor
+		return std::string{def};
+	}
+
+	//TODO: made hasKey accept string views
+	if(!_storage->hasKey(std::string{partition}, std::string{key})){
+		FB_DEBUG_LOG_I_TAG("Has no key: %s, ret default %s", key.cbegin(), def.cbegin());
+		return std::string{def};
+	}
+
+	//TODO: made readValue accept string views
+	std::string result;
+	if(!_storage->readValue(std::string{partition}, std::string{key}, result)){
+		FB_DEBUG_LOG_I_TAG("Failed to read key: %s, ret default %s", key.cbegin(), def.cbegin());
+		return std::string{def};
+	}
+
+	return result;
+}
+
+int64_t settings::getIntOrDefault(std::string_view partition,
+			std::string_view key,
+			int64_t def)
+{
+	if(!_storage){
+		FB_DEBUG_LOG_I_TAG("Has no store: %s, ret default %lld", key.cbegin(), def);
+		return def;
+	}
+
+	if(!_storage->hasKey(std::string{partition}, std::string{key})){
+		FB_DEBUG_LOG_I_TAG("Has no key: %s, ret default %lld", key.cbegin(), def);
+		return def;
+	}
+
+	int result;
+	if(!_storage->readValue(std::string{partition}, std::string{key}, result)){
+		FB_DEBUG_LOG_I_TAG("Failed to read key: %s, ret default %lld", key.cbegin(), def);
+		return def;
+	}
+
+	return result;
+}
+
+void settings::setStr(std::string_view partion,
+			std::string_view key,
+			std::string_view val)
+{
+	if(!_storage){
+		FB_DEBUG_LOG_E_TAG("No storage");
+		return;
+	}
+
+	if(!_storage->writeValue(std::string{partion}, std::string{key}, std::string{val})){
+		FB_DEBUG_LOG_E_TAG("Failed to set key: %s, val: %s", key.cbegin(), val.cbegin());
+		return;
+	}
+
+	FB_DEBUG_LOG_I_TAG("Set key: %s, val: %s", key.cbegin(), val.cbegin());
+}
+
+void settings::setInt(std::string_view partion,
+			std::string_view key,
+			int64_t val)
+{
+	if(!_storage){
+		FB_DEBUG_LOG_E_TAG("No storage");
+		return;
+	}
+
+	if(!_storage->writeValue(std::string{partion}, std::string{key}, val)){
+		FB_DEBUG_LOG_E_TAG("Failed to set key: %s, val: %lld", key.cbegin(), val);
+		return;
+	}
+
+	FB_DEBUG_LOG_I_TAG("Set key: %s, val: %lld", key.cbegin(), val);
+}
+
 std::string settings::getApSsid()
 {
-	return _getStrOrDefault(_PARTION_NET, _KEY_WIFI_AP_SSID, _DEFAULT_AP_SSID);
+	return getStrOrDefault(_PARTION_NET, _KEY_WIFI_AP_SSID, _DEFAULT_AP_SSID);
 }
 
 std::string settings::getApPass()
 {
-	return _getStrOrDefault(_PARTION_NET, _KEY_WIFI_AP_PASS, _DEFAULT_AP_PASS);
+	return getStrOrDefault(_PARTION_NET, _KEY_WIFI_AP_PASS, _DEFAULT_AP_PASS);
 }
 
 std::string settings::getStaSsid()
 {
-	return _getStrOrDefault(_PARTION_NET, _KEY_WIFI_STA_SSID, _DEFAULT_STA_SSID);
+	return getStrOrDefault(_PARTION_NET, _KEY_WIFI_STA_SSID, _DEFAULT_STA_SSID);
 }
 
 std::string settings::getStaPass()
 {
-	return _getStrOrDefault(_PARTION_NET, _KEY_WIFI_STA_PASS, _DEFAULT_STA_PASS);
+	return getStrOrDefault(_PARTION_NET, _KEY_WIFI_STA_PASS, _DEFAULT_STA_PASS);
 }
 
 WifiMode settings::getWifiMode()
 {
 	return static_cast<WifiMode>(
-		_getIntOrDefault(_PARTION_NET, _KEY_WIFI_MODE, std::to_underlying(_DEFAULT_WIFI_MODE)));
+		getIntOrDefault(_PARTION_NET, _KEY_WIFI_MODE, std::to_underlying(_DEFAULT_WIFI_MODE)));
 }
 
 std::string settings::getSntpServerUrl()
 {
-	return _getStrOrDefault(_PARTION_NET, _KEY_URL_SNTP, _DEFAULT_URL_SNTP);
+	return getStrOrDefault(_PARTION_NET, _KEY_URL_SNTP, _DEFAULT_URL_SNTP);
 }
 
 bool settings::isWifiProvided()
@@ -170,25 +178,25 @@ bool settings::isWifiProvided()
 
 void settings::setApSsid(const std::string& val)
 {
-	_setStr(_PARTION_NET, _KEY_WIFI_AP_SSID, val);
+	setStr(_PARTION_NET, _KEY_WIFI_AP_SSID, val);
 }
 
 void settings::setApPass(const std::string& val)
 {
-	_setStr(_PARTION_NET, _KEY_WIFI_AP_PASS, val);
+	setStr(_PARTION_NET, _KEY_WIFI_AP_PASS, val);
 }
 
 void settings::setStaSsid(const std::string& val)
 {
-	_setStr(_PARTION_NET, _KEY_WIFI_STA_SSID, val);
+	setStr(_PARTION_NET, _KEY_WIFI_STA_SSID, val);
 }
 
 void settings::setStaPass(const std::string& val)
 {
-	_setStr(_PARTION_NET, _KEY_WIFI_STA_PASS, val);
+	setStr(_PARTION_NET, _KEY_WIFI_STA_PASS, val);
 }
 
 void settings::setWifiMode(WifiMode val)
 {
-	_setInt(_PARTION_NET, _KEY_WIFI_MODE, std::to_underlying(val));
+	setInt(_PARTION_NET, _KEY_WIFI_MODE, std::to_underlying(val));
 }

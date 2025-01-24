@@ -1,8 +1,9 @@
 #pragma once
 
 
-
 #include <memory>
+#include <stdint.h>
+#include <string_view>
 #include <string>
 
 #include "fb_storage.hpp"
@@ -44,6 +45,28 @@ namespace fb
 
 		void init(std::unique_ptr<storage::StorageIface> storage);
 
+		//for custom settings for each project
+		storage::StorageIface* getStorage();
+
+		std::string getStrOrDefault(
+			std::string_view partition,
+			std::string_view key,
+			std::string_view def);
+		
+		int64_t getIntOrDefault(std::string_view partition,
+			std::string_view key,
+			int64_t def);
+		
+		void setStr(std::string_view partion,
+			std::string_view key,
+			std::string_view val);
+
+		void setInt(std::string_view partion,
+			std::string_view key,
+			int64_t val);
+
+
+		
 		//getters
 		std::string getApSsid();
 		std::string getApPass();

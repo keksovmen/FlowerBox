@@ -1,6 +1,7 @@
 #include "fb_project_hw_obj.hpp"
 
 #include "fb_pins.hpp"
+#include "fb_project_settings.hpp"
 
 
 
@@ -29,6 +30,14 @@ static sensor::SensorStorage _sensorStorage;
 
 
 
+static void _init_from_settings()
+{
+	_switchLight.setStartTime(settings::getLightStartTime());
+	_switchLight.setEndTime(settings::getLightEndTime());
+}
+
+
+
 void project::initHwObjs()
 {
 	_sensorService.addSensor(&getHwTempSensors());
@@ -38,6 +47,9 @@ void project::initHwObjs()
 	_swithService.addSwitch(&getHwLightSwitch());
 	_swithService.addSwitch(&getHwHeatSwitch());
 	_swithService.addSwitch(&getHwFanSwitch());
+
+	//init from settings
+	_init_from_settings();
 }
 
 sensor::TemperatureSensorArrayI& project::getHwTempSensors()

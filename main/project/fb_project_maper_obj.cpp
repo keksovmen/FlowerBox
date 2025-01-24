@@ -2,6 +2,7 @@
 
 #include "fb_project_box_obj.hpp"
 #include "fb_project_hw_obj.hpp"
+#include "fb_project_settings.hpp"
 #include "fb_switch.hpp"
 
 
@@ -45,6 +46,9 @@ static void _init_light_switch()
 	auto* startTimeProp = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_LIGHT_ON,
 		[](int val){
 			getHwLightSwitch().setStartTime(val);
+			//TODO: maybe put store in to swith iface somehow
+			//maybe chain of responsibility or composite
+			settings::setLightStartTime(val);
 
 			return true;
 		},
@@ -58,6 +62,7 @@ static void _init_light_switch()
 	auto* endTimeProp = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_LIGHT_OFF,
 		[](int val){
 			getHwLightSwitch().setEndTime(val);
+			settings::setLightEndTime(val);
 
 			return true;
 		},

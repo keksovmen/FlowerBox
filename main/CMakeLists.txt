@@ -9,6 +9,7 @@ if(${_PROJECT} STREQUAL "MINE")
 		"project/fb_project_hw_obj.cpp"
 		"project/fb_project_maper_obj.cpp"
 		"project/fb_project_core.cpp"
+		"project/fb_project_settings.cpp"
 		"sensors/fb_sensor_aht20.cpp"
 		)
 	set(_ADD_INCLUDES

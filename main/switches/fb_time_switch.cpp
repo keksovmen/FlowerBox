@@ -56,7 +56,7 @@ const clock::Time& TimeSwitch::getEndTime() const
 
 bool TimeSwitch::_isOverflow() const
 {
-	return _startTime < _endTime;
+	return _startTime > _endTime;
 }
 
 bool TimeSwitch::_condition(SwitchIface* me)
