@@ -65,14 +65,14 @@ std::string settings::getStrOrDefault(
 	}
 
 	//TODO: made hasKey accept string views
-	if(!_storage->hasKey(std::string{partition}, std::string{key})){
+	if(!_storage->hasKey(partition, key)){
 		FB_DEBUG_LOG_I_TAG("Has no key: %s, ret default %s", key.cbegin(), def.cbegin());
 		return std::string{def};
 	}
 
 	//TODO: made readValue accept string views
 	std::string result;
-	if(!_storage->readValue(std::string{partition}, std::string{key}, result)){
+	if(!_storage->readValue(partition, key, result)){
 		FB_DEBUG_LOG_I_TAG("Failed to read key: %s, ret default %s", key.cbegin(), def.cbegin());
 		return std::string{def};
 	}
@@ -89,13 +89,13 @@ int64_t settings::getIntOrDefault(std::string_view partition,
 		return def;
 	}
 
-	if(!_storage->hasKey(std::string{partition}, std::string{key})){
+	if(!_storage->hasKey(partition, key)){
 		FB_DEBUG_LOG_I_TAG("Has no key: %s, ret default %lld", key.cbegin(), def);
 		return def;
 	}
 
-	int result;
-	if(!_storage->readValue(std::string{partition}, std::string{key}, result)){
+	int64_t result;
+	if(!_storage->readValue(partition, key, result)){
 		FB_DEBUG_LOG_I_TAG("Failed to read key: %s, ret default %lld", key.cbegin(), def);
 		return def;
 	}
@@ -112,7 +112,7 @@ void settings::setStr(std::string_view partion,
 		return;
 	}
 
-	if(!_storage->writeValue(std::string{partion}, std::string{key}, std::string{val})){
+	if(!_storage->writeValue(partion, key, val)){
 		FB_DEBUG_LOG_E_TAG("Failed to set key: %s, val: %s", key.cbegin(), val.cbegin());
 		return;
 	}
@@ -129,7 +129,7 @@ void settings::setInt(std::string_view partion,
 		return;
 	}
 
-	if(!_storage->writeValue(std::string{partion}, std::string{key}, val)){
+	if(!_storage->writeValue(partion, key, val)){
 		FB_DEBUG_LOG_E_TAG("Failed to set key: %s, val: %lld", key.cbegin(), val);
 		return;
 	}

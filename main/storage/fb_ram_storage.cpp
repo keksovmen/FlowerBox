@@ -17,67 +17,81 @@ bool RamStorage::init()
 	return true;
 }
 
-bool RamStorage::hasKey(const std::string& partition, const std::string& key) const
+bool RamStorage::hasKey(std::string_view partition, std::string_view key) const
 {
-	return _data.contains(partition) && _data.at(partition).contains(key);
+	auto p = std::string(partition);
+	auto k = std::string(key);
+	return _data.contains({p}) && _data.at(p).contains(k);
 }
 
-bool RamStorage::writeValue(const std::string& partition, const std::string& key, const std::string& value)
+bool RamStorage::writeValue(std::string_view partition, std::string_view key, std::string_view value)
 {
-	if(!_data.contains(partition)){
-		_data[partition] = Page();
+	auto p = std::string(partition);
+	auto k = std::string(key);
+
+	if(!_data.contains(p)){
+		_data[p] = Page();
 	}
 
-	if(!_data[partition].contains(key)){
-		_data[partition][key] = Entry();
+	if(!_data[p].contains(k)){
+		_data[p][k] = Entry();
 	}
 
-	_data[partition][key].second = value;
+	_data[p][k].second = value;
 
 	return true;
 }
 
-bool RamStorage::writeValue(const std::string& partition, const std::string& key, int value)
+bool RamStorage::writeValue(std::string_view partition, std::string_view key, int64_t value)
 {
-	if(!_data.contains(partition)){
-		_data[partition] = Page();
+	auto p = std::string(partition);
+	auto k = std::string(key);
+
+	if(!_data.contains(p)){
+		_data[p] = Page();
 	}
 
-	if(!_data[partition].contains(key)){
-		_data[partition][key] = Entry();
+	if(!_data[p].contains(k)){
+		_data[p][k] = Entry();
 	}
 
-	_data[partition][key].first = value;
+	_data[p][k].first = value;
 
 	return true;
 }
 
-bool RamStorage::readValue(const std::string& partition, const std::string& key, std::string& out) const
+bool RamStorage::readValue(std::string_view partition, std::string_view key, std::string& out) const
 {
-	if(!_data.contains(partition)){
+	auto p = std::string(partition);
+	auto k = std::string(key);
+
+	if(!_data.contains(p)){
 		return false;
 	}
 
-	if(!_data.at(partition).contains(key)){
+	if(!_data.at(p).contains(k)){
 		return false;
 	}
 
-	out = _data.at(partition).at(key).second;
+	out = _data.at(p).at(k).second;
 
 	return true;
 }
 
-bool RamStorage::readValue(const std::string& partition, const std::string& key, int& out) const
+bool RamStorage::readValue(std::string_view partition, std::string_view key, int64_t& out) const
 {
-	if(!_data.contains(partition)){
+	auto p = std::string(partition);
+	auto k = std::string(key);
+
+	if(!_data.contains(p)){
 		return false;
 	}
 
-	if(!_data.at(partition).contains(key)){
+	if(!_data.at(p).contains(k)){
 		return false;
 	}
 
-	out = _data.at(partition).at(key).first;
+	out = _data.at(p).at(k).first;
 
 	return true;
 }

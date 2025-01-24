@@ -46,7 +46,7 @@ namespace fb
 				 * @return false doesn't exist
 				 */
 
-				virtual bool hasKey(const std::string& partition, const std::string& key) const = 0;
+				virtual bool hasKey(std::string_view partition, std::string_view key) const = 0;
 
 				/**
 				 * @brief writes value by a key
@@ -58,8 +58,8 @@ namespace fb
 				 * @return false failed in any way to write
 				 */
 
-				virtual bool writeValue(const std::string& partition, const std::string& key, const std::string& value) = 0;
-				virtual bool writeValue(const std::string& partition, const std::string& key, int value) = 0;
+				virtual bool writeValue(std::string_view partition, std::string_view key, std::string_view value) = 0;
+				virtual bool writeValue(std::string_view partition, std::string_view key, int64_t value) = 0;
 
 				/**
 				 * @brief reads value by a key
@@ -71,8 +71,8 @@ namespace fb
 				 * @return false failed in any way to write
 				 */
 
-				virtual bool readValue(const std::string& partition, const std::string& key, std::string& out) const = 0;
-				virtual bool readValue(const std::string& partition, const std::string& key, int& out) const = 0;
+				virtual bool readValue(std::string_view partition, std::string_view key, std::string& out) const = 0;
+				virtual bool readValue(std::string_view partition, std::string_view key, int64_t& out) const = 0;
 		};
 	}
 }

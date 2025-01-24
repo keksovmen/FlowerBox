@@ -30,80 +30,80 @@ bool NvsStorage::init()
 	return result == ESP_OK;
 }
 
-bool NvsStorage::hasKey(const std::string& partition, const std::string& key) const
+bool NvsStorage::hasKey(std::string_view partition, std::string_view key) const
 {
 	esp_err_t err = ESP_OK;
-	auto hndl = nvs::open_nvs_handle(partition.c_str(), NVS_READONLY, &err);
+	auto hndl = nvs::open_nvs_handle(partition.cbegin(), NVS_READONLY, &err);
 	if(!hndl){
 		return false;
 	}
 
 	nvs_type_t _ = NVS_TYPE_ANY;
 
-	err = hndl->find_key(key.c_str(), _);
-	FB_DEBUG_LOG_I_OBJ("Has key: %s = %d", key.c_str(), static_cast<int>(err));
+	err = hndl->find_key(key.cbegin(), _);
+	FB_DEBUG_LOG_I_OBJ("Has key: %s = %d", key.cbegin(), static_cast<int>(err));
 
 	return err == ESP_OK;
 }
 
-bool NvsStorage::writeValue(const std::string& partition, const std::string& key, const std::string& value)
+bool NvsStorage::writeValue(std::string_view partition, std::string_view key, std::string_view value)
 {
 	esp_err_t err = ESP_OK;
-	auto hndl = nvs::open_nvs_handle(partition.c_str(), NVS_READWRITE, &err);
+	auto hndl = nvs::open_nvs_handle(partition.cbegin(), NVS_READWRITE, &err);
 	if(!hndl){
 		return false;
 	}
 
-	err = hndl->set_string(key.c_str(), value.c_str());
+	err = hndl->set_string(key.cbegin(), value.cbegin());
 	hndl->commit();
-	FB_DEBUG_LOG_I_OBJ("Write str: %s -> %s, = %d", key.c_str(), value.c_str(), static_cast<int>(err));
+	FB_DEBUG_LOG_I_OBJ("Write str: %s -> %s, = %d", key.cbegin(), value.cbegin(), static_cast<int>(err));
 
 	return err == ESP_OK;
 }
 
-bool NvsStorage::writeValue(const std::string& partition, const std::string& key, int value)
+bool NvsStorage::writeValue(std::string_view partition, std::string_view key, int64_t value)
 {
 	esp_err_t err = ESP_OK;
-	auto hndl = nvs::open_nvs_handle(partition.c_str(), NVS_READWRITE, &err);
+	auto hndl = nvs::open_nvs_handle(partition.cbegin(), NVS_READWRITE, &err);
 	if(!hndl){
 		return false;
 	}
 
-	err = hndl->set_item<int>(key.c_str(), value);
+	err = hndl->set_item<int>(key.cbegin(), value);
 	hndl->commit();
-	FB_DEBUG_LOG_I_OBJ("Write int: %s -> %d, = %d", key.c_str(), value, static_cast<int>(err));
+	FB_DEBUG_LOG_I_OBJ("Write int: %s -> %lld, = %d", key.cbegin(), value, static_cast<int>(err));
 
 	return err == ESP_OK;
 }
 
-bool NvsStorage::readValue(const std::string& partition, const std::string& key, std::string& out) const
+bool NvsStorage::readValue(std::string_view partition, std::string_view key, std::string& out) const
 {
 	esp_err_t err = ESP_OK;
-	auto hndl = nvs::open_nvs_handle(partition.c_str(), NVS_READWRITE, &err);
+	auto hndl = nvs::open_nvs_handle(partition.cbegin(), NVS_READWRITE, &err);
 	if(!hndl){
 		return false;
 	}
 
 	char tmp[StorageIface::MAX_STRING_SIZE] = {0};
-	err = hndl->get_string(key.c_str(), tmp, sizeof(tmp));
+	err = hndl->get_string(key.cbegin(), tmp, sizeof(tmp));
 	out = tmp;
 	
-	FB_DEBUG_LOG_I_OBJ("Read str: %s -> %s, = %d", key.c_str(), out.c_str(), static_cast<int>(err));
+	FB_DEBUG_LOG_I_OBJ("Read str: %s -> %s, = %d", key.cbegin(), out.c_str(), static_cast<int>(err));
 
 	return err == ESP_OK;
 }
 
-bool NvsStorage::readValue(const std::string& partition, const std::string& key, int& out) const
+bool NvsStorage::readValue(std::string_view partition, std::string_view key, int64_t& out) const
 {
 	esp_err_t err = ESP_OK;
-	auto hndl = nvs::open_nvs_handle(partition.c_str(), NVS_READWRITE, &err);
+	auto hndl = nvs::open_nvs_handle(partition.cbegin(), NVS_READWRITE, &err);
 	if(!hndl){
 		return false;
 	}
 
-	err = hndl->get_item<int>(key.c_str(), out);
+	err = hndl->get_item<int64_t>(key.cbegin(), out);
 
-	FB_DEBUG_LOG_I_OBJ("Read int: %s -> %d, = %d", key.c_str(), out, static_cast<int>(err));
+	FB_DEBUG_LOG_I_OBJ("Read int: %s -> %lld, = %d", key.cbegin(), out, static_cast<int>(err));
 
 	return err == ESP_OK;
 }
