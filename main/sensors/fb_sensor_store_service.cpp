@@ -35,6 +35,12 @@ void SensorStoreService::handleEvent(const event::Event& event)
 
 
 		}else if(event.eventId == sensor::SensorEvent::SENSOR_VALUE_CHANGED){
+			//if no clock is init just skip
+			if(!clock::isTimeSynced())
+			{
+				return;
+			}
+
 			//need a way to define what sensor it is 
 			{
 				const auto* sen = dynamic_cast<sensor::TemperatureSensor*>(reinterpret_cast<sensor::SensorIface*>(event.data));

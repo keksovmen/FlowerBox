@@ -26,6 +26,7 @@ static const char* TAG = "fb_clock";
 
 
 static std::string _serverAddress;
+static bool _isTimeSynced = false;
 
 
 
@@ -53,6 +54,7 @@ static void _on_sntp_sync_event(struct timeval *tv)
 	FB_DEBUG_ENTER_I_TAG();
 
 	FB_DEBUG_LOG_W_TAG("Current time: %lld, or %lld", currentTimeStamp(), tv->tv_sec);
+	_isTimeSynced = true;
 
 	global::getEventManager()->pushEvent({event::EventGroup::CLOCK, std::to_underlying(clock::ClockEventId::SYNCED), nullptr});
 }
@@ -153,6 +155,11 @@ void clock::deinitClock()
 	FB_DEBUG_ENTER_I_TAG();
 
 	esp_netif_sntp_deinit();
+}
+
+bool clock::isTimeSynced()
+{
+	return _isTimeSynced;
 }
 
 Time clock::getCurrentTime()

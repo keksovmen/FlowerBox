@@ -36,7 +36,7 @@ static event::EventManager _eventManager;
 static pins::PinManager _pinManager;
 static state::StateManager _stateManager("STATE_MANAGER");
 
-;
+
 
 //TODO: made it somehow not call new in constructor, because it leads to crashes
 static sensor::SensorStoreService _sensorStoreService(project::getHwSensorStorage());
