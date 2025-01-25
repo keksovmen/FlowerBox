@@ -1,8 +1,9 @@
 #include "fb_clock.hpp"
 
+#include <stdlib.h>
 #include <string.h>
-#include <time.h>
 #include <sys/time.h>
+#include <time.h>
 
 #include "fb_debug.hpp"
 #include "fb_globals.hpp"
@@ -118,6 +119,10 @@ Time::operator Timestamp() const
 void clock::initClock()
 {
 	FB_DEBUG_ENTER_I_TAG();
+
+	//set current locale
+	setenv("TZ", "GMT-3", 1);
+	tzset();
 
 	if(settings::getWifiMode() == settings::WifiMode::STA){
 		_serverAddress = settings::getSntpServerUrl();
