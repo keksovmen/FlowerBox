@@ -123,11 +123,11 @@ int project::mapBoxSensorIdToAddres(int id)
 {
 	if(id == getBoxInsideTempSensor().getId())
 	{
-		return reinterpret_cast<int>(&getHwDS18Sensor());
+		return reinterpret_cast<int>(&getHwAhtSensor());
 	}
 	else if(id == getBoxOutsideTempSensor().getId())
 	{
-		return reinterpret_cast<int>(&getHwAhtSensor());
+		return reinterpret_cast<int>(&getHwDS18Sensor());
 	}
 	else if(id == getBoxInsideHumiditySensor().getId())
 	{
