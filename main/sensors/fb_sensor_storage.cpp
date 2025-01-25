@@ -11,8 +11,10 @@ void SensorStorage::addSensorValue(int address, float value)
 {
 	_addAddres(address);
 
-	//если полседнее значение точно такое же, то не добавляем
-	if(_getSensorValueBuffer(address).last() && _getSensorValueBuffer(address).last()->value == value){
+	//если полседнее значение близкое к прошлому, то не добавляем его
+	if(_getSensorValueBuffer(address).last() &&
+		(std::pow(_getSensorValueBuffer(address).last()->value - value, 2) < std::pow(MinimalDeltaValue, 2)))
+	{
 		return;
 	}
 

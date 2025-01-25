@@ -27,7 +27,8 @@ namespace fb
 		class SensorStorage
 		{
 			public:
-				static constexpr int BufferSize = 10;
+				static constexpr int BufferSize = 50;
+				static constexpr float MinimalDeltaValue = 0.5f;
 
 
 
