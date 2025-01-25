@@ -87,13 +87,17 @@ static void _init_box_properties()
 
 
 	//TODO: add dynamic value updates, as java beans
-	const auto* currentTimeProp = getBox().addProperty(std::make_unique<box::PropertyInt>(
+	auto* currentTimeProp = new box::PropertyInt(
 		box::Tid::PROPERTY_SYSTEM_TIME,
 		[](int millis){
 
 			return false;
 		},
-		clock::currentTimeStamp()));
+		clock::currentTimeStamp());
+	//made it dynamic
+	currentTimeProp->setGetAction([](){return clock::currentTimeStamp();});
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(currentTimeProp));
 	getBox().addPropertyDependency(currentTimeProp->getId());
 
 }

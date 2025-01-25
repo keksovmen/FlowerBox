@@ -55,7 +55,7 @@ std::string PropertyBase<T>::toJson() const
 	cJSON_AddNumberToObject(obj, "tid", std::to_underlying(getTid()));
 	cJSON_AddRawToObject(obj, "min_value", getMinValueStr().c_str());
 	cJSON_AddRawToObject(obj, "max_value", getMaxValueStr().c_str());
-	cJSON_AddStringToObject(obj, "value", _valueToString(_value).c_str());
+	cJSON_AddStringToObject(obj, "value", _valueToString(_getAction ? std::invoke(_getAction) : _value).c_str());
 
 	std::string result(cJSON_PrintUnformatted(obj));
 
@@ -83,6 +83,12 @@ template<class T>
 std::string PropertyBase<T>::getValue() const
 {
 	return _valueToString(_value);
+}
+
+template<class T>
+void PropertyBase<T>::setGetAction(ActionGet getAction)
+{
+	_getAction = getAction;
 }
 
 

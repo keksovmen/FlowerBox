@@ -31,6 +31,7 @@ namespace fb
 		{
 			public:
 				using ActionSet = std::function<bool(T)>;
+				using ActionGet = std::function<T()>;
 
 
 
@@ -52,8 +53,11 @@ namespace fb
 
 				virtual std::string getValue() const override;
 
+				void setGetAction(ActionGet getAction);
+
 			private:
 				const ActionSet _action;
+				ActionGet _getAction;
 				T _value;
 
 
