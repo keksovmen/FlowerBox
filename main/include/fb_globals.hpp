@@ -9,11 +9,11 @@
 #include "fb_id.hpp"
 #include "fb_pins.hpp"
 #include "fb_sensor_service.hpp"
-#include "fb_state_manager.hpp"
 #include "fb_sensor_storage.hpp"
-#include "fb_switch_service.hpp"
-
+#include "fb_state_manager.hpp"
 #include "fb_switch_iface.hpp"
+#include "fb_switch_service.hpp"
+#include "fb_time_scheduler.hpp"
 
 
 
@@ -38,5 +38,7 @@ namespace fb
 		switches::SwitchService* getSwitchService();
 
 		std::string getDeviceName();
+
+		util::TimeScheduler* getTimeScheduler();
 	}
 }

@@ -5,16 +5,16 @@
 #include "esp_efuse.h"
 #include "esp_efuse_table.h"
 
-#include "fb_main_state_manager.hpp"
-#include "fb_sensor_store_service.hpp"
 #include "fb_heat_switch.hpp"
-#include "fb_time_switch.hpp"
+#include "fb_main_state_manager.hpp"
 #include "fb_nvs_storage.hpp"
-#include "fb_ram_storage.hpp"
-#include "fb_settings.hpp"
 #include "fb_project_box_obj.hpp"
 #include "fb_project_hw_obj.hpp"
 #include "fb_project_maper_obj.hpp"
+#include "fb_ram_storage.hpp"
+#include "fb_sensor_store_service.hpp"
+#include "fb_settings.hpp"
+#include "fb_time_switch.hpp"
 
 
 
@@ -40,6 +40,7 @@ static state::StateManager _stateManager("STATE_MANAGER");
 
 //TODO: made it somehow not call new in constructor, because it leads to crashes
 static sensor::SensorStoreService _sensorStoreService(project::getHwSensorStorage());
+static util::TimeScheduler _timeScheduler;
 
 
 
@@ -61,6 +62,8 @@ static void _init_settings()
 void global::init()
 {
 	_init_settings();
+
+	_timeScheduler.start();
 
 	project::initHwObjs();
 	project::initBoxObjs();
@@ -115,4 +118,9 @@ switches::SwitchService* global::getSwitchService()
 std::string global::getDeviceName()
 {
 	return _DEVICE_NAME "_" + std::to_string(global::getUniqueId());
+}
+
+util::TimeScheduler* global::getTimeScheduler()
+{
+	return &_timeScheduler;
 }

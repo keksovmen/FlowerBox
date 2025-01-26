@@ -48,6 +48,7 @@ idf_component_register(
 		"fb_wifi.cpp"
 		"fb_service_iface.cpp"
 		"fb_provision.cpp"
+		"fb_time_scheduler.cpp"
 		"main.cpp"
 		"box/fb_box.cpp"
 		"box/fb_property.cpp"
