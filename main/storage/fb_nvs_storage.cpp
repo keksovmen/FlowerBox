@@ -69,7 +69,7 @@ bool NvsStorage::writeValue(std::string_view partition, std::string_view key, in
 		return false;
 	}
 
-	err = hndl->set_item<int>(key.cbegin(), value);
+	err = hndl->set_item<int64_t>(key.cbegin(), value);
 	hndl->commit();
 	FB_DEBUG_LOG_I_OBJ("Write int: %s -> %lld, = %d", key.cbegin(), value, static_cast<int>(err));
 
