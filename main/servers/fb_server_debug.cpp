@@ -13,7 +13,7 @@
 
 
 
-#define _LOG_BUFFER_SIZE_KB 16
+#define _LOG_BUFFER_SIZE_KB 24
 #define _TASK_STASK_SIZE 4 * 1024
 #define _TASK_PRIORITY 15
 #define _INVALID_SOCKET -1
