@@ -16,6 +16,10 @@
 
 
 
+#define _SYNC_PERIOD_SEC (12 * 60 * 60)
+
+
+
 using namespace fb;
 using namespace clock;
 
@@ -57,6 +61,7 @@ static void _on_sntp_sync_event(struct timeval *tv)
 	_isTimeSynced = true;
 
 	global::getEventManager()->pushEvent({event::EventGroup::CLOCK, std::to_underlying(clock::ClockEventId::SYNCED), nullptr});
+	global::getTimeScheduler()->addActionDelayed({&syncRequest}, _SYNC_PERIOD_SEC * 1000, portMAX_DELAY);
 }
 
 
