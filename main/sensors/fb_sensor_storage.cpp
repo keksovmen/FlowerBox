@@ -12,12 +12,13 @@ void SensorStorage::addSensorValue(int address, float value)
 	_addAddres(address);
 
 	//если последнее равно текущему то игнорируем
-	// if(getSensorLastValue(address))
-	// {
-		// return;
-	// }
+	if(getSensorLastValue(address).value_or(-255.0f) == value)
+	{
+		return;
+	}
 
-	_getSensorValueBuffer(address).pushValue(SensorStorageEntry{value, clock::currentTimeStamp()});
+	//науверенных тыкаем в указатель, ибо мы его точно получили через создание _addAddres()
+	_getSensorValueBuffer(address)->pushValue(SensorStorageEntry{value, clock::currentTimeStamp()});
 }
 
 // void SensorStorage::addSensorState(int address, bool state)
@@ -27,14 +28,24 @@ void SensorStorage::addSensorValue(int address, float value)
 
 SensorStorage::Iterator SensorStorage::getSensorValues(int address, clock::Timestamp from) const
 {
-	return _getSensorValueBuffer(address).findValueIndex([&from](const SensorStorageEntry& e){
+	auto* buffer = _getSensorValueBuffer(address);
+	if(!buffer){
+		return _sensorData[_MISSING_BUFFER_INDEX].end();
+	}
+
+	return buffer->findValueIndex([&from](const SensorStorageEntry& e){
 		return e.timestamp > from;
 	});
 }
 
 SensorStorage::Iterator SensorStorage::getSensorValuesEnd(int address) const
 {
-	return _getSensorValueBuffer(address).end();
+	auto* buffer = _getSensorValueBuffer(address);
+	if(!buffer){
+		return _sensorData[_MISSING_BUFFER_INDEX].end();
+	}
+
+	return buffer->end();
 }
 
 std::optional<float> SensorStorage::getSensorLastValue(int address) const
@@ -44,29 +55,30 @@ std::optional<float> SensorStorage::getSensorLastValue(int address) const
 		return {};
 	}
 
-	auto iter = _getSensorValueBuffer(address).last();
+	auto* buff = _getSensorValueBuffer(address);
+	if(buff == nullptr){
+		return {};
+	}
+
+	auto iter = buff->last();
 	if(!iter){
 		return {};
 	}
 
-	// return std::optional<float>(iter->value);
 	return {iter->value};
 }
 
-SensorStorage::Buffer& SensorStorage::_getSensorValueBuffer(int address)
+SensorStorage::Buffer* SensorStorage::_getSensorValueBuffer(int address)
 {
 	const int index = _mapAddresToIndex(address);
-	assert(index != SensorStorage::_ILLEGAL_INDEX);
-
-	return _sensorData.at(index);
+	return index == SensorStorage::_ILLEGAL_INDEX ? nullptr : &_sensorData.at(index);
+	// assert(index != SensorStorage::_ILLEGAL_INDEX);
 }
 
-const SensorStorage::Buffer& SensorStorage::_getSensorValueBuffer(int address) const
+const SensorStorage::Buffer* SensorStorage::_getSensorValueBuffer(int address) const
 {
 	const int index = _mapAddresToIndex(address);
-	assert(index != SensorStorage::_ILLEGAL_INDEX);
-
-	return _sensorData.at(index);
+	return index == SensorStorage::_ILLEGAL_INDEX ? nullptr : &_sensorData.at(index);
 }
 
 int SensorStorage::_mapAddresToIndex(int address) const

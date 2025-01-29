@@ -29,7 +29,6 @@ namespace fb
 		{
 			public:
 				static constexpr int BufferSize = 50;
-				static constexpr float MinimalDeltaValue = 0.5f;
 
 
 
@@ -83,6 +82,7 @@ namespace fb
 			
 			private:
 				static constexpr int _ILLEGAL_INDEX = -1;
+				static constexpr int _MISSING_BUFFER_INDEX = 0;
 
 
 
@@ -95,8 +95,8 @@ namespace fb
 
 
 
-				Buffer& _getSensorValueBuffer(int address);
-				const Buffer& _getSensorValueBuffer(int address) const;
+				Buffer* _getSensorValueBuffer(int address);
+				const Buffer* _getSensorValueBuffer(int address) const;
 				int _mapAddresToIndex(int address) const;
 				int _addAddres(int address);
 		};

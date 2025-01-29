@@ -45,6 +45,7 @@ namespace fb
 				
 				bool isInit() const;
 
+				//TODO: put in to next child class PlainSensor
 				virtual float getValue() const;
 				virtual float getValueIndexed(int index) const;
 				virtual int getIndexCount() const;
