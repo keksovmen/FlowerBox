@@ -13,7 +13,7 @@ namespace fb
 		//TODO: add more tids
 		enum class Tid : int
 		{
-			SENSOR_MP3,
+			SENSOR_MP3 = 0,
 			SENSOR_TEMPERATURE,
 			SENSOR_HUMIDITY,
 

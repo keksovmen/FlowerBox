@@ -41,7 +41,6 @@ idf_component_register(
 		"fb_event_manager.cpp"
 		"fb_file_system.cpp"
 		"fb_globals.cpp"
-		"fb_http_server.cpp"
 		"fb_pins.cpp"
 		"fb_update.cpp"
 		"fb_settings.cpp"

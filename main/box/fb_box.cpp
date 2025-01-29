@@ -2,9 +2,10 @@
 
 #include <algorithm>
 
-#include "cJSON.h"
-
 #include "fb_debug.hpp"
+#include "fb_dynamic_str_constructor.hpp"
+
+#include "cJSON.h"
 
 
 
@@ -48,7 +49,7 @@ std::string Box::toJson() const
 	std::for_each(_boxProperties.begin(), _boxProperties.end(), [&ids](auto p){ids.push_back(p);});
 	cJSON_AddItemToObject(obj, "box_properties_ids", cJSON_CreateIntArray(ids.data(), ids.size()));
 
-	std::string result(cJSON_PrintUnformatted(obj));
+	std::string result(util::DynamicStrConstructor(cJSON_PrintUnformatted(obj)));
 
 	cJSON_Delete(obj);
 

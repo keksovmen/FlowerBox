@@ -1,5 +1,7 @@
 #include "fb_sensor.hpp"
 
+#include "fb_dynamic_str_constructor.hpp"
+
 #include "cJSON.h"
 
 
@@ -27,8 +29,7 @@ std::string Sensor::toJson() const
 	cJSON_AddRawToObject(obj, "max_value", getMaxValueStr().c_str());
 	cJSON_AddItemToObject(obj, "property_ids", cJSON_CreateIntArray(getPropertyDependencies().data(), getPropertyDependencies().size()));
 	
-
-	std::string result(cJSON_PrintUnformatted(obj));
+	std::string result(util::DynamicStrConstructor(cJSON_PrintUnformatted(obj)));
 
 	cJSON_Delete(obj);
 

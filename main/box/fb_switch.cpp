@@ -2,6 +2,8 @@
 
 #include <algorithm>
 
+#include "fb_dynamic_str_constructor.hpp"
+
 #include "cJSON.h"
 
 
@@ -43,7 +45,7 @@ std::string Switch::toJson() const
 	cJSON_AddItemToObject(obj, "property_ids", cJSON_CreateIntArray(getPropertyDependencies().data(), getPropertyDependencies().size()));
 	cJSON_AddItemToObject(obj, "sensors_ids", cJSON_CreateIntArray(_dependentSensors.data(), _dependentSensors.size()));
 
-	std::string result(cJSON_PrintUnformatted(obj));
+	std::string result(util::DynamicStrConstructor(cJSON_PrintUnformatted(obj)));
 
 	cJSON_Delete(obj);
 

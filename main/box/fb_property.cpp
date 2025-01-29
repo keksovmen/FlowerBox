@@ -1,5 +1,7 @@
 #include "fb_property.hpp"
 
+#include "fb_dynamic_str_constructor.hpp"
+
 #include "cJSON.h"
 
 
@@ -57,7 +59,7 @@ std::string PropertyBase<T>::toJson() const
 	cJSON_AddRawToObject(obj, "max_value", getMaxValueStr().c_str());
 	cJSON_AddStringToObject(obj, "value", _valueToString(_getAction ? std::invoke(_getAction) : _value).c_str());
 
-	std::string result(cJSON_PrintUnformatted(obj));
+	std::string result(util::DynamicStrConstructor(cJSON_PrintUnformatted(obj)));
 
 	cJSON_Delete(obj);
 
