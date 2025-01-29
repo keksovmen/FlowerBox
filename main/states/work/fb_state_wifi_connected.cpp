@@ -1,6 +1,5 @@
 #include "fb_state_wifi_connected.hpp"
 
-#include "fb_http_server.hpp"
 #include "fb_state_time_init.hpp"
 #include "fb_state_wifi_connect.hpp"
 #include "fb_wifi.hpp"

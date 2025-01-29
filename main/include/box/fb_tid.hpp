@@ -13,7 +13,6 @@ namespace fb
 		//TODO: add more tids
 		enum class Tid : int
 		{
-			SENSOR_DS18B20 = 0,
 			SENSOR_MP3,
 			SENSOR_TEMPERATURE,
 			SENSOR_HUMIDITY,
@@ -51,32 +50,19 @@ namespace fb
 				const char* valueType;
 				const char* minValue;
 				const char* maxValue;
-
-				// constexpr _TidHolder(
-				// 	const char* name,
-				// 	const char* description,
-				// 	const char* valueType,
-				// 	const char* minValue,
-				// 	const char* maxValue
-				// ) : name(name), description(description), valueType(valueType), minValue(minValue), maxValue(maxValue) {}
-				// constexpr ~_TidHolder() = default;
 			};
 
 			constexpr const _TidHolder map(Tid tid){
 				switch(tid)
 				{
-					case Tid::SENSOR_DS18B20:
-						return {"DS18B20", "Temperature sensor", "float", "-100.0", "100.0"};
-						// return _TidHolder("DS18B20", "Temperature sensor", "float", "-100.0", "100.0");
-
-					case Tid::SENSOR_MP3:
-						return {"Mp3 player", "", "int", "-1", "2000"};
-					
 					case Tid::SENSOR_TEMPERATURE:
 						return {"Temperature", "General temperature sensor", "float", "-40.0", "100.0"};
 					
 					case Tid::SENSOR_HUMIDITY:
 						return {"Humidity", "General humidity sensor", "float", "0.0", "100.0"};
+
+					case Tid::SENSOR_MP3:
+						return {"Mp3 player", "", "int", "-1", "2000"};
 
 					case Tid::SWITCH_LIGHT:
 						return {"Light switch", "", "bool", "0", "1"};
