@@ -40,6 +40,21 @@ const char* SensorAht20::getName() const
 	return "SensorAht20";
 }
 
+float SensorAht20::getValue() const
+{
+	return getTemperature();
+}
+
+float SensorAht20::getValueIndexed(int index) const
+{
+	return index == ValueTemperatureIndex ? getTemperature() : getHumidity();
+}
+
+int SensorAht20::getIndexCount() const
+{
+	return 2;
+}
+
 float SensorAht20::getTemperature() const
 {
 	return _temperature;

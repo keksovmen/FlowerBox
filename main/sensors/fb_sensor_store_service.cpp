@@ -41,22 +41,9 @@ void SensorStoreService::handleEvent(const event::Event& event)
 				return;
 			}
 
-			//need a way to define what sensor it is 
-			{
-				const auto* sen = dynamic_cast<sensor::TemperatureSensor*>(reinterpret_cast<sensor::SensorIface*>(event.data));
-				if(sen){
-					_storage.addSensorValue(reinterpret_cast<int>(sen), sen->getValue());
-				}
-			}
+			_handleChangeEvent(reinterpret_cast<sensor::SensorIface*>(event.data));
 
-			{
-			const auto* sen = dynamic_cast<sensor::SensorAht20*>(reinterpret_cast<sensor::SensorIface*>(event.data));
-				if(sen){
-					_storage.addSensorValue(reinterpret_cast<int>(sen), sen->getTemperature());
-					//TODO: comment offset
-					_storage.addSensorValue(reinterpret_cast<int>(sen) + 1, sen->getHumidity());
-				}
-			}
+			
 			// for(int i = 0; i < sensorArray->getDeviceCount(); i++)
 			// {
 				// auto* s = sensorArray->getSensor(i);
@@ -83,4 +70,71 @@ void SensorStoreService::handleEvent(const event::Event& event)
 const char* SensorStoreService::getName() const
 {
 	return "SensorStoreService";
+}
+
+void SensorStoreService::_handleChangeEvent(sensor::SensorIface* sensor)
+{
+	//need a way to define what sensor it is 
+	if(!_isSupportedSensor(sensor)){
+		return;
+	}
+
+	for(int i = 0; i < sensor->getIndexCount(); i++){
+		const int address = reinterpret_cast<int>(sensor) + i;
+
+		auto lastVal = _storage.getSensorLastValue(address);
+		//check if initial value exists if not then add
+		//and check if inital exists compare with last using mean square function
+		if(!lastVal ||
+			(std::pow(sensor->getValueIndexed(i) - lastVal.value(), 2) > std::pow(_mapSensorToPrecision(sensor, i), 2)))
+		{
+			_storage.addSensorValue(address, sensor->getValueIndexed(i));
+		}
+	}
+
+	// {
+	// 	const auto* sen = dynamic_cast<sensor::TemperatureSensor*>(reinterpret_cast<sensor::SensorIface*>(event.data));
+	// 	auto last = _storage.getSensorLastValue(reinterpret_cast<int>(sen));
+	// 	if(sen && (std::pow(sen->getValue() - , 2) < std::pow(_mapSensorToPrecision(sen), 2))){
+	// 		_storage.addSensorValue(reinterpret_cast<int>(sen), sen->getValue());
+	// 	}
+	// }
+
+	// {
+	// 	const auto* sen = dynamic_cast<sensor::SensorAht20*>(reinterpret_cast<sensor::SensorIface*>(event.data));
+	// 	if(sen){
+	// 		_storage.addSensorValue(reinterpret_cast<int>(sen), sen->getTemperature());
+	// 		//TODO: comment offset
+	// 		_storage.addSensorValue(reinterpret_cast<int>(sen) + 1, sen->getHumidity());
+	// 	}
+	// }
+}
+
+bool SensorStoreService::_isSupportedSensor(const sensor::SensorIface* sensor) const
+{
+	if(dynamic_cast<const sensor::TemperatureSensor*>(sensor)){
+		return true;
+	}
+
+	if(dynamic_cast<const sensor::SensorAht20*>(sensor)){
+		return true;
+	}
+
+	FB_DEBUG_LOG_W_OBJ("Unsupported sensor for saving: %s", typeid(sensor).name());
+
+	return false;
+}
+
+float SensorStoreService::_mapSensorToPrecision(const sensor::SensorIface* sensor, int valueIndex) const
+{
+	if(dynamic_cast<const sensor::TemperatureSensor*>(sensor)){
+		return 0.5f;
+	}
+
+	if(dynamic_cast<const sensor::SensorAht20*>(sensor)){
+		return valueIndex == sensor::SensorAht20::ValueTemperatureIndex ?
+			0.5f : 1.5f;
+	}
+
+	return 0.0f;
 }

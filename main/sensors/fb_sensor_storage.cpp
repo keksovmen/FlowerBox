@@ -11,12 +11,11 @@ void SensorStorage::addSensorValue(int address, float value)
 {
 	_addAddres(address);
 
-	//если полседнее значение близкое к прошлому, то не добавляем его
-	if(_getSensorValueBuffer(address).last() &&
-		(std::pow(_getSensorValueBuffer(address).last()->value - value, 2) < std::pow(MinimalDeltaValue, 2)))
-	{
-		return;
-	}
+	//если последнее равно текущему то игнорируем
+	// if(getSensorLastValue(address))
+	// {
+		// return;
+	// }
 
 	_getSensorValueBuffer(address).pushValue(SensorStorageEntry{value, clock::currentTimeStamp()});
 }
@@ -36,6 +35,22 @@ SensorStorage::Iterator SensorStorage::getSensorValues(int address, clock::Times
 SensorStorage::Iterator SensorStorage::getSensorValuesEnd(int address) const
 {
 	return _getSensorValueBuffer(address).end();
+}
+
+std::optional<float> SensorStorage::getSensorLastValue(int address) const
+{
+	const int index = _mapAddresToIndex(address);
+	if(index == SensorStorage::_ILLEGAL_INDEX){
+		return {};
+	}
+
+	auto iter = _getSensorValueBuffer(address).last();
+	if(!iter){
+		return {};
+	}
+
+	// return std::optional<float>(iter->value);
+	return {iter->value};
 }
 
 SensorStorage::Buffer& SensorStorage::_getSensorValueBuffer(int address)

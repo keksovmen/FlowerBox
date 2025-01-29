@@ -22,6 +22,13 @@ namespace fb
 			
 			private:
 				sensor::SensorStorage& _storage;
+
+
+
+				void _handleChangeEvent(sensor::SensorIface* sensor);
+
+				bool _isSupportedSensor(const sensor::SensorIface* sensor) const;
+				float _mapSensorToPrecision(const sensor::SensorIface* sensor, int valueIndex) const;
 		};
 	} // namespace box
 	

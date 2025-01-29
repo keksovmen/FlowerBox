@@ -47,3 +47,18 @@ bool SensorIface::isInit() const
 {
 	return _initFlag;
 }
+
+float SensorIface::getValue() const
+{
+	assert(0 && "NOT SUPPORTED");
+}
+
+float SensorIface::getValueIndexed(int index) const
+{
+	assert(0 && "NOT SUPPORTED");
+}
+
+int SensorIface::getIndexCount() const
+{
+	assert(0 && "NOT SUPPORTED");
+}

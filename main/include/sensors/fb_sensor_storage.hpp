@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <iterator>
 #include <unordered_map>
+#include <optional>
 
 #include "fb_sensor_temperature.hpp"
 #include "fb_clock.hpp"
@@ -70,6 +71,15 @@ namespace fb
 				 */
 
 				Iterator getSensorValuesEnd(int address) const;
+
+				/**
+				 * @brief достает, если есть, последнее сохраненное значение
+				 * 
+				 * @param address датчика
+				 * @return std::optional<float> 
+				 */
+
+				std::optional<float> getSensorLastValue(int address) const;
 			
 			private:
 				static constexpr int _ILLEGAL_INDEX = -1;

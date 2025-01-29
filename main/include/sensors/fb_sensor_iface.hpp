@@ -21,7 +21,7 @@ namespace fb
 				/**
 				 * @brief 
 				 * 
-				 * @return true init was sucess,
+				 * @return true init was success,
 				 * 			sensor ready to be called for updates
 				 * @return false 
 				 */
@@ -44,6 +44,10 @@ namespace fb
 				 */
 				
 				bool isInit() const;
+
+				virtual float getValue() const;
+				virtual float getValueIndexed(int index) const;
+				virtual int getIndexCount() const;
 
 			protected:
 				enum class UpdateResult : int

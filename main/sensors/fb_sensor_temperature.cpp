@@ -23,15 +23,25 @@ const char* TemperatureSensor::getName() const
 	return "TemperatureSensor";
 }
 
+float TemperatureSensor::getValue() const
+{
+	return _value;
+}
+
+float TemperatureSensor::getValueIndexed(int index) const
+{
+	return getValue();
+}
+
+int TemperatureSensor::getIndexCount() const
+{
+	return 1;
+}
+
 void TemperatureSensor::lateInit(Id id, OW_t* interface)
 {
 	_id = id;
 	_interface = interface;
-}
-
-float TemperatureSensor::getValue() const
-{
-	return _value;
 }
 
 TemperatureSensor::Id TemperatureSensor::getId() const

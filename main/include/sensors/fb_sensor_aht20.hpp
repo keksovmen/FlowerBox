@@ -16,6 +16,8 @@ namespace fb
 		{
 			public:
 				constexpr static float InvalidValue = -255.0f;
+				constexpr static int ValueTemperatureIndex = 0;
+				constexpr static int ValueHumidityIndex = ValueTemperatureIndex + 1;
 
 
 
@@ -23,6 +25,10 @@ namespace fb
 				~SensorAht20();
 
 				virtual const char* getName() const override;
+
+				virtual float getValue() const override;
+				virtual float getValueIndexed(int index) const override;
+				virtual int getIndexCount() const override;
 
 				float getTemperature() const;
 				float getHumidity() const;

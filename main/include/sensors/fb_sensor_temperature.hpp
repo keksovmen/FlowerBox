@@ -32,9 +32,13 @@ namespace fb
 
 				virtual const char* getName() const override;
 
+				virtual float getValue() const override;
+				virtual float getValueIndexed(int index) const override;
+				virtual int getIndexCount() const override;
+
 				void lateInit(Id id, OW_t* interface);
 
-				float getValue() const;
+				// float getValue() const;
 				Id getId() const;
 
 			private:
