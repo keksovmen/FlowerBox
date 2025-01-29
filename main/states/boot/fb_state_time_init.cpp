@@ -41,10 +41,10 @@ void StateTimeInit::handleEvent(const event::Event& event)
 
 void StateTimeInit::enter()
 {
-	// clock::initClock();
-	// clock::syncRequest();
+	clock::initClock();
+	clock::syncRequest();
 
-	global::getEventManager()->pushEvent(event::Event{fb::event::EventGroup::TRANSITION, 0, nullptr});
+	// global::getEventManager()->pushEvent(event::Event{fb::event::EventGroup::TRANSITION, 0, nullptr});
 
 
 	//TODO: start timer if no clock event is provided then something wrong with internet access
@@ -52,5 +52,5 @@ void StateTimeInit::enter()
 
 void StateTimeInit::exit()
 {
-	clock::deinitClock();
+	// clock::deinitClock();
 }
