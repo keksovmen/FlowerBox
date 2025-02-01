@@ -1,5 +1,7 @@
 #include "fb_data_entry.hpp"
 
+#include "fb_dynamic_str_constructor.hpp"
+
 #include "cJSON.h"
 
 
@@ -27,7 +29,7 @@ std::string DataEntry::toJson() const
 	cJSON_AddNumberToObject(obj, "value", _value);
 	cJSON_AddNumberToObject(obj, "timestamp", _timestamp);
 	
-	std::string result(cJSON_PrintUnformatted(obj));
+	std::string result(util::DynamicStrConstructor(cJSON_PrintUnformatted(obj)));
 
 	cJSON_Delete(obj);
 
