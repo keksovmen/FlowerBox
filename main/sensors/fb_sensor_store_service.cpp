@@ -4,6 +4,7 @@
 #include "fb_sensor_event.hpp"
 #include "fb_globals.hpp"
 #include "fb_sensor_aht20.hpp"
+#include "fb_project_core.hpp"
 
 
 
@@ -35,8 +36,10 @@ void SensorStoreService::handleEvent(const event::Event& event)
 
 
 		}else if(event.eventId == sensor::SensorEvent::SENSOR_VALUE_CHANGED){
+			
 			//if no clock is init just skip
-			if(!clock::isTimeSynced())
+			//TODO: for project that do not have clock is bad design
+			if(project::getInfo().requiresTime && !clock::isTimeSynced())
 			{
 				return;
 			}
@@ -70,6 +73,11 @@ void SensorStoreService::handleEvent(const event::Event& event)
 const char* SensorStoreService::getName() const
 {
 	return "SensorStoreService";
+}
+
+void SensorStoreService::registerSensor(const SensorStoreCfg& sens)
+{
+	_regedSensors.push_back(sens);
 }
 
 void SensorStoreService::_handleChangeEvent(sensor::SensorIface* sensor)
@@ -112,29 +120,44 @@ void SensorStoreService::_handleChangeEvent(sensor::SensorIface* sensor)
 
 bool SensorStoreService::_isSupportedSensor(const sensor::SensorIface* sensor) const
 {
-	if(dynamic_cast<const sensor::TemperatureSensor*>(sensor)){
-		return true;
-	}
+	return std::find_if(
+		_regedSensors.begin(),
+		_regedSensors.end(),
+		[sensor](auto cfg){return cfg.sens == sensor;}
+		) != _regedSensors.end();
+	// if(dynamic_cast<const sensor::TemperatureSensor*>(sensor)){
+	// 	return true;
+	// }
 
-	if(dynamic_cast<const sensor::SensorAht20*>(sensor)){
-		return true;
-	}
+	// if(dynamic_cast<const sensor::SensorAht20*>(sensor)){
+	// 	return true;
+	// }
 
-	FB_DEBUG_LOG_W_OBJ("Unsupported sensor for saving: %s", typeid(sensor).name());
+	// FB_DEBUG_LOG_W_OBJ("Unsupported sensor for saving: %s", typeid(sensor).name());
 
-	return false;
+	// return false;
 }
 
 float SensorStoreService::_mapSensorToPrecision(const sensor::SensorIface* sensor, int valueIndex) const
 {
-	if(dynamic_cast<const sensor::TemperatureSensor*>(sensor)){
-		return 0.5f;
-	}
+	//TODO: demove dynamic_cast and typeid putting everything in to sensor class
+	// if(dynamic_cast<const sensor::TemperatureSensor*>(sensor)){
+	// 	return 0.5f;
+	// }
 
-	if(dynamic_cast<const sensor::SensorAht20*>(sensor)){
-		return valueIndex == sensor::SensorAht20::ValueTemperatureIndex ?
-			0.5f : 1.5f;
-	}
+	// if(dynamic_cast<const sensor::SensorAht20*>(sensor)){
+	// 	return valueIndex == sensor::SensorAht20::ValueTemperatureIndex ?
+	// 		0.5f : 1.5f;
+	// }
 
-	return 0.0f;
+
+	// return 0.0f;
+
+	auto iter = std::find_if(
+		_regedSensors.begin(),
+		_regedSensors.end(),
+		[sensor](auto cfg){return cfg.sens == sensor;});
+	assert(iter != _regedSensors.end());
+
+	return std::invoke(iter->mapIndexToPrecision, valueIndex);
 }

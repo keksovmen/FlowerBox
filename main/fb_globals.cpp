@@ -110,6 +110,11 @@ sensor::SensorStorage* global::getSensorStorage()
 	return &project::getHwSensorStorage();
 }
 
+sensor::SensorStoreService* global::getSensorStoreService()
+{
+	return &_sensorStoreService;
+}
+
 switches::SwitchService* global::getSwitchService()
 {
 	return &project::getHwSwitchService();

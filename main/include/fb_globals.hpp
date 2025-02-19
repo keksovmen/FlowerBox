@@ -10,6 +10,7 @@
 #include "fb_pins.hpp"
 #include "fb_sensor_service.hpp"
 #include "fb_sensor_storage.hpp"
+#include "fb_sensor_store_service.hpp"
 #include "fb_state_manager.hpp"
 #include "fb_switch_iface.hpp"
 #include "fb_switch_service.hpp"
@@ -34,6 +35,7 @@ namespace fb
 
 		sensor::SensorService* getSensorService();
 		sensor::SensorStorage* getSensorStorage();
+		sensor::SensorStoreService* getSensorStoreService();
 
 		switches::SwitchService* getSwitchService();
 

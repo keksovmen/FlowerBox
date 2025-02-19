@@ -2,6 +2,8 @@
 
 
 
+#include <functional>
+
 #include "fb_debug.hpp"
 #include "fb_event_manager.hpp"
 #include "fb_sensor_storage.hpp"
@@ -12,6 +14,14 @@ namespace fb
 {
 	namespace sensor
 	{
+		struct SensorStoreCfg
+		{
+			sensor::SensorIface* sens;
+			std::function<float(int)> mapIndexToPrecision;
+		};
+
+
+
 		class SensorStoreService : public event::EventListener, public debug::Named
 		{
 			public:
@@ -19,9 +29,13 @@ namespace fb
 
 				virtual void handleEvent(const event::Event& event) override;
 				virtual const char* getName() const override;
+
+				void registerSensor(const SensorStoreCfg& sens);
 			
 			private:
 				sensor::SensorStorage& _storage;
+
+				std::vector<SensorStoreCfg> _regedSensors;
 
 
 
