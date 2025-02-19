@@ -15,7 +15,7 @@ namespace fb
 		class Mp3Sensor : public SensorIface
 		{
 			public:
-				Mp3Sensor(int rxPin, int txPin);
+				Mp3Sensor(int port, int rxPin, int txPin);
 
 				virtual const char* getName() const override;
 

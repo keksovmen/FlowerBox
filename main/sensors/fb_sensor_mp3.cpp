@@ -9,8 +9,8 @@ using namespace sensor;
 
 
 
-Mp3Sensor::Mp3Sensor(int rxPin, int txPin)
-	: _uart(UART_NUM_1, rxPin, txPin, 9600),
+Mp3Sensor::Mp3Sensor(int port, int rxPin, int txPin)
+	: _uart(static_cast<uart_port_t>(port), rxPin, txPin, 9600),
 	// _player([this](auto span, auto timeoutMs){
 	// 	const bool result = _uart.read(span, timeoutMs);
 	// 	FB_DEBUG_LOG_W_OBJ("READ: 0x%2X 0x%2X 0x%2X 0x%2X 0x%2X 0x%2X 0x%2X 0x%2X 0x%2X 0x%2X",
