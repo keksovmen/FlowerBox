@@ -10,6 +10,12 @@ using namespace project;
 
 
 
+static CoreInfo _info = {
+	.requiresTime = false,
+};
+
+
+
 static void _controlsCb(templates::Engine& engine)
 {
 	engine.addIntArg(getRgbProperty().getId(), "rgb_color_id");
@@ -27,4 +33,9 @@ static void _controlsCb(templates::Engine& engine)
 void project::init()
 {
 	server::htmlAddFileHandler("controls.html", &_controlsCb);	
+}
+
+const CoreInfo& project::getInfo()
+{
+	return _info;
 }

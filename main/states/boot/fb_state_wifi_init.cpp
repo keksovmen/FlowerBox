@@ -1,9 +1,10 @@
 #include "fb_state_wifi_init.hpp"
 
-#include "fb_state_time_init.hpp"
+#include "fb_globals.hpp"
+#include "fb_project_core.hpp"
 #include "fb_settings.hpp"
+#include "fb_state_time_init.hpp"
 #include "fb_wifi.hpp"
-
 
 
 using namespace fb;
@@ -27,7 +28,12 @@ void StateWifiInit::handleEvent(const event::Event& event)
 	if(event.groupId == event::EventGroup::WIFI){
 		//handle on wifi connect and on wifi failure events
 		if(event.eventId == wifi::WifiEventId::CONNECTED){
-			getContext().transition(std::make_unique<StateTimeInit>(getContext()));
+			//conditional time state
+			if(project::getInfo().requiresTime){
+				getContext().transition(std::make_unique<StateTimeInit>(getContext()));
+			}else{
+				global::getEventManager()->pushEvent(event::Event{fb::event::EventGroup::TRANSITION, 0, nullptr});
+			}
 
 		}else if(event.eventId == wifi::WifiEventId::FAILED_TO_CONNECT){
 			FB_DEBUG_LOG_I_OBJ("Failed to connect");
