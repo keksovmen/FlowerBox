@@ -93,6 +93,8 @@ namespace fb
 		void setSntpPass(const std::string& val);
 
 		void setWifiProvisioned();
+
+		void clearWifi();
 	} // namespace settings
 	
 }

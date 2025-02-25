@@ -27,6 +27,8 @@ namespace fb
 
 				virtual bool readValue(std::string_view partition, std::string_view key, std::string& out) const override;
 				virtual bool readValue(std::string_view partition, std::string_view key, int64_t& out) const override;
+
+				virtual void clearValue(std::string_view partition, std::string_view key) override;
 			
 			private:
 				using Entry = std::pair<int64_t, std::string>;

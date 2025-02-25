@@ -73,6 +73,15 @@ namespace fb
 
 				virtual bool readValue(std::string_view partition, std::string_view key, std::string& out) const = 0;
 				virtual bool readValue(std::string_view partition, std::string_view key, int64_t& out) const = 0;
+
+				/**
+				 * @brief must delete key value pair, so
+				 * hasKey() will return false
+				 * 
+				 * @param partition 
+				 * @param key 
+				 */
+				virtual void clearValue(std::string_view partition, std::string_view key) = 0;
 		};
 	}
 }

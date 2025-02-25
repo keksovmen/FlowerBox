@@ -95,3 +95,19 @@ bool RamStorage::readValue(std::string_view partition, std::string_view key, int
 
 	return true;
 }
+
+void RamStorage::clearValue(std::string_view partition, std::string_view key)
+{
+	auto p = std::string(partition);
+	auto k = std::string(key);
+
+	if(!_data.contains(p)){
+		return;
+	}
+
+	if(!_data.at(p).contains(k)){
+		return;
+	}
+
+	_data.at(p).erase(k);
+}

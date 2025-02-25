@@ -171,9 +171,11 @@ std::string settings::getSntpServerUrl()
 bool settings::isWifiProvided()
 {
 	return _storage &&
-		_storage->hasKey(_PARTION_NET, _KEY_WIFI_MODE) &&
-		_storage->hasKey(_PARTION_NET, _KEY_WIFI_STA_SSID) &&
-		_storage->hasKey(_PARTION_NET, _KEY_WIFI_STA_PASS);
+		_storage->hasKey(_PARTION_NET, _KEY_WIFI_MODE) && (
+		(_storage->hasKey(_PARTION_NET, _KEY_WIFI_STA_SSID) &&
+		_storage->hasKey(_PARTION_NET, _KEY_WIFI_STA_PASS)) ||
+		(_storage->hasKey(_PARTION_NET, _KEY_WIFI_AP_SSID) &&
+		_storage->hasKey(_PARTION_NET, _KEY_WIFI_AP_SSID)));
 }
 
 void settings::setApSsid(const std::string& val)
@@ -199,4 +201,15 @@ void settings::setStaPass(const std::string& val)
 void settings::setWifiMode(WifiMode val)
 {
 	setInt(_PARTION_NET, _KEY_WIFI_MODE, std::to_underlying(val));
+}
+
+void settings::clearWifi()
+{
+	_storage->clearValue(_PARTION_NET, _KEY_WIFI_MODE);
+
+	_storage->clearValue(_PARTION_NET, _KEY_WIFI_STA_SSID);
+	_storage->clearValue(_PARTION_NET, _KEY_WIFI_STA_PASS);
+	
+	_storage->clearValue(_PARTION_NET, _KEY_WIFI_AP_SSID);
+	_storage->clearValue(_PARTION_NET, _KEY_WIFI_AP_PASS);
 }

@@ -107,3 +107,16 @@ bool NvsStorage::readValue(std::string_view partition, std::string_view key, int
 
 	return err == ESP_OK;
 }
+
+void NvsStorage::clearValue(std::string_view partition, std::string_view key)
+{
+	esp_err_t err = ESP_OK;
+	auto hndl = nvs::open_nvs_handle(partition.cbegin(), NVS_READWRITE, &err);
+	if(!hndl){
+		return;
+	}
+
+	err = hndl->erase_item(key.cbegin());
+
+	FB_DEBUG_LOG_I_OBJ("Erase key: %s -> %d", key.cbegin(), static_cast<int>(err));
+}
