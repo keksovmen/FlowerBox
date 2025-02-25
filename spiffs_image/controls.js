@@ -45,7 +45,10 @@ async function change_color(event) {
 
 	request_in_progress = true;
 
-	var color = parseInt(document.getElementById("color").value.substr(1), 16);
+	var rgb_color = parseInt(document.getElementById("color").value.substr(1), 16);
+	var white_color = parseInt(document.getElementById("white_color").value, 10);
+	var color = (white_color << 24) + rgb_color
+	
 	var id = document.getElementById("id_color").value;
 
 	if (event.type == "click") {

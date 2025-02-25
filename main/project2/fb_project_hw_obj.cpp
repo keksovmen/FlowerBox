@@ -10,7 +10,6 @@
 
 #define _MP3_PIN_TX 19
 #define _MP3_PIN_RX 18
-#define _MP3_PIN_RTS 15
 #define _MP3_UART_PORT UART_NUM_1
 
 #define _DMX_TX 22
@@ -51,7 +50,7 @@ static const char* TAG = "hw";
 static void _dmx_send_task(void* arg)
 {
 	FB_DEBUG_LOG_I_TAG("Started DMX send task");
-	
+
 	for(;;)
 	{
 		dmx_send(_DMX_UART_PORT);

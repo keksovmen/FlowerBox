@@ -26,6 +26,10 @@
 
 			<label for="value">RGB</label>
 			<input id="color" name="value" type="color" oninput="change_color(event)">
+
+			<label for="white_color">White color</label>
+			<input id="white_color" name="white_value" type="range" min="0" max="255" oninput="change_color(event)" list="byte_marks">
+
 			<div class="button" onclick="change_color(event)">Change color</div>
 			<div class="button" onclick="turn_on(event)">Turn RGB on</div>
 			<div class="button" onclick="turn_off(event)">Turn RGB off</div>
@@ -38,6 +42,14 @@
 			<label for="volume">Volume</label>
 			<input id="volume" name="volume" value="{{ puti volume_val }}" type="number" min="0" max="30">
 			<div class="button" onclick="set_volume(event)">Set volume</div>
+
+			<datalist id="byte_marks">
+				<option value="0" label="0"></option>
+				<option value="64" label="25"></option>
+				<option value="127" label="50"></option>
+				<option value="191" label="75"></option>
+				<option value="255" label="100"></option>
+			</datalist>
 		</div>
 	</div>
 </body>
