@@ -93,3 +93,80 @@ void RgbSwitch::_action(SwitchIface* me, bool value)
 		ptr->_applyColor(0);
 	}
 }
+
+
+
+RgbSwitchDmx::RgbSwitchDmx(dmx_port_t port, int gpioRX, int gpioTX, int gpioRTS)
+	: SwitchIface(&_condition, &_action),
+	_dmx(port), _gpioRX(gpioRX), _gpioTX(gpioTX), _gpioRTS(gpioRTS)
+{
+	
+}
+
+RgbSwitchDmx::~RgbSwitchDmx()
+{
+	dmx_driver_delete(_dmx);
+}
+
+const char* RgbSwitchDmx::getName() const
+{
+	return "RgbSwitchDmx";
+}
+
+void RgbSwitchDmx::init()
+{
+	dmx_config_t config = DMX_CONFIG_DEFAULT;
+	config.queue_size_max = 0;
+	
+	// ...install the DMX driver...
+	dmx_driver_install(_dmx, &config, NULL, 0);
+	dmx_set_pin(_dmx, _gpioTX, _gpioRX, _gpioRTS);
+	dmx_set_baud_rate(_dmx, 250000);
+	dmx_set_break_len(_dmx, 88);
+	dmx_set_mab_len(_dmx, 8);
+}
+
+void RgbSwitchDmx::setColor(int color)
+{
+	_color = color;
+
+	if(isOn()){
+		_applyColor(getColor());
+	}
+}
+
+int RgbSwitchDmx::getColor() const
+{
+	return _color;
+}
+
+void RgbSwitchDmx::_applyColor(int color)
+{
+	const uint8_t white = (color >> 24) & 0xFF;
+	const uint8_t red = (color >> 16) & 0xFF;
+	const uint8_t green = (color >> 8) & 0xFF;
+	const uint8_t blue = color & 0xFF;
+
+	FB_DEBUG_LOG_I_OBJ("Apply color: R = %u, G = %u, B = %u, W = %u", red, green, blue, white);
+
+	uint8_t packet[4] = {red, green, blue, white};
+
+	dmx_write_slot(_dmx, 0, 0);
+	dmx_write_offset(_dmx, _address, packet, sizeof(packet));
+}
+
+bool RgbSwitchDmx::_condition(SwitchIface* me)
+{
+	return false;
+}
+
+void RgbSwitchDmx::_action(SwitchIface* me, bool value)
+{
+	RgbSwitchDmx* ptr = reinterpret_cast<RgbSwitchDmx*>(me);
+
+	if(value){
+		ptr->_applyColor(ptr->getColor());
+	}else{
+		ptr->_applyColor(0);
+	}
+}
