@@ -1,8 +1,10 @@
 #include "fb_project_maper_obj.hpp"
 
+#include "fb_globals.hpp"
 #include "fb_project_box_obj.hpp"
 #include "fb_project_hw_obj.hpp"
 #include "fb_project_settings.hpp"
+#include "fb_settings.hpp"
 #include "fb_switch.hpp"
 
 
@@ -100,6 +102,22 @@ static void _init_box_properties()
 	getBox().addProperty(std::unique_ptr<box::PropertyIface>(currentTimeProp));
 	getBox().addPropertyDependency(currentTimeProp->getId());
 
+	auto* settingsProp = new box::PropertyNone(box::Tid::PROPERTY_SYSTEM_RESET_SETTINGS,
+		[](auto val){
+			settings::clearWifi();
+			return true;
+		});
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(settingsProp));
+	getBox().addPropertyDependency(settingsProp->getId());
+
+
+	auto* restartProp = new box::PropertyNone(box::Tid::PROPERTY_SYSTEM_RESTART,
+		[](auto val){
+			global::getTimeScheduler()->addActionDelayed([](){esp_restart();}, 5000, portMAX_DELAY);
+			return true;
+		});
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(restartProp));
+	getBox().addPropertyDependency(restartProp->getId());
 }
 
 

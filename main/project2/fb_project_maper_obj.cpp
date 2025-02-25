@@ -2,8 +2,10 @@
 
 #include <ranges>
 
+#include "fb_globals.hpp"
 #include "fb_project_box_obj.hpp"
 #include "fb_project_hw_obj.hpp"
+#include "fb_settings.hpp"
 #include "fb_switch.hpp"
 
 
@@ -84,6 +86,28 @@ static void _initMp3Sensor()
 	getBoxMp3Sensor().addPropertyDependency(volumeProperty->getId());
 }
 
+static void _init_box_properties()
+{
+	auto* settingsProp = new box::PropertyNone(box::Tid::PROPERTY_SYSTEM_RESET_SETTINGS,
+		[](auto val){
+			settings::clearWifi();
+			return true;
+		});
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(settingsProp));
+	getBox().addPropertyDependency(settingsProp->getId());
+
+
+	auto* restartProp = new box::PropertyNone(box::Tid::PROPERTY_SYSTEM_RESTART,
+		[](auto val){
+			global::getTimeScheduler()->addActionDelayed([](){esp_restart();}, 5000, portMAX_DELAY);
+			return true;
+		});
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(restartProp));
+	getBox().addPropertyDependency(restartProp->getId());
+}
+
+
+
 void project::initMaperObjs()
 {
 	getBox().addSwitch(&_boxRgbSwitch);
@@ -91,6 +115,7 @@ void project::initMaperObjs()
 
 	_initRgbSwitch();
 	_initMp3Sensor();
+	_init_box_properties();
 }
 
 int project::mapBoxSensorIdToAddres(int id)

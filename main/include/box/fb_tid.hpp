@@ -36,6 +36,9 @@ namespace fb
 
 			PROPERTY_SYSTEM_TIME,
 
+			PROPERTY_SYSTEM_RESET_SETTINGS,
+			PROPERTY_SYSTEM_RESTART,
+
 			MAX
 		};
 
@@ -111,6 +114,12 @@ namespace fb
 
 					case Tid::PROPERTY_SYSTEM_TIME:
 						return {"Current system time", "Unix time since 1970", "int", "0", "4294967295"};
+
+					case Tid::PROPERTY_SYSTEM_RESET_SETTINGS:
+						return {"Reset settings", "Deletes all WIFI settings", "none", "0", "0"};
+
+					case Tid::PROPERTY_SYSTEM_RESTART:
+						return {"System restart", "Restarts the system", "none", "0", "0"};
 
 					default:
 						// abort();
