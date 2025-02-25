@@ -23,6 +23,7 @@ namespace fb
 			STA_DISCONNECTED,	//when disconnected from AP
 			SCAN_FINISHED,		//when successfully finished
 			SCAN_FAILED,		//when scan failed
+			AP_STARTED,			//when AP starts up
 		};
 		bool operator==(int val, WifiEventId id);
 

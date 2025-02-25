@@ -41,6 +41,10 @@ void StateWifiInit::handleEvent(const event::Event& event)
 			//TODO:
 			//go to provision state
 			//or try again until network is provided
+		}else if(event.eventId == wifi::WifiEventId::AP_STARTED){
+			//we are working as AP so go to next state ignoring time init???
+			//for now let say at AP we do not have init clock source
+			global::getEventManager()->pushEvent(event::Event{fb::event::EventGroup::TRANSITION, 0, nullptr});
 		}
 	}
 }

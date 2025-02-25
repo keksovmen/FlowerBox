@@ -64,7 +64,7 @@ static void _on_sta_got_ip(void *arg, esp_event_base_t event_base,
 	ESP_LOGI(TAG, "Got IPv4 event: Interface \"%s\" address: " IPSTR, esp_netif_get_desc(event->esp_netif), IP2STR(&event->ip_info.ip));
 	ESP_LOGI(TAG, "- IPv4 address: " IPSTR ",", IP2STR(&event->ip_info.ip));
 
-	global::getEventManager()->pushEvent({event::EventGroup::WIFI, static_cast<int>(WifiEventId::CONNECTED), NULL});
+	global::getEventManager()->pushEvent({event::EventGroup::WIFI, std::to_underlying(WifiEventId::CONNECTED), NULL});
 }
 
 
@@ -97,9 +97,17 @@ static void _on_ap_gave_ip(void *arg, esp_event_base_t event_base,
 
 	ESP_LOGI(TAG, "Provided IPv4, event: Interface \"%s\", AID = %d, address: " IPSTR, esp_netif_get_desc(event->esp_netif), aid, IP2STR(&event->ip));
 
-	global::getEventManager()->pushEvent({event::EventGroup::WIFI, static_cast<int>(WifiEventId::CONNECTED), NULL});
+	global::getEventManager()->pushEvent({event::EventGroup::WIFI, std::to_underlying(WifiEventId::CONNECTED), NULL});
 }
 
+static void _on_wifi_ap_start(void *arg, esp_event_base_t event_base,
+							   int32_t event_id, void *event_data)
+{
+	FB_DEBUG_LOG_I_TAG("AP started");
+
+	global::getEventManager()->pushEvent({event::EventGroup::WIFI, std::to_underlying(WifiEventId::AP_STARTED), NULL});
+
+}
 
 
 // static esp_err_t _sta_disconnect()
@@ -193,6 +201,7 @@ static void _launchWifi(const WifiConfig& cfg)
 		_netif = esp_netif_create_default_wifi_ap();
 
 		ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, WIFI_EVENT_AP_STADISCONNECTED, &_on_wifi_ap_disconnect, NULL));
+		ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, WIFI_EVENT_AP_START, &_on_wifi_ap_start, NULL));
 		ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_AP_STAIPASSIGNED, &_on_ap_gave_ip, NULL));
 
 	}else{
