@@ -18,7 +18,7 @@ namespace fb
 
 		sensor::Mp3Sensor& getHwMp3Sensor();
 
-		switches::RgbSwitch& getHwRgbSwitch();
+		switches::RgbSwitchDmx& getHwRgbSwitch();
 
 		sensor::SensorService& getHwSensorService();
 		switches::SwitchService& getHwSwitchService();

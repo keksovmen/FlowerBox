@@ -1,13 +1,16 @@
 #include "fb_project_hw_obj.hpp"
 
+#include <cstring>
+
 #include "fb_pins.hpp"
 
 #include "esp_dmx.h"
 
 
 
-#define _MP3_PIN_TX 18
-#define _MP3_PIN_RX 19
+#define _MP3_PIN_TX 19
+#define _MP3_PIN_RX 18
+#define _MP3_PIN_RTS 15
 #define _MP3_UART_PORT UART_NUM_1
 
 #define _DMX_TX 22
@@ -15,6 +18,8 @@
 #define _DMX_RTS 21
 #define _DMX_UART_PORT UART_NUM_2
 
+#define _DMX_TASK_STACK 4 * 1024
+#define _DMX_TASK_PRIORITY 20
 
 
 
@@ -27,8 +32,7 @@ using namespace project;
 static sensor::Mp3Sensor _mp3Sensor(_MP3_UART_PORT, _MP3_PIN_RX, _MP3_PIN_TX);
 
 // //переключатели туть
-static switches::RgbSwitch _rgbSwitch(LEDC_TIMER_0, LEDC_CHANNEL_0,
-			pins::PIN_RED_LED, pins::PIN_GREEN_LED, pins::PIN_BLUE_LED);
+static switches::RgbSwitchDmx _rgbSwitch(_DMX_UART_PORT, _DMX_RX, _DMX_TX, _DMX_RTS);
 			
 
 // //сервисы туть
@@ -40,25 +44,75 @@ static sensor::SensorStorage _sensorStorage;
 
 
 
+static const char* TAG = "hw";
+
+
+
+static void _dmx_send_task(void* arg)
+{
+	FB_DEBUG_LOG_I_TAG("Started DMX send task");
+	
+	for(;;)
+	{
+		dmx_send(_DMX_UART_PORT);
+		// uint8_t data[DMX_PACKET_SIZE];
+		// dmx_packet_t packet;
+
+		// int size = dmx_receive(_MP3_UART_PORT, &packet, DMX_TIMEOUT_TICK);
+		// if(size > 0){
+		// 	dmx_read(_MP3_UART_PORT, data, size);
+		// 	FB_DEBUG_LOG_I_TAG("Read from DMX: err = %d, rdm = %d, sc = %d, size = %d", static_cast<int>(packet.err), packet.is_rdm, packet.sc, packet.size);
+		// 	FB_DEBUG_LOG_I_TAG("Read from DMX: R=%u, G=%u, B=%u", data[1], data[2], data[3]);
+		// }else{
+		// 	FB_DEBUG_LOG_W_TAG("NOTHING TO RECEIVE");
+		// 	vTaskDelay(pdMS_TO_TICKS(1000));
+		// }
+	}
+
+	vTaskDelete(NULL);
+}
+
 void project::initHwObjs()
 {
 	_sensorService.addSensor(&getHwMp3Sensor());
 
 	_swithService.addSwitch(&getHwRgbSwitch());
 
-	// First, use the default DMX configuration...
-	dmx_config_t config = DMX_CONFIG_DEFAULT;
+	_rgbSwitch.init();
+
+	// _rgbSwitch.setForseFlag(switches::SwitchForseState::ON);
+	// _rgbSwitch.check();
+
+	// for(;;){
+	// 	for(int slot = 0; slot < 8; slot++){
+	// 		FB_DEBUG_LOG_I_TAG("Writing slot %d", slot);
+
+	// 		for(int val = 0; val < 255; val++){
+	// 			dmx_write_slot(_DMX_UART_PORT, 0, 0);
+	// 			dmx_write_slot(_DMX_UART_PORT, 1 + slot, val);
+	// 			dmx_send(_DMX_UART_PORT);
+	// 		}
+	// 	}
+	// }
+
+
+	// // First, use the default DMX configuration...
+	// dmx_config_t config = DMX_CONFIG_DEFAULT;
 	
-	// ...declare the driver's DMX personalities...
-	const int personality_count = 1;
-	dmx_personality_t personalities[] = {
-		{1, "Default Personality"}
-	};
+	// // ...declare the driver's DMX personalities...
+	// const int personality_count = 1;
+	// dmx_personality_t personalities[] = {
+	// 	{1, "Default Personality"}
+	// };
 	
-	// ...install the DMX driver...
-	dmx_driver_install(_DMX_UART_PORT, &config, personalities, personality_count);
+	// // ...install the DMX driver...
+	// // dmx_driver_install(_DMX_UART_PORT, &config, personalities, personality_count);
+	// dmx_driver_install(_MP3_UART_PORT, &config, personalities, personality_count);
 	
-	dmx_set_pin(_DMX_UART_PORT, _DMX_TX, _DMX_RX, _DMX_RTS);
+	// // dmx_set_pin(_DMX_UART_PORT, _DMX_TX, _DMX_RX, _DMX_RTS);
+	// dmx_set_pin(_MP3_UART_PORT, _MP3_PIN_TX, _MP3_PIN_RX, _MP3_PIN_RTS);
+
+	xTaskCreate(&_dmx_send_task, "DMX_READER", _DMX_TASK_STACK, NULL, _DMX_TASK_PRIORITY, NULL);
 }
 
 sensor::Mp3Sensor& project::getHwMp3Sensor()
@@ -66,7 +120,7 @@ sensor::Mp3Sensor& project::getHwMp3Sensor()
 	return _mp3Sensor;
 }
 
-switches::RgbSwitch& project::getHwRgbSwitch()
+switches::RgbSwitchDmx& project::getHwRgbSwitch()
 {
 	return _rgbSwitch;
 }
