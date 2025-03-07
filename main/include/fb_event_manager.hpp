@@ -28,6 +28,7 @@ namespace fb
 			UPDATE,
 			SENSOR,
 			PROVISION,
+			KEYBOARD,
 		};
 
 
@@ -37,6 +38,27 @@ namespace fb
 			EventGroup groupId;
 			int eventId;		//см различные .hpp файлы зависящие от группы
 			void* data;
+			bool freeMemory;	//если true то на data будет вызвано delete в конце жизни
+
+
+
+			explicit Event() :
+				groupId(EventGroup::BOOT), eventId(0), data(NULL), freeMemory(false)
+			{
+
+			}
+
+			Event(EventGroup gId, int eId, void* d) :
+				groupId(gId), eventId(eId), data(d), freeMemory(false)
+			{
+
+			}
+
+			Event(EventGroup gId, int eId, void* d, bool freeFlag) :
+				groupId(gId), eventId(eId), data(d), freeMemory(freeFlag)
+			{
+
+			}
 		};
 
 
