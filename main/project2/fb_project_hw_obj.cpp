@@ -12,8 +12,8 @@
 #define _MP3_PIN_RX 18
 #define _MP3_UART_PORT UART_NUM_1
 
-#define _DMX_TX 22
-#define _DMX_RX 23
+#define _DMX_TX 23
+#define _DMX_RX 22
 #define _DMX_RTS 21
 #define _DMX_UART_PORT UART_NUM_2
 
