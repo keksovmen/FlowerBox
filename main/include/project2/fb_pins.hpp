@@ -19,5 +19,8 @@ namespace fb
 		static constexpr int PIN_DMX_TX = 23;
 		static constexpr int PIN_DMX_RX = 22;
 		static constexpr int PIN_DMX_RTS = 21;
+
+		//keyboard
+		static constexpr int PIN_KEYBOARD_RESET = 0;
 	}
 }

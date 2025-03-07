@@ -2,6 +2,7 @@
 
 #include <cstring>
 
+#include "fb_globals.hpp"
 #include "fb_pins.hpp"
 
 #include "esp_dmx.h"
@@ -24,6 +25,7 @@ using namespace project;
 
 //сенсоры туть
 static sensor::Mp3Sensor _mp3Sensor(_MP3_UART_PORT, pins::PIN_MP3_RX, pins::PIN_MP3_TX);
+static sensor::KeyboardSensor<1> _keyboardSensor({std::pair{pins::PIN_KEYBOARD_RESET, h::ButtonVK::VK_0}});
 
 // //переключатели туть
 static switches::RgbSwitchDmx _rgbSwitch(_DMX_UART_PORT, pins::PIN_DMX_RX, pins::PIN_DMX_TX, pins::PIN_DMX_RTS);
@@ -69,6 +71,7 @@ static void _dmx_send_task(void* arg)
 void project::initHwObjs()
 {
 	_sensorService.addSensor(&getHwMp3Sensor());
+	_sensorService.addSensor(&getHwKeyboardSensor());
 
 	_swithService.addSwitch(&getHwRgbSwitch());
 
@@ -112,6 +115,11 @@ void project::initHwObjs()
 sensor::Mp3Sensor& project::getHwMp3Sensor()
 {
 	return _mp3Sensor;
+}
+
+sensor::KeyboardSensor<1>& project::getHwKeyboardSensor()
+{
+	return _keyboardSensor;
 }
 
 switches::RgbSwitchDmx& project::getHwRgbSwitch()
