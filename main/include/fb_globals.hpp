@@ -7,7 +7,6 @@
 #include "fb_box.hpp"
 #include "fb_event_manager.hpp"
 #include "fb_id.hpp"
-#include "fb_pins.hpp"
 #include "fb_sensor_service.hpp"
 #include "fb_sensor_storage.hpp"
 #include "fb_sensor_store_service.hpp"
@@ -27,7 +26,6 @@ namespace fb
 
 
 		event::EventManager* getEventManager();
-		pins::PinManager* getPinManager();
 		state::StateManager* getStateManager();
 
 		id::UniqueId getUniqueId();

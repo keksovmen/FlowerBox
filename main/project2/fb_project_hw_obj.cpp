@@ -8,13 +8,8 @@
 
 
 
-#define _MP3_PIN_TX 19
-#define _MP3_PIN_RX 18
 #define _MP3_UART_PORT UART_NUM_1
 
-#define _DMX_TX 23
-#define _DMX_RX 22
-#define _DMX_RTS 21
 #define _DMX_UART_PORT UART_NUM_2
 
 #define _DMX_TASK_STACK 4 * 1024
@@ -28,10 +23,10 @@ using namespace project;
 
 
 //сенсоры туть
-static sensor::Mp3Sensor _mp3Sensor(_MP3_UART_PORT, _MP3_PIN_RX, _MP3_PIN_TX);
+static sensor::Mp3Sensor _mp3Sensor(_MP3_UART_PORT, pins::PIN_MP3_RX, pins::PIN_MP3_TX);
 
 // //переключатели туть
-static switches::RgbSwitchDmx _rgbSwitch(_DMX_UART_PORT, _DMX_RX, _DMX_TX, _DMX_RTS);
+static switches::RgbSwitchDmx _rgbSwitch(_DMX_UART_PORT, pins::PIN_DMX_RX, pins::PIN_DMX_TX, pins::PIN_DMX_RTS);
 			
 
 // //сервисы туть
@@ -108,8 +103,8 @@ void project::initHwObjs()
 	// // dmx_driver_install(_DMX_UART_PORT, &config, personalities, personality_count);
 	// dmx_driver_install(_MP3_UART_PORT, &config, personalities, personality_count);
 	
-	// // dmx_set_pin(_DMX_UART_PORT, _DMX_TX, _DMX_RX, _DMX_RTS);
-	// dmx_set_pin(_MP3_UART_PORT, _MP3_PIN_TX, _MP3_PIN_RX, _MP3_PIN_RTS);
+	// // dmx_set_pin(_DMX_UART_PORT, PIN_DMX_TX, PIN_DMX_RX, PIN_DMX_RTS);
+	// dmx_set_pin(_MP3_UART_PORT, PIN_MP3_TX, PIN_MP3_RX, _MP3_PIN_RTS);
 
 	xTaskCreate(&_dmx_send_task, "DMX_READER", _DMX_TASK_STACK, NULL, _DMX_TASK_PRIORITY, NULL);
 }

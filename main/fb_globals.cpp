@@ -33,7 +33,6 @@ static const char* TAG = "globals";
 
 //сервисы туть
 static event::EventManager _eventManager;
-static pins::PinManager _pinManager;
 static state::StateManager _stateManager("STATE_MANAGER");
 
 
@@ -75,11 +74,6 @@ void global::init()
 event::EventManager* global::getEventManager()
 {
 	return &_eventManager;
-}
-
-pins::PinManager* global::getPinManager()
-{
-	return &_pinManager;
 }
 
 state::StateManager* global::getStateManager()
