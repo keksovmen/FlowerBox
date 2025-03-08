@@ -48,6 +48,7 @@ idf_component_register(
 		"fb_service_iface.cpp"
 		"fb_provision.cpp"
 		"fb_time_scheduler.cpp"
+"fb_keyboard_handler.cpp"
 "h_keyboard.cpp"
 		"main.cpp"
 		"box/fb_box.cpp"

@@ -3,6 +3,7 @@
 #include <cstring>
 
 #include "fb_globals.hpp"
+#include "fb_keyboard_handler.hpp"
 #include "fb_pins.hpp"
 
 #include "esp_dmx.h"
@@ -38,6 +39,9 @@ static switches::SwitchService _swithService;
 //склады туть
 static sensor::SensorStorage _sensorStorage;
 
+//прочее туть
+static keyboard::KeyboardHandler _keyboardHandler;
+
 
 
 static const char* TAG = "hw";
@@ -70,12 +74,15 @@ static void _dmx_send_task(void* arg)
 
 void project::initHwObjs()
 {
-	_sensorService.addSensor(&getHwMp3Sensor());
+	// _sensorService.addSensor(&getHwMp3Sensor());
 	_sensorService.addSensor(&getHwKeyboardSensor());
 
 	_swithService.addSwitch(&getHwRgbSwitch());
 
 	_rgbSwitch.init();
+
+	//register key handler for dropping WIFI settings
+	global::getEventManager()->attachListener(&_keyboardHandler);
 
 	// _rgbSwitch.setForseFlag(switches::SwitchForseState::ON);
 	// _rgbSwitch.check();

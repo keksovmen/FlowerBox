@@ -1,5 +1,7 @@
 #include "fb_project_hw_obj.hpp"
 
+#include "fb_globals.hpp"
+#include "fb_keyboard_handler.hpp"
 #include "fb_pins.hpp"
 #include "fb_project_settings.hpp"
 
@@ -28,6 +30,9 @@ static switches::SwitchService _swithService;
 //склады туть
 static sensor::SensorStorage _sensorStorage;
 
+//прочее туть
+static keyboard::KeyboardHandler _keyboardHandler;
+
 
 
 static void _init_from_settings()
@@ -50,6 +55,9 @@ void project::initHwObjs()
 
 	//init from settings
 	_init_from_settings();
+
+	//register key handler for dropping WIFI settings
+	global::getEventManager()->attachListener(&_keyboardHandler);
 }
 
 sensor::TemperatureSensorArrayI& project::getHwTempSensors()
