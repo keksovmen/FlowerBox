@@ -14,19 +14,12 @@ using namespace switches;
 TimeSwitch::TimeSwitch(
 	const clock::Time& startTime,
 	const clock::Time& endTime,
-	int gpio
+	wrappers::WrapperIface* wrapper
 )
 	: SwitchIface(&TimeSwitch::_condition, &TimeSwitch::_action),
-	_startTime(startTime), _endTime(endTime), _gpio(gpio)
+	_startTime(startTime), _endTime(endTime), _wrapper(wrapper)
 {
-	gpio_config_t cfg = {
-		.pin_bit_mask = 1ULL << gpio,
-		.mode = GPIO_MODE_OUTPUT,
-		.pull_up_en = GPIO_PULLUP_DISABLE,
-		.pull_down_en = GPIO_PULLDOWN_DISABLE,
-		.intr_type = GPIO_INTR_DISABLE,
-	};
-	assert(gpio_config(&cfg) == ESP_OK);
+	wrapper->init();
 }
 
 const char* TimeSwitch::getName() const
@@ -80,6 +73,5 @@ bool TimeSwitch::_condition(SwitchIface* me)
 void TimeSwitch::_action(SwitchIface* me, bool value)
 {
 	TimeSwitch* mePtr = reinterpret_cast<TimeSwitch*>(me);
-
-	gpio_set_level(static_cast<gpio_num_t>(mePtr->_gpio), value ? 1 : 0);
+	mePtr->_wrapper->setValue(value);
 }

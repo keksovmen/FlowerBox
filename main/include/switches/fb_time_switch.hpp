@@ -4,6 +4,7 @@
 
 #include "fb_clock.hpp"
 #include "fb_switch_iface.hpp"
+#include "fb_wrappers.hpp"
 
 
 
@@ -17,7 +18,7 @@ namespace fb
 				TimeSwitch(
 					const clock::Time& startTime,
 					const clock::Time& endTime,
-					int gpio);
+					wrappers::WrapperIface* wrapper);
 
 				virtual const char* getName() const override;
 
@@ -30,7 +31,7 @@ namespace fb
 			private:
 				clock::Time _startTime;
 				clock::Time _endTime;
-				int _gpio;
+				wrappers::WrapperIface* _wrapper;
 
 
 				bool _isOverflow() const;

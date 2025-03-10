@@ -60,9 +60,9 @@ namespace h
 
 	struct ButtonAction
 	{
-		const ButtonKeys button;
-		const uint32_t holdMs;			//на момент генерации события
-		const ButtonMovement movement;
+		ButtonKeys button;
+		uint32_t holdMs;			//на момент генерации события
+		ButtonMovement movement;
 
 
 		bool isJustPressed(ButtonKeys key) const {

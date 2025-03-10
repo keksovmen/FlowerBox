@@ -35,7 +35,7 @@ bool KeyboardSensor<N>::_doInit()
 		h::ButtonAction* eventData = (h::ButtonAction*) std::malloc(sizeof(h::ButtonAction));
 		assert(eventData);
 
-		memcpy(eventData, &val, sizeof(val));
+		*eventData = val;
 
 		event::Event e (
 			event::EventGroup::KEYBOARD,
