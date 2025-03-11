@@ -129,6 +129,41 @@ std::string PropertyInt::_valueToString(int val) const
 
 
 
+PropertyFloat::PropertyFloat(
+	std::string name,
+	std::string description,
+	Tid tid,
+	ActionSet action,
+	float value,
+	float minValue,
+	float maxValue
+)
+	: PropertyBase(name, description, tid, action, value),
+	_minValue(minValue), _maxValue(maxValue)
+{
+
+}
+
+PropertyFloat::PropertyFloat(Tid tid, ActionSet action, float value)
+	: PropertyBase(tidToName(tid), tidToDescription(tid), tid, action, value),
+	_minValue(std::atof(tidToMinValue(tid))),
+	_maxValue(std::atof(tidToMaxValue(tid)))
+{
+	
+}
+
+std::pair<bool, float> PropertyFloat::_strToValue(const std::string& str) const
+{
+	return {true, std::atof(str.c_str())};
+}
+
+std::string PropertyFloat::_valueToString(float val) const
+{
+	return std::to_string(val);
+}
+
+
+
 PropertyString::PropertyString(
 			std::string name,
 			std::string description,

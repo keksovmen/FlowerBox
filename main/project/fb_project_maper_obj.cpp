@@ -45,6 +45,7 @@ static void _init_light_switch()
 {
 	_create_and_register_forse_property(getHwLightSwitch(), _boxLightSwitch);
 
+
 	auto* startTimeProp = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_LIGHT_ON,
 		[](int val){
 			getHwLightSwitch().setStartTime(val);
@@ -75,6 +76,44 @@ static void _init_light_switch()
 	_boxLightSwitch.addPropertyDependency(endTimeProp->getId());
 }
 
+static void _init_heat_switch()
+{
+	_create_and_register_forse_property(getHwHeatSwitch(), _boxHeatSwitch);
+	_boxHeatSwitch.addSensorDependency(getBoxInsideTempSensor().getId());
+
+
+	auto* lowTempProperty = new box::PropertyFloat(box::Tid::PROPERTY_SWITCH_LOW_TEMP,
+		[](float val){
+			getHwHeatSwitch().setLowValue(val);
+			//TODO: maybe put store in to swith iface somehow
+			//maybe chain of responsibility or composite
+			settings::setHeaterLowTemp(val);
+
+			return true;
+		},
+		getHwHeatSwitch().getLowValue()
+	);
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(lowTempProperty));
+	_boxHeatSwitch.addPropertyDependency(lowTempProperty->getId());
+
+
+	auto* highTempProperty = new box::PropertyFloat(box::Tid::PROPERTY_SWITCH_HIGH_TEMP,
+		[](float val){
+			getHwHeatSwitch().setHighValue(val);
+			//TODO: maybe put store in to swith iface somehow
+			//maybe chain of responsibility or composite
+			settings::setHeaterHighTemp(val);
+
+			return true;
+		},
+		getHwHeatSwitch().getHighValue()
+	);
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(highTempProperty));
+	_boxHeatSwitch.addPropertyDependency(highTempProperty->getId());
+}
+
 static void _init_fan_switch()
 {
 	_create_and_register_forse_property(getHwFanSwitch(), _boxFanSwitch);
@@ -87,11 +126,43 @@ static void _init_fan_switch()
 
 			return true;
 		},
-		static_cast<int>(getHwFanSwitch().getSpeed())
+		getHwFanSwitch().getSpeed()
 	);
 
 	getBox().addProperty(std::unique_ptr<box::PropertyIface>(speedPwmProperty));
 	_boxFanSwitch.addPropertyDependency(speedPwmProperty->getId());
+
+
+	auto* lowTempProperty = new box::PropertyFloat(box::Tid::PROPERTY_SWITCH_LOW_TEMP,
+		[](float val){
+			getHwFanSwitch().setLowValue(val);
+			//TODO: maybe put store in to swith iface somehow
+			//maybe chain of responsibility or composite
+			settings::setFanLowTemp(val);
+
+			return true;
+		},
+		getHwFanSwitch().getLowValue()
+	);
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(lowTempProperty));
+	_boxFanSwitch.addPropertyDependency(lowTempProperty->getId());
+
+
+	auto* highTempProperty = new box::PropertyFloat(box::Tid::PROPERTY_SWITCH_HIGH_TEMP,
+		[](float val){
+			getHwFanSwitch().setHighValue(val);
+			//TODO: maybe put store in to swith iface somehow
+			//maybe chain of responsibility or composite
+			settings::setFanHighTemp(val);
+
+			return true;
+		},
+		getHwFanSwitch().getHighValue()
+	);
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(highTempProperty));
+	_boxFanSwitch.addPropertyDependency(highTempProperty->getId());
 }
 
 static void _init_box_properties()
@@ -149,11 +220,7 @@ void project::initMaperObjs()
 
 
 	_init_light_switch();
-
-	_create_and_register_forse_property(getHwHeatSwitch(), _boxHeatSwitch);
-	_boxHeatSwitch.addSensorDependency(getBoxInsideTempSensor().getId());
-
-	
+	_init_heat_switch();
 	_init_fan_switch();
 
 	_init_box_properties();

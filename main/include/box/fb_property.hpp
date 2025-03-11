@@ -95,6 +95,33 @@ namespace fb
 		};
 
 
+
+		class PropertyFloat : public PropertyBase<float>
+		{
+			public:
+				PropertyFloat(
+					std::string name,
+					std::string description,
+					Tid tid,
+					ActionSet action,
+					float value,
+					float minValue,
+					float maxValue
+				);
+
+				PropertyFloat(Tid tid, ActionSet action, float value);
+
+			private:
+				const float _minValue;
+				const float _maxValue;
+
+
+				
+				std::pair<bool, float> _strToValue(const std::string& str) const override;
+				std::string _valueToString(float val) const override;
+		};
+
+
 		/*
 		class PropertyFloat : public PropertyBase<float>
 		{

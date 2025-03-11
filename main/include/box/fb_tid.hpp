@@ -40,6 +40,8 @@ namespace fb
 			PROPERTY_SYSTEM_RESTART,
 
 			PROPERTY_SWITCH_SPEED,
+			PROPERTY_SWITCH_LOW_TEMP,
+			PROPERTY_SWITCH_HIGH_TEMP,
 
 			MAX
 		};
@@ -125,6 +127,12 @@ namespace fb
 
 					case Tid::PROPERTY_SWITCH_SPEED:
 						return {"Switch speed", "PWM ", "int", "0", "100"};
+
+					case Tid::PROPERTY_SWITCH_LOW_TEMP:
+						return {"Switch's low temperature", "Determines lowest possible temperature", "float", "-100.0", "100.0"};
+
+					case Tid::PROPERTY_SWITCH_HIGH_TEMP:
+						return {"Switch's high temperature", "Determines highest possible temperature", "float", "-100.0", "100.0"};
 
 					default:
 						// abort();

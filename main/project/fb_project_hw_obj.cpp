@@ -45,7 +45,13 @@ static void _init_from_settings()
 {
 	_switchLight.setStartTime(settings::getLightStartTime());
 	_switchLight.setEndTime(settings::getLightEndTime());
+
 	_switchFan.setSpeed(settings::getFanSpeed());
+	_switchFan.setLowValue(settings::getFanLowTemp());
+	_switchFan.setHighValue(settings::getFanHighTemp());
+
+	_switchHeating.setLowValue(settings::getHeaterLowTemp());
+	_switchHeating.setHighValue(settings::getHeaterHighTemp());
 }
 
 

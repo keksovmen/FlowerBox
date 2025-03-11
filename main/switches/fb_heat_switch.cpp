@@ -21,6 +21,16 @@ const char* RangeSwitch::getName() const
 	return "RangeSwitch";
 }
 
+void RangeSwitch::setLowValue(float value)
+{
+	_lowValue = value;
+}
+
+void RangeSwitch::setHighValue(float value)
+{
+	_highValue = value;
+}
+
 float RangeSwitch::getLowValue() const
 {
 	return _lowValue;

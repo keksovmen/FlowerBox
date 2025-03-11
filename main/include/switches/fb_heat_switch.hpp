@@ -29,6 +29,9 @@ namespace fb
 
 				virtual const char* getName() const override;
 
+				void setLowValue(float value);
+				void setHighValue(float value);
+
 				float getLowValue() const;
 				float getHighValue() const;
 
