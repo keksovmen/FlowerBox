@@ -59,14 +59,25 @@ namespace fb
 		class HeatSwitch : public RangeSwitch
 		{
 			public:
-				HeatSwitch(sensor::TemperatureSensor* sensor,
+				HeatSwitch(sensor::SensorIface* sensor,
 					float lowTemp, float highTemp, wrappers::WrapperIface* wrapper);
 
 				virtual const char* getName() const override;
 
+				/**
+				 * @brief Set the Speed
+				 * 
+				 * @param speed from 0 to 100 inclusive
+				 */
+
+				void setSpeed(int speed);
+
+				int getSpeed() const;
+
 			private:
-				const sensor::TemperatureSensor* _sensor;
+				const sensor::SensorIface* _sensor;
 				wrappers::WrapperIface* _wrapper;
+				int _speed = 1;
 		};
 
 
@@ -74,13 +85,13 @@ namespace fb
 		class FanSwitch : public HeatSwitch
 		{
 			public:
-				FanSwitch(sensor::TemperatureSensor* sensor,
+				FanSwitch(sensor::SensorIface* sensor,
 					float lowTemp, float highTemp, wrappers::WrapperIface* wrapper);
 
 				virtual const char* getName() const override;
 			
 			protected:
-				virtual bool _checkTemperature();
+				virtual bool _checkValues() override;
 
 		};
 	} // namespace switches

@@ -1,5 +1,7 @@
 #include "fb_wrappers.hpp"
 
+#include <cmath>
+
 
 
 using namespace fb;
@@ -45,8 +47,8 @@ void WrapperGpio::setValue(int value)
 
 bool WrapperPwm::_timer_states[] = {false};
 
-WrapperPwm::WrapperPwm(ledc_timer_t timer, ledc_channel_t channel, gpio_num_t gpio)
-	: _timer(timer), _channel(channel), _gpio(gpio)
+WrapperPwm::WrapperPwm(ledc_timer_t timer, ledc_channel_t channel, gpio_num_t gpio, bool highSpeed)
+	: _timer(timer), _channel(channel), _gpio(gpio), _isHighSpeed(highSpeed)
 {
 	
 }
@@ -58,7 +60,7 @@ void WrapperPwm::init()
 			.speed_mode = LEDC_LOW_SPEED_MODE,
 			.duty_resolution = LEDC_TIMER_8_BIT,
 			.timer_num = _timer,
-			.freq_hz = 4000,
+			.freq_hz = _isHighSpeed ? 300000ul : 4000,
 			.clk_cfg = LEDC_AUTO_CLK,
 			.deconfigure = false,
 		};
@@ -87,6 +89,14 @@ void WrapperPwm::setValue(bool value)
 
 void WrapperPwm::setValue(int value)
 {
-	ESP_ERROR_CHECK(ledc_set_duty(LEDC_LOW_SPEED_MODE, _channel, value));
+	const int duty = _valueToDuty(value);
+
+	ESP_ERROR_CHECK(ledc_set_duty(LEDC_LOW_SPEED_MODE, _channel, duty));
 	ESP_ERROR_CHECK(ledc_update_duty(LEDC_LOW_SPEED_MODE, _channel));
+}
+
+int WrapperPwm::_valueToDuty(int val)
+{
+	const float maxValue = 1 << (int) LEDC_TIMER_8_BIT;
+	return round((val / 100.0) * maxValue);
 }

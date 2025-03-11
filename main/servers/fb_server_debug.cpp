@@ -134,7 +134,7 @@ static int _logPrintf(const char* format, va_list args)
 		strcpy(color, "black");
 	}
 
-	char html[256];
+	char html[512];
 	const int result = sprintf(html, "<p style=\"color: %s;\">%.*s</p>", color, clear_size, tmp + sizeof(LOG_COLOR_I));
 
 	{

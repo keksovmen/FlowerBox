@@ -80,13 +80,13 @@ void RangeSwitch::_action(SwitchIface* me, bool value)
 
 
 
-HeatSwitch::HeatSwitch(sensor::TemperatureSensor* sens,
+HeatSwitch::HeatSwitch(sensor::SensorIface* sens,
 	float onTemp, float offTemp, wrappers::WrapperIface* wrapper
 )
 	: RangeSwitch(onTemp, offTemp,
 		[this](){return _sensor->getValue() == sensor::TemperatureSensor::InvalidValue ?
 			RangeSwitch::INVALID_VALUE : _sensor->getValue();},
-		[this](bool val){_wrapper->setValue(val);}),
+		[this](bool val){_wrapper->setValue(val ? _speed : 0);}),
 	_sensor(sens),
 	_wrapper(wrapper)
 {
@@ -98,9 +98,23 @@ const char* HeatSwitch::getName() const
 	return "HeatSwitch";
 }
 
+void HeatSwitch::setSpeed(int speed)
+{
+	_speed = speed;
+	if(isOn()){
+		_wrapper->setValue(speed);
+	}
+}
+
+int HeatSwitch::getSpeed() const
+{
+	return _speed;
+}
 
 
-FanSwitch::FanSwitch(sensor::TemperatureSensor* sensor,
+
+
+FanSwitch::FanSwitch(sensor::SensorIface* sensor,
 					float lowTemp, float highTemp, wrappers::WrapperIface* wrapper)
 	: HeatSwitch(sensor, lowTemp, highTemp, wrapper)
 {
@@ -112,9 +126,7 @@ const char* FanSwitch::getName() const
 	return "FanSwitch";
 }
 
-bool FanSwitch::_checkTemperature()
+bool FanSwitch::_checkValues()
 {
-	HeatSwitch::_checkValues();
-
-	return _isColling();
+	return !HeatSwitch::_checkValues();
 }

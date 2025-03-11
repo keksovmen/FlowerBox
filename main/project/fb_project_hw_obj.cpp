@@ -21,10 +21,13 @@ static sensor::SensorAht20 _sensorAhtInside(I2C_NUM_0, pins::PIN_IIC_SDA, pins::
 static switches::TimeSwitch _switchLight(clock::Time(0, 0, 0), clock::Time(0, 0, 0),
 	new wrappers::WrapperGpio((gpio_num_t) pins::PIN_LIGHT, false));
 //change to reference instead of a pointer senor argument
-static switches::HeatSwitch _switchHeating(_sensorDS18Outside, 28.5, 29,
-	new wrappers::WrapperGpio((gpio_num_t) pins::PIN_GREEN_LED, false));
-static switches::FanSwitch _switchFan(_sensorDS18Outside, 30, 31,
-	new wrappers::WrapperGpio((gpio_num_t) pins::PIN_FAN, false));
+
+static switches::HeatSwitch _switchHeating(&_sensorAhtInside, 23, 27,
+	new wrappers::WrapperGpio((gpio_num_t) pins::PIN_HEATER, false));
+
+static switches::FanSwitch _switchFan(&_sensorAhtInside, 27, 28,
+	// new wrappers::WrapperGpio((gpio_num_t) pins::PIN_FAN, false));
+	new wrappers::WrapperPwm(LEDC_TIMER_0, LEDC_CHANNEL_0, (gpio_num_t) pins::PIN_FAN, true));
 
 //сервисы туть
 static sensor::SensorService _sensorService;
@@ -42,14 +45,15 @@ static void _init_from_settings()
 {
 	_switchLight.setStartTime(settings::getLightStartTime());
 	_switchLight.setEndTime(settings::getLightEndTime());
+	_switchFan.setSpeed(settings::getFanSpeed());
 }
 
 
 
 void project::initHwObjs()
 {
-	_sensorService.addSensor(&getHwTempSensors());
-	_sensorService.addSensor(&getHwDS18Sensor());
+	// _sensorService.addSensor(&getHwTempSensors());
+	// _sensorService.addSensor(&getHwDS18Sensor());
 	_sensorService.addSensor(&getHwAhtSensor());
 
 	_swithService.addSwitch(&getHwLightSwitch());

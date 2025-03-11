@@ -39,6 +39,8 @@ namespace fb
 			PROPERTY_SYSTEM_RESET_SETTINGS,
 			PROPERTY_SYSTEM_RESTART,
 
+			PROPERTY_SWITCH_SPEED,
+
 			MAX
 		};
 
@@ -120,6 +122,9 @@ namespace fb
 
 					case Tid::PROPERTY_SYSTEM_RESTART:
 						return {"System restart", "Restarts the system", "none", "0", "0"};
+
+					case Tid::PROPERTY_SWITCH_SPEED:
+						return {"Switch speed", "PWM ", "int", "0", "100"};
 
 					default:
 						// abort();

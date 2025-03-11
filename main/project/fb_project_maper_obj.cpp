@@ -75,6 +75,25 @@ static void _init_light_switch()
 	_boxLightSwitch.addPropertyDependency(endTimeProp->getId());
 }
 
+static void _init_fan_switch()
+{
+	_create_and_register_forse_property(getHwFanSwitch(), _boxFanSwitch);
+	_boxFanSwitch.addSensorDependency(getBoxInsideTempSensor().getId());
+
+	auto* speedPwmProperty = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_SPEED,
+		[](int val){
+			getHwFanSwitch().setSpeed(val);
+			settings::setFanSpeed(val);
+
+			return true;
+		},
+		static_cast<int>(getHwFanSwitch().getSpeed())
+	);
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(speedPwmProperty));
+	_boxFanSwitch.addPropertyDependency(speedPwmProperty->getId());
+}
+
 static void _init_box_properties()
 {
 	const auto* sensorServiceProp = getBox().addProperty(std::make_unique<box::PropertyInt>(
@@ -134,9 +153,8 @@ void project::initMaperObjs()
 	_create_and_register_forse_property(getHwHeatSwitch(), _boxHeatSwitch);
 	_boxHeatSwitch.addSensorDependency(getBoxInsideTempSensor().getId());
 
-	_create_and_register_forse_property(getHwFanSwitch(), _boxFanSwitch);
-	_boxFanSwitch.addSensorDependency(getBoxInsideTempSensor().getId());
-
+	
+	_init_fan_switch();
 
 	_init_box_properties();
 }

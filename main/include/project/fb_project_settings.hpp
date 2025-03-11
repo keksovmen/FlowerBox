@@ -13,9 +13,11 @@ namespace fb
 		//light switch
 		void setLightStartTime(clock::Timestamp t);
 		void setLightEndTime(clock::Timestamp t);
+		void setFanSpeed(int speed);
 
 		//light switch
 		clock::Timestamp getLightStartTime();
 		clock::Timestamp getLightEndTime();
+		int getFanSpeed();
 	}
 }

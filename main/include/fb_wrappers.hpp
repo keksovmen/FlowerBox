@@ -44,7 +44,7 @@ namespace fb
 		class WrapperPwm : public WrapperIface
 		{
 			public:
-				WrapperPwm(ledc_timer_t timer, ledc_channel_t channel, gpio_num_t gpio);
+				WrapperPwm(ledc_timer_t timer, ledc_channel_t channel, gpio_num_t gpio, bool highSpeed);
 
 				virtual void init() override;
 
@@ -59,6 +59,11 @@ namespace fb
 				ledc_timer_t _timer;
 				ledc_channel_t _channel;
 				gpio_num_t _gpio;
+				bool _isHighSpeed;
+
+
+
+				int _valueToDuty(int val);
 		};
 	}
 }
