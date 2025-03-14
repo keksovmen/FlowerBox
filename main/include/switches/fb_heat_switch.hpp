@@ -4,6 +4,7 @@
 
 #include "fb_switch_iface.hpp"
 #include "fb_sensor_temperature.hpp"
+#include "fb_sensor_aht20.hpp"
 #include "fb_wrappers.hpp"
 
 
@@ -24,7 +25,7 @@ namespace fb
 
 
 
-				RangeSwitch(float lowValue, float highValue, ReadCb read, ActionCb action);
+				RangeSwitch(float lowValue, float highValue, ReadCb read, ActionCb action, bool inverseFlag = false);
 				virtual ~RangeSwitch() = default;
 
 				virtual const char* getName() const override;
@@ -35,9 +36,9 @@ namespace fb
 				float getLowValue() const;
 				float getHighValue() const;
 
-			protected:
-				virtual bool _checkValues();
+				bool checkValues();
 
+			protected:
 				void _setColling(bool state);
 				bool _isColling() const;
 				float _getSensorValue() const;
@@ -45,6 +46,7 @@ namespace fb
 			private:
 				const ReadCb _readCb;
 				const ActionCb _actionCb;
+				const bool _inverseFlag;
 
 				float _lowValue;
 				float _highValue;
@@ -59,11 +61,11 @@ namespace fb
 
 
 
-		class HeatSwitch : public RangeSwitch
+		class SensorSwitch : public RangeSwitch
 		{
 			public:
-				HeatSwitch(sensor::SensorIface* sensor,
-					float lowTemp, float highTemp, wrappers::WrapperIface* wrapper);
+				SensorSwitch(sensor::SensorIface* sensor,
+					float lowTemp, float highTemp, wrappers::WrapperIface* wrapper, bool inverseFlag = false);
 
 				virtual const char* getName() const override;
 
@@ -85,17 +87,43 @@ namespace fb
 
 
 
-		class FanSwitch : public HeatSwitch
+		class FanSwitch : public SwitchIface
 		{
 			public:
-				FanSwitch(sensor::SensorIface* sensor,
-					float lowTemp, float highTemp, wrappers::WrapperIface* wrapper);
-
+				FanSwitch(sensor::SensorAht20* sensor,
+					float lowTemp, float highTemp,
+					float lowHumidity, float highHumidity,
+					wrappers::WrapperIface* wrapper);
+				
 				virtual const char* getName() const override;
-			
-			protected:
-				virtual bool _checkValues() override;
 
+				void setSpeed(int speed);
+
+				int getSpeed() const;
+
+				void setTempLowValue(float value);
+				void setTempHighValue(float value);
+				void setHumLowValue(float value);
+				void setHumHighValue(float value);
+
+				float getTempLowValue() const;
+				float getTempHighValue() const;
+				float getHumLowValue() const;
+				float getHumHighValue() const;
+			
+			private:
+				const sensor::SensorAht20* _sensor;
+				wrappers::WrapperIface* _wrapper;
+
+				RangeSwitch _tempSwitch;
+				RangeSwitch _humSwitch;
+
+				int _speed = 100;
+
+
+
+				static bool _condition(SwitchIface* me);
+				static void _action(SwitchIface* me, bool value);
 		};
 	} // namespace switches
 } // namespace fb

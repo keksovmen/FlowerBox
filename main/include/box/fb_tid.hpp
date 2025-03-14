@@ -42,6 +42,8 @@ namespace fb
 			PROPERTY_SWITCH_SPEED,
 			PROPERTY_SWITCH_LOW_TEMP,
 			PROPERTY_SWITCH_HIGH_TEMP,
+			PROPERTY_SWITCH_LOW_HUMIDITY,
+			PROPERTY_SWITCH_HIGH_HUMIDITY,
 
 			MAX
 		};
@@ -133,6 +135,12 @@ namespace fb
 
 					case Tid::PROPERTY_SWITCH_HIGH_TEMP:
 						return {"Switch's high temperature", "Determines highest possible temperature", "float", "-100.0", "100.0"};
+
+					case Tid::PROPERTY_SWITCH_LOW_HUMIDITY:
+						return {"Switch's low humidity", "Determines lowest possible humidity", "float", "0.0", "100.0"};
+
+					case Tid::PROPERTY_SWITCH_HIGH_HUMIDITY:
+						return {"Switch's high humidity", "Determines highest possible humidity", "float", "0.0", "100.0"};
 
 					default:
 						// abort();

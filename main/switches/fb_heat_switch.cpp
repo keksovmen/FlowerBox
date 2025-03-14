@@ -9,9 +9,10 @@ using namespace switches;
 
 
 
-RangeSwitch::RangeSwitch(float lowValue, float highValue, ReadCb read, ActionCb action)
+RangeSwitch::RangeSwitch(float lowValue, float highValue, ReadCb read, ActionCb action, bool inverseFlag)
 	: SwitchIface(&RangeSwitch::_condition, &RangeSwitch::_action),
-	_readCb(read), _actionCb(action), _lowValue(lowValue), _highValue(highValue)
+	_readCb(read), _actionCb(action), _inverseFlag(inverseFlag),
+	_lowValue(lowValue), _highValue(highValue)
 {
 
 }
@@ -41,7 +42,7 @@ float RangeSwitch::getHighValue() const
 	return _highValue;
 }
 
-bool RangeSwitch::_checkValues()
+bool RangeSwitch::checkValues()
 {
 	if(_getSensorValue() == INVALID_VALUE){
 		//пока просто ждем когда сенсор инициализируется
@@ -56,7 +57,9 @@ bool RangeSwitch::_checkValues()
 		_setColling(_getSensorValue() >= getHighValue());
 	}
 
-	return !_isColling();
+	const bool result = !_isColling();
+
+	return _inverseFlag ? !result : result;
 }
 
 void RangeSwitch::_setColling(bool state)
@@ -78,7 +81,7 @@ bool RangeSwitch::_condition(SwitchIface* me)
 {
 	auto* mePtr = reinterpret_cast<RangeSwitch*>(me);
 
-	return mePtr->_checkValues();
+	return mePtr->checkValues();
 }
 
 void RangeSwitch::_action(SwitchIface* me, bool value)
@@ -90,25 +93,25 @@ void RangeSwitch::_action(SwitchIface* me, bool value)
 
 
 
-HeatSwitch::HeatSwitch(sensor::SensorIface* sens,
-	float onTemp, float offTemp, wrappers::WrapperIface* wrapper
+SensorSwitch::SensorSwitch(sensor::SensorIface* sens,
+	float onTemp, float offTemp, wrappers::WrapperIface* wrapper, bool inverseFlag
 )
 	: RangeSwitch(onTemp, offTemp,
 		[this](){return _sensor->getValue() == sensor::TemperatureSensor::InvalidValue ?
 			RangeSwitch::INVALID_VALUE : _sensor->getValue();},
-		[this](bool val){_wrapper->setValue(val ? _speed : 0);}),
+		[this](bool val){_wrapper->setValue(val ? _speed : 0);}, inverseFlag),
 	_sensor(sens),
 	_wrapper(wrapper)
 {
 	_wrapper->init();
 }
 
-const char* HeatSwitch::getName() const
+const char* SensorSwitch::getName() const
 {
-	return "HeatSwitch";
+	return "SensorSwitch";
 }
 
-void HeatSwitch::setSpeed(int speed)
+void SensorSwitch::setSpeed(int speed)
 {
 	_speed = speed;
 	if(isOn()){
@@ -116,27 +119,100 @@ void HeatSwitch::setSpeed(int speed)
 	}
 }
 
-int HeatSwitch::getSpeed() const
+int SensorSwitch::getSpeed() const
 {
 	return _speed;
 }
 
 
 
-
-FanSwitch::FanSwitch(sensor::SensorIface* sensor,
-					float lowTemp, float highTemp, wrappers::WrapperIface* wrapper)
-	: HeatSwitch(sensor, lowTemp, highTemp, wrapper)
+FanSwitch::FanSwitch(sensor::SensorAht20* sensor,
+	float lowTemp, float highTemp,
+	float lowHumidity, float highHumidity,
+	wrappers::WrapperIface* wrapper)
+	: SwitchIface(&FanSwitch::_condition, &FanSwitch::_action),
+	_sensor(sensor), _wrapper(wrapper),
+	_tempSwitch(lowTemp, highTemp,
+		[this](){return _sensor->getTemperature() == sensor::SensorAht20::InvalidValue ?
+			RangeSwitch::INVALID_VALUE : _sensor->getTemperature();},
+		[this](bool val){_wrapper->setValue(val ? _speed : 0);}, true),
+	_humSwitch(lowHumidity, highHumidity,
+		[this](){return _sensor->getHumidity() == sensor::SensorAht20::InvalidValue ?
+			RangeSwitch::INVALID_VALUE : _sensor->getHumidity();},
+		[this](bool val){_wrapper->setValue(val ? _speed : 0);}, true)
 {
-
+	wrapper->init();
 }
-
+	
 const char* FanSwitch::getName() const
 {
 	return "FanSwitch";
 }
 
-bool FanSwitch::_checkValues()
+void FanSwitch::setSpeed(int speed)
 {
-	return !HeatSwitch::_checkValues();
+	_speed = speed;
+
+	if(isOn()){
+		_wrapper->setValue(speed);
+	}
+}
+
+int FanSwitch::getSpeed() const
+{
+	return _speed;
+}
+
+void FanSwitch::setTempLowValue(float value)
+{
+	_tempSwitch.setLowValue(value);
+}
+
+void FanSwitch::setTempHighValue(float value)
+{
+	_tempSwitch.setHighValue(value);
+}
+
+void FanSwitch::setHumLowValue(float value)
+{
+	_humSwitch.setLowValue(value);
+}
+
+void FanSwitch::setHumHighValue(float value)
+{
+	_humSwitch.setHighValue(value);
+}
+
+float FanSwitch::getTempLowValue() const
+{
+	return _tempSwitch.getLowValue();
+}
+
+float FanSwitch::getTempHighValue() const
+{
+	return _tempSwitch.getHighValue();
+}
+
+float FanSwitch::getHumLowValue() const
+{
+	return _humSwitch.getLowValue();
+}
+
+float FanSwitch::getHumHighValue() const
+{
+	return _humSwitch.getHighValue();
+}
+
+bool FanSwitch::_condition(SwitchIface* me)
+{
+	auto* self = static_cast<FanSwitch*>(me);
+
+	return self->_humSwitch.checkValues() || self->_tempSwitch.checkValues();
+}
+
+void FanSwitch::_action(SwitchIface* me, bool value)
+{
+	auto* self = static_cast<FanSwitch*>(me);
+
+	self->_wrapper->setValue(value ? self->getSpeed() : 0);
 }

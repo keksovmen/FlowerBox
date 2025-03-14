@@ -22,11 +22,10 @@ static switches::TimeSwitch _switchLight(clock::Time(0, 0, 0), clock::Time(0, 0,
 	new wrappers::WrapperGpio((gpio_num_t) pins::PIN_LIGHT, false));
 //change to reference instead of a pointer senor argument
 
-static switches::HeatSwitch _switchHeating(&_sensorAhtInside, 23, 27,
+static switches::SensorSwitch _switchHeating(&_sensorAhtInside, 23, 27,
 	new wrappers::WrapperGpio((gpio_num_t) pins::PIN_HEATER, false));
 
-static switches::FanSwitch _switchFan(&_sensorAhtInside, 27, 28,
-	// new wrappers::WrapperGpio((gpio_num_t) pins::PIN_FAN, false));
+static switches::FanSwitch _switchFan(&_sensorAhtInside, 27, 28, 70, 85,
 	new wrappers::WrapperPwm(LEDC_TIMER_0, LEDC_CHANNEL_0, (gpio_num_t) pins::PIN_FAN, true));
 
 //сервисы туть
@@ -47,8 +46,10 @@ static void _init_from_settings()
 	_switchLight.setEndTime(settings::getLightEndTime());
 
 	_switchFan.setSpeed(settings::getFanSpeed());
-	_switchFan.setLowValue(settings::getFanLowTemp());
-	_switchFan.setHighValue(settings::getFanHighTemp());
+	_switchFan.setTempLowValue(settings::getFanLowTemp());
+	_switchFan.setTempHighValue(settings::getFanHighTemp());
+	_switchFan.setHumLowValue(settings::getFanLowHum());
+	_switchFan.setHumHighValue(settings::getFanHighHum());
 
 	_switchHeating.setLowValue(settings::getHeaterLowTemp());
 	_switchHeating.setHighValue(settings::getHeaterHighTemp());
@@ -93,7 +94,7 @@ switches::TimeSwitch& project::getHwLightSwitch()
 	return _switchLight;
 }
 
-switches::HeatSwitch& project::getHwHeatSwitch()
+switches::SensorSwitch& project::getHwHeatSwitch()
 {
 	return _switchHeating;
 }

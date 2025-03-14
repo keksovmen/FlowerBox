@@ -11,9 +11,13 @@
 
 #define _KEY_LIGHT_START "l_on"
 #define _KEY_LIGHT_END "l_off"
+
 #define _KEY_FAN_SPEED "f_speed"
 #define _KEY_FAN_LOW_TEMP "f_low_t"
 #define _KEY_FAN_HIGH_TEMP "f_high_t"
+#define _KEY_FAN_LOW_HUMIDITY "f_low_h"
+#define _KEY_FAN_HIGH_HUMIDITY "f_high_h"
+
 #define _KEY_HEATER_LOW_TEMP "h_low_t"
 #define _KEY_HEATER_HIGH_TEMP "h_high_t"
 
@@ -53,6 +57,22 @@ void settings::setFanHighTemp(float value)
 	sprintf(tmp, "%.6f", value);
 
 	settings::setStr(_PARTITION, _KEY_FAN_HIGH_TEMP, tmp);
+}
+
+void settings::setFanLowHum(float value)
+{
+	char tmp[16] = {0};
+	sprintf(tmp, "%.6f", value);
+
+	settings::setStr(_PARTITION, _KEY_FAN_LOW_HUMIDITY, tmp);
+}
+
+void settings::setFanHighHum(float value)
+{
+	char tmp[16] = {0};
+	sprintf(tmp, "%.6f", value);
+
+	settings::setStr(_PARTITION, _KEY_FAN_HIGH_HUMIDITY, tmp);
 }
 
 void settings::setHeaterLowTemp(float value)
@@ -97,6 +117,18 @@ float settings::getFanLowTemp()
 float settings::getFanHighTemp()
 {
 	auto val = settings::getStrOrDefault(_PARTITION, _KEY_FAN_HIGH_TEMP, "28.0");
+	return std::atof(val.c_str());
+}
+
+float settings::getFanLowHum()
+{
+	auto val = settings::getStrOrDefault(_PARTITION, _KEY_FAN_LOW_HUMIDITY, "70.0");
+	return std::atof(val.c_str());
+}
+
+float settings::getFanHighHum()
+{
+	auto val = settings::getStrOrDefault(_PARTITION, _KEY_FAN_HIGH_HUMIDITY, "85.0");
 	return std::atof(val.c_str());
 }
 

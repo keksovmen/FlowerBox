@@ -135,14 +135,14 @@ static void _init_fan_switch()
 
 	auto* lowTempProperty = new box::PropertyFloat(box::Tid::PROPERTY_SWITCH_LOW_TEMP,
 		[](float val){
-			getHwFanSwitch().setLowValue(val);
+			getHwFanSwitch().setTempLowValue(val);
 			//TODO: maybe put store in to swith iface somehow
 			//maybe chain of responsibility or composite
 			settings::setFanLowTemp(val);
 
 			return true;
 		},
-		getHwFanSwitch().getLowValue()
+		getHwFanSwitch().getTempLowValue()
 	);
 
 	getBox().addProperty(std::unique_ptr<box::PropertyIface>(lowTempProperty));
@@ -151,18 +151,50 @@ static void _init_fan_switch()
 
 	auto* highTempProperty = new box::PropertyFloat(box::Tid::PROPERTY_SWITCH_HIGH_TEMP,
 		[](float val){
-			getHwFanSwitch().setHighValue(val);
+			getHwFanSwitch().setTempHighValue(val);
 			//TODO: maybe put store in to swith iface somehow
 			//maybe chain of responsibility or composite
 			settings::setFanHighTemp(val);
 
 			return true;
 		},
-		getHwFanSwitch().getHighValue()
+		getHwFanSwitch().getTempHighValue()
 	);
 
 	getBox().addProperty(std::unique_ptr<box::PropertyIface>(highTempProperty));
 	_boxFanSwitch.addPropertyDependency(highTempProperty->getId());
+
+
+	auto* lowHumProperty = new box::PropertyFloat(box::Tid::PROPERTY_SWITCH_LOW_HUMIDITY,
+		[](float val){
+			getHwFanSwitch().setHumLowValue(val);
+			//TODO: maybe put store in to swith iface somehow
+			//maybe chain of responsibility or composite
+			settings::setFanLowHum(val);
+
+			return true;
+		},
+		getHwFanSwitch().getHumLowValue()
+	);
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(lowHumProperty));
+	_boxFanSwitch.addPropertyDependency(lowHumProperty->getId());
+
+
+	auto* highHumProperty = new box::PropertyFloat(box::Tid::PROPERTY_SWITCH_HIGH_HUMIDITY,
+		[](float val){
+			getHwFanSwitch().setHumHighValue(val);
+			//TODO: maybe put store in to swith iface somehow
+			//maybe chain of responsibility or composite
+			settings::setFanHighHum(val);
+
+			return true;
+		},
+		getHwFanSwitch().getHumHighValue()
+	);
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(highHumProperty));
+	_boxFanSwitch.addPropertyDependency(highHumProperty->getId());
 }
 
 static void _init_box_properties()

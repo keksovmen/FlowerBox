@@ -23,7 +23,7 @@ namespace fb
 		sensor::SensorAht20& getHwAhtSensor();
 
 		switches::TimeSwitch& getHwLightSwitch();
-		switches::HeatSwitch& getHwHeatSwitch();
+		switches::SensorSwitch& getHwHeatSwitch();
 		switches::FanSwitch& getHwFanSwitch();
 
 		sensor::SensorService& getHwSensorService();
