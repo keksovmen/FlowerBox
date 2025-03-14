@@ -19,8 +19,8 @@ void project::init()
 {
 	global::getSensorStoreService()->registerSensor({
 		&getHwAhtSensor(),
-		[](int index){return index == 0 ? 0.5f : 1.5f;}
-	});	
+		[](int index){return index == 0 ? 0.5f : 2.0f;}
+	});
 }
 
 const CoreInfo& project::getInfo()
