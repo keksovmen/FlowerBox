@@ -2,11 +2,10 @@
 
 
 
-#include "fb_switch_iface.hpp"
-#include "fb_sensor_temperature.hpp"
+#include "fb_clock.hpp"
 #include "fb_sensor_aht20.hpp"
+#include "fb_switch_iface.hpp"
 #include "fb_wrappers.hpp"
-
 
 
 namespace fb
@@ -43,6 +42,9 @@ namespace fb
 				bool _isColling() const;
 				float _getSensorValue() const;
 
+				virtual float _getTargetLowValue() const;
+				virtual float _getTargetHighValue() const;
+
 			private:
 				const ReadCb _readCb;
 				const ActionCb _actionCb;
@@ -61,7 +63,41 @@ namespace fb
 
 
 
-		class SensorSwitch : public RangeSwitch
+		class DayNightRangeSwitch : public RangeSwitch
+		{
+			public:
+				DayNightRangeSwitch(float lowValue, float highValue,
+							ReadCb read, ActionCb action,
+							int delta, bool inverseFlag = false);
+
+				virtual const char* getName() const override;
+
+				void setDelta(float delta);
+				float getDelta() const;
+
+				void setDayStartTime(clock::Timestamp seconds);
+				void setDayEndTime(clock::Timestamp seconds);
+
+				const clock::Time& getDayStartTime() const;
+				const clock::Time& getDayEndTime() const;
+			
+			protected:
+				virtual float _getTargetLowValue() const override;
+				virtual float _getTargetHighValue() const override;
+			
+			private:
+				float _delta;
+				clock::Time _startTime{0};
+				clock::Time _endTime{0};
+
+
+
+				bool _isDay() const;
+		};
+
+
+
+		class SensorSwitch : public DayNightRangeSwitch
 		{
 			public:
 				SensorSwitch(sensor::SensorIface* sensor,

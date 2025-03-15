@@ -49,6 +49,7 @@ static void _init_light_switch()
 	auto* startTimeProp = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_LIGHT_ON,
 		[](int val){
 			getHwLightSwitch().setStartTime(val);
+			getHwHeatSwitch().setDayStartTime(val);
 			//TODO: maybe put store in to swith iface somehow
 			//maybe chain of responsibility or composite
 			settings::setLightStartTime(val);
@@ -65,6 +66,7 @@ static void _init_light_switch()
 	auto* endTimeProp = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_LIGHT_OFF,
 		[](int val){
 			getHwLightSwitch().setEndTime(val);
+			getHwHeatSwitch().setDayEndTime(val);
 			settings::setLightEndTime(val);
 
 			return true;
@@ -112,6 +114,22 @@ static void _init_heat_switch()
 
 	getBox().addProperty(std::unique_ptr<box::PropertyIface>(highTempProperty));
 	_boxHeatSwitch.addPropertyDependency(highTempProperty->getId());
+
+
+	auto* deltaTempProperty = new box::PropertyFloat(box::Tid::PROPERTY_SWITCH_DELTA_TEMP,
+		[](float val){
+			getHwHeatSwitch().setDelta(val);
+			//TODO: maybe put store in to swith iface somehow
+			//maybe chain of responsibility or composite
+			settings::setHeaterDayNightDelta(val);
+
+			return true;
+		},
+		getHwHeatSwitch().getDelta()
+	);
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(deltaTempProperty));
+	_boxHeatSwitch.addPropertyDependency(deltaTempProperty->getId());
 }
 
 static void _init_fan_switch()

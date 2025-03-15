@@ -20,6 +20,7 @@
 
 #define _KEY_HEATER_LOW_TEMP "h_low_t"
 #define _KEY_HEATER_HIGH_TEMP "h_high_t"
+#define _KEY_HEATER_DAY_NIGHT_DELTA_TEMP "h_high_dt"
 
 
 
@@ -91,6 +92,14 @@ void settings::setHeaterHighTemp(float value)
 	settings::setStr(_PARTITION, _KEY_HEATER_HIGH_TEMP, tmp);
 }
 
+void settings::setHeaterDayNightDelta(float value)
+{
+	char tmp[16] = {0};
+	sprintf(tmp, "%.6f", value);
+
+	settings::setStr(_PARTITION, _KEY_HEATER_DAY_NIGHT_DELTA_TEMP, tmp);
+}
+
 
 
 clock::Timestamp settings::getLightStartTime()
@@ -141,5 +150,11 @@ float settings::getHeaterLowTemp()
 float settings::getHeaterHighTemp()
 {
 	auto val = settings::getStrOrDefault(_PARTITION, _KEY_HEATER_HIGH_TEMP, "27.0");
+	return std::atof(val.c_str());
+}
+
+float settings::getHeaterDayNightDelta()
+{
+	auto val = settings::getStrOrDefault(_PARTITION, _KEY_HEATER_DAY_NIGHT_DELTA_TEMP, "4.0");
 	return std::atof(val.c_str());
 }

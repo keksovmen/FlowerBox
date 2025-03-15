@@ -25,6 +25,7 @@ namespace fb
 		//heater switch
 		void setHeaterLowTemp(float value);
 		void setHeaterHighTemp(float value);
+		void setHeaterDayNightDelta(float value);
 
 
 		//getters
@@ -42,5 +43,6 @@ namespace fb
 		//heater switch
 		float getHeaterLowTemp();
 		float getHeaterHighTemp();
+		float getHeaterDayNightDelta();
 	}
 }

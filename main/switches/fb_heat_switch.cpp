@@ -51,10 +51,10 @@ bool RangeSwitch::checkValues()
 
 	if(_isColling()){
 		//охлождаемся, ждем когда температура упадет ниже минимума, тогда включаемся
-		_setColling(_getSensorValue() > getLowValue());
+		_setColling(_getSensorValue() > _getTargetLowValue());
 	}else{
 		//нагреваемся, ждем когда температура вырастет чуть выше максимума
-		_setColling(_getSensorValue() >= getHighValue());
+		_setColling(_getSensorValue() >= _getTargetHighValue());
 	}
 
 	const bool result = !_isColling();
@@ -77,6 +77,16 @@ float RangeSwitch::_getSensorValue() const
 	return std::invoke(_readCb);
 }
 
+float RangeSwitch::_getTargetLowValue() const
+{
+	return _lowValue;
+}
+
+float RangeSwitch::_getTargetHighValue() const
+{
+	return _highValue;
+}
+
 bool RangeSwitch::_condition(SwitchIface* me)
 {
 	auto* mePtr = reinterpret_cast<RangeSwitch*>(me);
@@ -93,11 +103,82 @@ void RangeSwitch::_action(SwitchIface* me, bool value)
 
 
 
+DayNightRangeSwitch::DayNightRangeSwitch(
+			float lowValue, float highValue,
+			ReadCb read, ActionCb action,
+			int delta, bool inverseFlag)
+	: RangeSwitch(lowValue, highValue, read, action, inverseFlag)
+{
+
+}
+
+const char* DayNightRangeSwitch::getName() const
+{
+	return "DayNightRangeSwitch";
+}
+
+void DayNightRangeSwitch::setDelta(float delta)
+{
+	_delta = delta;
+}
+
+float DayNightRangeSwitch::getDelta() const
+{
+	return _delta;
+}
+
+void DayNightRangeSwitch::setDayStartTime(clock::Timestamp seconds)
+{
+	_startTime = clock::Time(seconds);
+}
+
+void DayNightRangeSwitch::setDayEndTime(clock::Timestamp seconds)
+{
+	_endTime = clock::Time(seconds);
+}
+
+const clock::Time& DayNightRangeSwitch::getDayStartTime() const
+{
+	return _startTime;
+}
+
+const clock::Time& DayNightRangeSwitch::getDayEndTime() const
+{
+	return _endTime;
+}
+
+float DayNightRangeSwitch::_getTargetLowValue() const
+{
+	return getLowValue() - (_isDay() ? 0 : getDelta());
+}
+
+float DayNightRangeSwitch::_getTargetHighValue() const
+{
+	return getHighValue() - (_isDay() ? 0 : getDelta());
+}
+
+bool DayNightRangeSwitch::_isDay() const
+{
+	if(_startTime == _endTime){
+		return true;
+	}
+
+	const clock::Timestamp current = clock::getCurrentTime();
+
+	if(_startTime > _endTime){
+		return current >= _startTime || current < _endTime;
+	}else{
+		return current >= _startTime && current < _endTime;
+	}
+}
+
+
+
 SensorSwitch::SensorSwitch(sensor::SensorIface* sens,
 	float onTemp, float offTemp, wrappers::WrapperIface* wrapper, bool inverseFlag
 )
-	: RangeSwitch(onTemp, offTemp,
-		[this](){return _sensor->getValue() == sensor::TemperatureSensor::InvalidValue ?
+	: DayNightRangeSwitch(onTemp, offTemp,
+		[this](){return _sensor->getValue() == sensor::SensorIface::InvalidValue ?
 			RangeSwitch::INVALID_VALUE : _sensor->getValue();},
 		[this](bool val){_wrapper->setValue(val ? _speed : 0);}, inverseFlag),
 	_sensor(sens),

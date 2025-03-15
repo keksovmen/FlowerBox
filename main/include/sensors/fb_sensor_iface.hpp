@@ -15,6 +15,11 @@ namespace fb
 		class SensorIface : public debug::Named
 		{
 			public:
+				constexpr static float InvalidValue = -255.0f;
+				constexpr static int ValueTemperatureIndex = 0;
+				constexpr static int ValueHumidityIndex = ValueTemperatureIndex + 1;
+
+				
 
 				virtual ~SensorIface() = default;
 

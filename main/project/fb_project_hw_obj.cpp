@@ -53,6 +53,9 @@ static void _init_from_settings()
 
 	_switchHeating.setLowValue(settings::getHeaterLowTemp());
 	_switchHeating.setHighValue(settings::getHeaterHighTemp());
+	_switchHeating.setDayStartTime(settings::getLightStartTime());
+	_switchHeating.setDayEndTime(settings::getLightEndTime());
+	_switchHeating.setDelta(settings::getHeaterDayNightDelta());
 }
 
 

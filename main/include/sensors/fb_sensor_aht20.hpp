@@ -15,7 +15,7 @@ namespace fb
 		class SensorAht20 : public SensorIface
 		{
 			public:
-				constexpr static float InvalidValue = -255.0f;
+				constexpr static float InvalidValue = SensorIface::InvalidValue;
 				constexpr static int ValueTemperatureIndex = 0;
 				constexpr static int ValueHumidityIndex = ValueTemperatureIndex + 1;
 
