@@ -56,6 +56,8 @@ bool RangeSwitch::checkValues()
 		//нагреваемся, ждем когда температура вырастет чуть выше максимума
 		_setColling(_getSensorValue() >= _getTargetHighValue());
 	}
+	// FB_DEBUG_LOG_E_OBJ("Coolin=%d, inverse=%d, result=%d",
+	// 	_isColling(), _inverseFlag, _inverseFlag ? _isColling() : !_isColling());
 
 	const bool result = !_isColling();
 
@@ -107,7 +109,8 @@ DayNightRangeSwitch::DayNightRangeSwitch(
 			float lowValue, float highValue,
 			ReadCb read, ActionCb action,
 			int delta, bool inverseFlag)
-	: RangeSwitch(lowValue, highValue, read, action, inverseFlag)
+	: RangeSwitch(lowValue, highValue, read, action, inverseFlag),
+	_delta(delta)
 {
 
 }
@@ -149,11 +152,17 @@ const clock::Time& DayNightRangeSwitch::getDayEndTime() const
 
 float DayNightRangeSwitch::_getTargetLowValue() const
 {
+	// FB_DEBUG_LOG_E_OBJ("D=%.2f, Low=%.2f, High=%.2f, Current=%.2f, R=%.2f",
+	// 	getDelta(), getLowValue(), getHighValue(), _getSensorValue(),
+	// 	getLowValue() - (_isDay() ? 0 : getDelta()));
 	return getLowValue() - (_isDay() ? 0 : getDelta());
 }
 
 float DayNightRangeSwitch::_getTargetHighValue() const
 {
+	// FB_DEBUG_LOG_E_OBJ("D=%.2f, Low=%.2f, High=%.2f, Current=%.2f, R=%.2f",
+	// 	getDelta(), getLowValue(), getHighValue(), _getSensorValue(),
+	// 	getHighValue() - (_isDay() ? 0 : getDelta()));
 	return getHighValue() - (_isDay() ? 0 : getDelta());
 }
 
@@ -180,7 +189,7 @@ SensorSwitch::SensorSwitch(sensor::SensorIface* sens,
 	: DayNightRangeSwitch(onTemp, offTemp,
 		[this](){return _sensor->getValue() == sensor::SensorIface::InvalidValue ?
 			RangeSwitch::INVALID_VALUE : _sensor->getValue();},
-		[this](bool val){_wrapper->setValue(val ? _speed : 0);}, inverseFlag),
+		[this](bool val){_wrapper->setValue(val ? _speed : 0);}, 0, inverseFlag),
 	_sensor(sens),
 	_wrapper(wrapper)
 {
@@ -220,7 +229,7 @@ FanSwitch::FanSwitch(sensor::SensorAht20* sensor,
 	_humSwitch(lowHumidity, highHumidity,
 		[this](){return _sensor->getHumidity() == sensor::SensorAht20::InvalidValue ?
 			RangeSwitch::INVALID_VALUE : _sensor->getHumidity();},
-		[this](bool val){_wrapper->setValue(val ? _speed : 0);}, true)
+		[this](bool val){_wrapper->setValue(val ? _speed : 0);}, 0, true)
 {
 	wrapper->init();
 }
