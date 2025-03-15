@@ -1,5 +1,6 @@
 #include "fb_settings.hpp"
 
+#include <cstring>
 #include <utility>
 
 
@@ -103,6 +104,18 @@ int64_t settings::getIntOrDefault(std::string_view partition,
 	return result;
 }
 
+float settings::getFloatOrDefault(std::string_view partition,
+			std::string_view key,
+			float def)
+{
+	auto result = getStrOrDefault(partition, key, "");
+	if(result.empty()){
+		return def;
+	}
+
+	return std::atof(result.c_str());
+}
+
 void settings::setStr(std::string_view partion,
 			std::string_view key,
 			std::string_view val)
@@ -135,6 +148,16 @@ void settings::setInt(std::string_view partion,
 	}
 
 	FB_DEBUG_LOG_I_TAG("Set key: %s, val: %lld", key.cbegin(), val);
+}
+
+void settings::setFloat(std::string_view partion,
+			std::string_view key,
+			float val)
+{
+	char tmp[16] = {0};
+	sprintf(tmp, "%.6f", val);
+
+	settings::setStr(partion, key, tmp);
 }
 
 std::string settings::getApSsid()

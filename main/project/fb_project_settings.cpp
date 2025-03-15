@@ -47,66 +47,42 @@ void settings::setFanSpeed(int speed)
 
 void settings::setFanLowTemp(float value)
 {
-	char tmp[16] = {0};
-	sprintf(tmp, "%.6f", value);
-
-	settings::setStr(_PARTITION, _KEY_FAN_LOW_TEMP, tmp);
+	settings::setFloat(_PARTITION, _KEY_FAN_LOW_TEMP, value);
 }
 
 void settings::setFanHighTemp(float value)
 {
-	char tmp[16] = {0};
-	sprintf(tmp, "%.6f", value);
-
-	settings::setStr(_PARTITION, _KEY_FAN_HIGH_TEMP, tmp);
+	settings::setFloat(_PARTITION, _KEY_FAN_HIGH_TEMP, value);
 }
 
 void settings::setFanLowHum(float value)
 {
-	char tmp[16] = {0};
-	sprintf(tmp, "%.6f", value);
-
-	settings::setStr(_PARTITION, _KEY_FAN_LOW_HUMIDITY, tmp);
+	settings::setFloat(_PARTITION, _KEY_FAN_LOW_HUMIDITY, value);
 }
 
 void settings::setFanHighHum(float value)
 {
-	char tmp[16] = {0};
-	sprintf(tmp, "%.6f", value);
-
-	settings::setStr(_PARTITION, _KEY_FAN_HIGH_HUMIDITY, tmp);
+	settings::setFloat(_PARTITION, _KEY_FAN_HIGH_HUMIDITY, value);
 }
 
 void settings::setFanDayNightDelta(float value)
 {
-	char tmp[16] = {0};
-	sprintf(tmp, "%.6f", value);
-
-	settings::setStr(_PARTITION, _KEY_FAN_DAY_NIGHT_DELTA_HUMIDITY, tmp);
+	settings::setFloat(_PARTITION, _KEY_FAN_DAY_NIGHT_DELTA_HUMIDITY, value);
 }
 
 void settings::setHeaterLowTemp(float value)
 {
-	char tmp[16] = {0};
-	sprintf(tmp, "%.6f", value);
-
-	settings::setStr(_PARTITION, _KEY_HEATER_LOW_TEMP, tmp);
+	settings::setFloat(_PARTITION, _KEY_HEATER_LOW_TEMP, value);
 }
 
 void settings::setHeaterHighTemp(float value)
 {
-	char tmp[16] = {0};
-	sprintf(tmp, "%.6f", value);
-
-	settings::setStr(_PARTITION, _KEY_HEATER_HIGH_TEMP, tmp);
+	settings::setFloat(_PARTITION, _KEY_HEATER_HIGH_TEMP, value);
 }
 
 void settings::setHeaterDayNightDelta(float value)
 {
-	char tmp[16] = {0};
-	sprintf(tmp, "%.6f", value);
-
-	settings::setStr(_PARTITION, _KEY_HEATER_DAY_NIGHT_DELTA_TEMP, tmp);
+	settings::setFloat(_PARTITION, _KEY_HEATER_DAY_NIGHT_DELTA_TEMP, value);
 }
 
 
@@ -128,48 +104,40 @@ int settings::getFanSpeed()
 
 float settings::getFanLowTemp()
 {
-	auto val = settings::getStrOrDefault(_PARTITION, _KEY_FAN_LOW_TEMP, "27.0");
-	return std::atof(val.c_str());
+	return settings::getFloatOrDefault(_PARTITION, _KEY_FAN_LOW_TEMP, 25.0f);
 }
 
 float settings::getFanHighTemp()
 {
-	auto val = settings::getStrOrDefault(_PARTITION, _KEY_FAN_HIGH_TEMP, "28.0");
-	return std::atof(val.c_str());
+	return settings::getFloatOrDefault(_PARTITION, _KEY_FAN_HIGH_TEMP, 26.0f);
 }
 
 float settings::getFanLowHum()
 {
-	auto val = settings::getStrOrDefault(_PARTITION, _KEY_FAN_LOW_HUMIDITY, "70.0");
-	return std::atof(val.c_str());
+	return settings::getFloatOrDefault(_PARTITION, _KEY_FAN_LOW_HUMIDITY, 60.0f);
 }
 
 float settings::getFanHighHum()
 {
-	auto val = settings::getStrOrDefault(_PARTITION, _KEY_FAN_HIGH_HUMIDITY, "85.0");
-	return std::atof(val.c_str());
+	return settings::getFloatOrDefault(_PARTITION, _KEY_FAN_HIGH_HUMIDITY, 70.0f);
 }
 
 float settings::getFanDayNightDelta()
 {
-	auto val = settings::getStrOrDefault(_PARTITION, _KEY_FAN_DAY_NIGHT_DELTA_HUMIDITY, "10.0");
-	return std::atof(val.c_str());
+	return settings::getFloatOrDefault(_PARTITION, _KEY_FAN_DAY_NIGHT_DELTA_HUMIDITY, -10.0f);
 }
 
 float settings::getHeaterLowTemp()
 {
-	auto val = settings::getStrOrDefault(_PARTITION, _KEY_HEATER_LOW_TEMP, "23.0");
-	return std::atof(val.c_str());
+	return settings::getFloatOrDefault(_PARTITION, _KEY_HEATER_LOW_TEMP, 23.0f);
 }
 
 float settings::getHeaterHighTemp()
 {
-	auto val = settings::getStrOrDefault(_PARTITION, _KEY_HEATER_HIGH_TEMP, "27.0");
-	return std::atof(val.c_str());
+	return settings::getFloatOrDefault(_PARTITION, _KEY_HEATER_HIGH_TEMP, 25.0f);
 }
 
 float settings::getHeaterDayNightDelta()
 {
-	auto val = settings::getStrOrDefault(_PARTITION, _KEY_HEATER_DAY_NIGHT_DELTA_TEMP, "4.0");
-	return std::atof(val.c_str());
+	return settings::getFloatOrDefault(_PARTITION, _KEY_HEATER_DAY_NIGHT_DELTA_TEMP, 4.0f);
 }

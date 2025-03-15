@@ -57,6 +57,10 @@ namespace fb
 			std::string_view key,
 			int64_t def);
 		
+		float getFloatOrDefault(std::string_view partition,
+			std::string_view key,
+			float def);
+		
 		void setStr(std::string_view partion,
 			std::string_view key,
 			std::string_view val);
@@ -64,6 +68,10 @@ namespace fb
 		void setInt(std::string_view partion,
 			std::string_view key,
 			int64_t val);
+
+		void setFloat(std::string_view partion,
+			std::string_view key,
+			float val);
 
 
 		
