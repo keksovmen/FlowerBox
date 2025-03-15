@@ -17,10 +17,11 @@
 #define _KEY_FAN_HIGH_TEMP "f_high_t"
 #define _KEY_FAN_LOW_HUMIDITY "f_low_h"
 #define _KEY_FAN_HIGH_HUMIDITY "f_high_h"
+#define _KEY_FAN_DAY_NIGHT_DELTA_HUMIDITY "f_delta"
 
 #define _KEY_HEATER_LOW_TEMP "h_low_t"
 #define _KEY_HEATER_HIGH_TEMP "h_high_t"
-#define _KEY_HEATER_DAY_NIGHT_DELTA_TEMP "h_high_dt"
+#define _KEY_HEATER_DAY_NIGHT_DELTA_TEMP "h_delta"
 
 
 
@@ -74,6 +75,14 @@ void settings::setFanHighHum(float value)
 	sprintf(tmp, "%.6f", value);
 
 	settings::setStr(_PARTITION, _KEY_FAN_HIGH_HUMIDITY, tmp);
+}
+
+void settings::setFanDayNightDelta(float value)
+{
+	char tmp[16] = {0};
+	sprintf(tmp, "%.6f", value);
+
+	settings::setStr(_PARTITION, _KEY_FAN_DAY_NIGHT_DELTA_HUMIDITY, tmp);
 }
 
 void settings::setHeaterLowTemp(float value)
@@ -138,6 +147,12 @@ float settings::getFanLowHum()
 float settings::getFanHighHum()
 {
 	auto val = settings::getStrOrDefault(_PARTITION, _KEY_FAN_HIGH_HUMIDITY, "85.0");
+	return std::atof(val.c_str());
+}
+
+float settings::getFanDayNightDelta()
+{
+	auto val = settings::getStrOrDefault(_PARTITION, _KEY_FAN_DAY_NIGHT_DELTA_HUMIDITY, "10.0");
 	return std::atof(val.c_str());
 }
 

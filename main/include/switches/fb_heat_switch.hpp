@@ -146,13 +146,22 @@ namespace fb
 				float getTempHighValue() const;
 				float getHumLowValue() const;
 				float getHumHighValue() const;
+
+				void setDayStartTime(clock::Timestamp seconds);
+				void setDayEndTime(clock::Timestamp seconds);
+
+				const clock::Time& getDayStartTime() const;
+				const clock::Time& getDayEndTime() const;
+
+				void setDelta(float delta);
+				float getDelta() const;
 			
 			private:
 				const sensor::SensorAht20* _sensor;
 				wrappers::WrapperIface* _wrapper;
 
 				RangeSwitch _tempSwitch;
-				RangeSwitch _humSwitch;
+				DayNightRangeSwitch _humSwitch;
 
 				int _speed = 100;
 

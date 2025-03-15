@@ -50,6 +50,9 @@ static void _init_from_settings()
 	_switchFan.setTempHighValue(settings::getFanHighTemp());
 	_switchFan.setHumLowValue(settings::getFanLowHum());
 	_switchFan.setHumHighValue(settings::getFanHighHum());
+	_switchFan.setDayStartTime(settings::getLightStartTime());
+	_switchFan.setDayEndTime(settings::getLightEndTime());
+	_switchFan.setDelta(settings::getFanDayNightDelta());
 
 	_switchHeating.setLowValue(settings::getHeaterLowTemp());
 	_switchHeating.setHighValue(settings::getHeaterHighTemp());

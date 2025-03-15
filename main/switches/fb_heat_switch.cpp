@@ -284,6 +284,36 @@ float FanSwitch::getHumHighValue() const
 	return _humSwitch.getHighValue();
 }
 
+void FanSwitch::setDayStartTime(clock::Timestamp seconds)
+{
+	_humSwitch.setDayStartTime(seconds);
+}
+
+void FanSwitch::setDayEndTime(clock::Timestamp seconds)
+{
+	_humSwitch.setDayEndTime(seconds);
+}
+
+const clock::Time& FanSwitch::getDayStartTime() const
+{
+	return _humSwitch.getDayStartTime();
+}
+
+const clock::Time& FanSwitch::getDayEndTime() const
+{
+	return _humSwitch.getDayEndTime();
+}
+
+void FanSwitch::setDelta(float delta)
+{
+	return _humSwitch.setDelta(delta);
+}
+
+float FanSwitch::getDelta() const
+{
+	return _humSwitch.getDelta();
+}
+
 bool FanSwitch::_condition(SwitchIface* me)
 {
 	auto* self = static_cast<FanSwitch*>(me);

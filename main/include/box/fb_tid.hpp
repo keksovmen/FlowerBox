@@ -45,6 +45,7 @@ namespace fb
 			PROPERTY_SWITCH_DELTA_TEMP,
 			PROPERTY_SWITCH_LOW_HUMIDITY,
 			PROPERTY_SWITCH_HIGH_HUMIDITY,
+			PROPERTY_SWITCH_DELTA_HUMIDITY,
 
 			MAX
 		};
@@ -138,13 +139,16 @@ namespace fb
 						return {"Switch's high temperature", "Determines highest possible temperature", "float", "-100.0", "100.0"};
 
 					case Tid::PROPERTY_SWITCH_DELTA_TEMP:
-						return {"Switch's day and night delta temperature", "Difference between day and night temperatures", "float", "0.0", "100.0"};
+						return {"Switch's day and night delta temperature", "Difference between day and night temperatures", "float", "-100.0", "100.0"};
 
 					case Tid::PROPERTY_SWITCH_LOW_HUMIDITY:
 						return {"Switch's low humidity", "Determines lowest possible humidity", "float", "0.0", "100.0"};
 
 					case Tid::PROPERTY_SWITCH_HIGH_HUMIDITY:
 						return {"Switch's high humidity", "Determines highest possible humidity", "float", "0.0", "100.0"};
+
+					case Tid::PROPERTY_SWITCH_DELTA_HUMIDITY:
+						return {"Switch's day and night delta humidity", "Difference between day and night humidity", "float", "-100.0", "100.0"};
 
 					default:
 						// abort();

@@ -21,6 +21,7 @@ namespace fb
 		void setFanHighTemp(float value);
 		void setFanLowHum(float value);
 		void setFanHighHum(float value);
+		void setFanDayNightDelta(float value);
 
 		//heater switch
 		void setHeaterLowTemp(float value);
@@ -39,6 +40,7 @@ namespace fb
 		float getFanHighTemp();
 		float getFanLowHum();
 		float getFanHighHum();
+		float getFanDayNightDelta();
 
 		//heater switch
 		float getHeaterLowTemp();
