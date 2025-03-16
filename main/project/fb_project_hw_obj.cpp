@@ -25,7 +25,7 @@ static switches::TimeSwitch _switchLight(clock::Time(0, 0, 0), clock::Time(0, 0,
 static switches::SensorSwitch _switchHeating(&_sensorAhtInside, 23, 27,
 	new wrappers::WrapperGpio((gpio_num_t) pins::PIN_HEATER, false));
 
-static switches::FanSwitch _switchFan(&_sensorAhtInside, 27, 28, 70, 85,
+static switches::FanSwitch _switchFan(&_sensorAhtInside, _sensorDS18Outside, 27, 28, 70, 85,
 	new wrappers::WrapperPwm(LEDC_TIMER_0, LEDC_CHANNEL_0, (gpio_num_t) pins::PIN_FAN, true));
 
 //сервисы туть
@@ -52,7 +52,8 @@ static void _init_from_settings()
 	_switchFan.setHumHighValue(settings::getFanHighHum());
 	_switchFan.setDayStartTime(settings::getLightStartTime());
 	_switchFan.setDayEndTime(settings::getLightEndTime());
-	_switchFan.setDelta(settings::getFanDayNightDelta());
+	_switchFan.setDeltaHumidity(settings::getFanDayNightDelta());
+	_switchFan.setDeltaTemp(settings::getHeaterDayNightDelta());
 
 	_switchHeating.setLowValue(settings::getHeaterLowTemp());
 	_switchHeating.setHighValue(settings::getHeaterHighTemp());
@@ -65,8 +66,8 @@ static void _init_from_settings()
 
 void project::initHwObjs()
 {
-	// _sensorService.addSensor(&getHwTempSensors());
-	// _sensorService.addSensor(&getHwDS18Sensor());
+	_sensorService.addSensor(&getHwTempSensors());
+	_sensorService.addSensor(&getHwDS18Sensor());
 	_sensorService.addSensor(&getHwAhtSensor());
 
 	_swithService.addSwitch(&getHwLightSwitch());

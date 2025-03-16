@@ -219,14 +219,14 @@ static void _init_fan_switch()
 
 	auto* deltaHumProperty = new box::PropertyFloat(box::Tid::PROPERTY_SWITCH_DELTA_HUMIDITY,
 		[](float val){
-			getHwFanSwitch().setDelta(val);
+			getHwFanSwitch().setDeltaHumidity(val);
 			//TODO: maybe put store in to swith iface somehow
 			//maybe chain of responsibility or composite
 			settings::setFanDayNightDelta(val);
 
 			return true;
 		},
-		getHwFanSwitch().getDelta()
+		getHwFanSwitch().getDeltaHumidity()
 	);
 
 	getBox().addProperty(std::unique_ptr<box::PropertyIface>(deltaHumProperty));

@@ -216,19 +216,21 @@ int SensorSwitch::getSpeed() const
 
 
 
-FanSwitch::FanSwitch(sensor::SensorAht20* sensor,
-	float lowTemp, float highTemp,
-	float lowHumidity, float highHumidity,
-	wrappers::WrapperIface* wrapper)
+FanSwitch::FanSwitch(sensor::SensorAht20* innerSensor,
+			sensor::SensorIface* outerSensor,
+			float lowTemp, float highTemp,
+			float lowHumidity, float highHumidity,
+			wrappers::WrapperIface* wrapper)
 	: SwitchIface(&FanSwitch::_condition, &FanSwitch::_action),
-	_sensor(sensor), _wrapper(wrapper),
+	_innerSensor(innerSensor), _outerSensor(outerSensor),
+	_wrapper(wrapper),
 	_tempSwitch(lowTemp, highTemp,
-		[this](){return _sensor->getTemperature() == sensor::SensorAht20::InvalidValue ?
-			RangeSwitch::INVALID_VALUE : _sensor->getTemperature();},
-		[this](bool val){_wrapper->setValue(val ? _speed : 0);}, true),
+		[this](){return _innerSensor->getTemperature() == sensor::SensorAht20::InvalidValue ?
+			RangeSwitch::INVALID_VALUE : _innerSensor->getTemperature();},
+		[this](bool val){_wrapper->setValue(val ? _speed : 0);}, 0, true),
 	_humSwitch(lowHumidity, highHumidity,
-		[this](){return _sensor->getHumidity() == sensor::SensorAht20::InvalidValue ?
-			RangeSwitch::INVALID_VALUE : _sensor->getHumidity();},
+		[this](){return _innerSensor->getHumidity() == sensor::SensorAht20::InvalidValue ?
+			RangeSwitch::INVALID_VALUE : _innerSensor->getHumidity();},
 		[this](bool val){_wrapper->setValue(val ? _speed : 0);}, 0, true)
 {
 	wrapper->init();
@@ -296,11 +298,13 @@ float FanSwitch::getHumHighValue() const
 void FanSwitch::setDayStartTime(clock::Timestamp seconds)
 {
 	_humSwitch.setDayStartTime(seconds);
+	_tempSwitch.setDayStartTime(seconds);
 }
 
 void FanSwitch::setDayEndTime(clock::Timestamp seconds)
 {
 	_humSwitch.setDayEndTime(seconds);
+	_tempSwitch.setDayEndTime(seconds);
 }
 
 const clock::Time& FanSwitch::getDayStartTime() const
@@ -313,21 +317,40 @@ const clock::Time& FanSwitch::getDayEndTime() const
 	return _humSwitch.getDayEndTime();
 }
 
-void FanSwitch::setDelta(float delta)
+void FanSwitch::setDeltaHumidity(float delta)
 {
 	return _humSwitch.setDelta(delta);
 }
 
-float FanSwitch::getDelta() const
+float FanSwitch::getDeltaHumidity() const
 {
 	return _humSwitch.getDelta();
 }
+
+void FanSwitch::setDeltaTemp(float delta)
+{
+	_tempSwitch.setDelta(delta);
+}
+
+float FanSwitch::getDeltaTemp() const
+{
+	return _tempSwitch.getDelta();
+}
+
 
 bool FanSwitch::_condition(SwitchIface* me)
 {
 	auto* self = static_cast<FanSwitch*>(me);
 
-	return self->_humSwitch.checkValues() || self->_tempSwitch.checkValues();
+	//dependent on outer temperature
+	const float possibleTemperature = self->_outerSensor->getValue() + 0.7f;
+	const bool isImpossible = self->_innerSensor->getTemperature() <= possibleTemperature;
+	bool tempSwitch = self->_tempSwitch.checkValues();
+	if(tempSwitch && isImpossible){
+		tempSwitch = false;
+	}
+
+	return self->_humSwitch.checkValues() || tempSwitch;
 }
 
 void FanSwitch::_action(SwitchIface* me, bool value)

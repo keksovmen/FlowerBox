@@ -126,7 +126,8 @@ namespace fb
 		class FanSwitch : public SwitchIface
 		{
 			public:
-				FanSwitch(sensor::SensorAht20* sensor,
+				FanSwitch(sensor::SensorAht20* innerSensor,
+					sensor::SensorIface* outerSensor,
 					float lowTemp, float highTemp,
 					float lowHumidity, float highHumidity,
 					wrappers::WrapperIface* wrapper);
@@ -153,14 +154,18 @@ namespace fb
 				const clock::Time& getDayStartTime() const;
 				const clock::Time& getDayEndTime() const;
 
-				void setDelta(float delta);
-				float getDelta() const;
+				void setDeltaHumidity(float delta);
+				float getDeltaHumidity() const;
+
+				void setDeltaTemp(float delta);
+				float getDeltaTemp() const;
 			
 			private:
-				const sensor::SensorAht20* _sensor;
+				const sensor::SensorAht20* _innerSensor;
+				const sensor::SensorIface* _outerSensor;
 				wrappers::WrapperIface* _wrapper;
 
-				RangeSwitch _tempSwitch;
+				DayNightRangeSwitch _tempSwitch;
 				DayNightRangeSwitch _humSwitch;
 
 				int _speed = 100;
