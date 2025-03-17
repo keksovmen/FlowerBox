@@ -343,7 +343,7 @@ bool FanSwitch::_condition(SwitchIface* me)
 	auto* self = static_cast<FanSwitch*>(me);
 
 	//dependent on outer temperature
-	const float possibleTemperature = self->_outerSensor->getValue() + 0.7f;
+	const float possibleTemperature = self->_outerSensor->getValue() + 0.5f;
 	const bool isImpossible = self->_innerSensor->getTemperature() <= possibleTemperature;
 	bool tempSwitch = self->_tempSwitch.checkValues();
 	if(tempSwitch && isImpossible){
