@@ -119,7 +119,13 @@ PropertyInt::PropertyInt(Tid tid, ActionSet action, int value)
 
 std::pair<bool, int> PropertyInt::_strToValue(const std::string& str) const
 {
-	return {true, std::atoi(str.c_str())};
+	//for negatives
+	const int firstIndex = (str[0] == '-') ? 1 : 0;
+	if(std::isdigit(str[firstIndex])){
+		return {true, std::atoi(str.c_str())};
+	}else{
+		return {false, 0};
+	}
 }
 
 std::string PropertyInt::_valueToString(int val) const
@@ -154,7 +160,13 @@ PropertyFloat::PropertyFloat(Tid tid, ActionSet action, float value)
 
 std::pair<bool, float> PropertyFloat::_strToValue(const std::string& str) const
 {
-	return {true, std::atof(str.c_str())};
+	//for negatives
+	const int firstIndex = (str[0] == '-') ? 1 : 0;
+	if(std::isdigit(str[firstIndex])){
+		return {true, std::atof(str.c_str())};
+	}else{
+		return {false, 0.0f};
+	}
 }
 
 std::string PropertyFloat::_valueToString(float val) const
