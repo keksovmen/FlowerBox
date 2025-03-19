@@ -71,7 +71,7 @@ namespace fb
 
 
 
-		class EventManager : public debug::Named, public subject::BaseSubject<EventListener, 3>
+		class EventManager : public debug::Named, public subject::BaseSubject<EventListener, 10>
 		{
 			public:
 				explicit EventManager(int queueSize = 10);

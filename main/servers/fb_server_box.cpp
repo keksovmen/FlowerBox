@@ -132,7 +132,7 @@ static esp_err_t _property_set_cb(httpd_req_t* r)
 	}else{
 		FB_DEBUG_LOG_I_TAG("Setting property with id %d to %s", id, result);
 		auto* prop = global::getFlowerBox()->getProperty(id);
-		if(prop->setFromJson(std::string(result))){
+		if(prop && prop->setFromJson(std::string(result))){
 			err = httpd_resp_send(r, nullptr, 0);
 		}else{
 			err = httpd_resp_send_500(r);

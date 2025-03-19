@@ -20,6 +20,7 @@ else()
 		"project2/fb_project_hw_obj.cpp"
 		"project2/fb_project_maper_obj.cpp"
 		"project2/fb_project_core.cpp"
+"project2/fb_http_puller.cpp"
 		"switches/fb_rgb_switch.cpp"
 		"switches/fb_mp3_switch.cpp"
 		"sensors/fb_sensor_mp3.cpp"

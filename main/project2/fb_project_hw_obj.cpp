@@ -3,6 +3,7 @@
 #include <cstring>
 
 #include "fb_globals.hpp"
+#include "fb_http_puller.hpp"
 #include "fb_keyboard_handler.hpp"
 #include "fb_pins.hpp"
 
@@ -17,6 +18,7 @@
 #define _DMX_TASK_STACK 4 * 1024
 #define _DMX_TASK_PRIORITY 20
 
+#define _DEFAULT_HTTP_PULLER_URL "https://gameofmind.ru/_projects/hardware_management/get.php"
 
 
 using namespace fb;
@@ -41,6 +43,7 @@ static sensor::SensorStorage _sensorStorage;
 
 //прочее туть
 static keyboard::KeyboardHandler _keyboardHandler;
+static HttpPuller _httpPuller;
 
 
 
@@ -117,6 +120,12 @@ void project::initHwObjs()
 	// dmx_set_pin(_MP3_UART_PORT, PIN_MP3_TX, PIN_MP3_RX, _MP3_PIN_RTS);
 
 	xTaskCreate(&_dmx_send_task, "DMX_READER", _DMX_TASK_STACK, NULL, _DMX_TASK_PRIORITY, NULL);
+
+	//read it from NVS
+	_httpPuller.setUrl(_DEFAULT_HTTP_PULLER_URL);
+	_httpPuller.start();
+
+	global::getEventManager()->attachListener(&_httpPuller);
 }
 
 sensor::Mp3Sensor& project::getHwMp3Sensor()
