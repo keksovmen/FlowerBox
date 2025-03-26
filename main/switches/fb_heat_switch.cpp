@@ -345,8 +345,9 @@ bool FanSwitch::_condition(SwitchIface* me)
 	//dependent on outer temperature
 	const float possibleTemperature = self->_outerSensor->getValue() + 0.5f;
 	const bool isImpossible = self->_innerSensor->getTemperature() <= possibleTemperature;
+	const bool isNotReasonable = abs(self->_innerSensor->getTemperature() - self->_outerSensor->getValue()) < 0.15f;
 	bool tempSwitch = self->_tempSwitch.checkValues();
-	if(tempSwitch && isImpossible){
+	if(tempSwitch && (isImpossible || isNotReasonable)){
 		tempSwitch = false;
 	}
 
