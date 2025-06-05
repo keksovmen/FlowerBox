@@ -51,6 +51,9 @@ namespace fb
 				void setColor(int color);
 				int getColor() const;
 
+				void setDmxAddress(int address);
+				int getDmxAddress() const;
+
 			private:
 				const dmx_port_t _dmx;
 				const int _gpioRX, _gpioTX, _gpioRTS;

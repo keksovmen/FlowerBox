@@ -50,6 +50,17 @@ static void _initRgbSwitch()
 
 	getBox().addProperty(std::unique_ptr<box::PropertyIface>(colorProperty));
 	_boxRgbSwitch.addPropertyDependency(colorProperty->getId());
+
+
+	auto* dmxAddressProperty = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_DMX_ADDRESS,
+		[](int val){
+			getHwRgbSwitch().setDmxAddress(val);
+			return true;
+		}, getHwRgbSwitch().getDmxAddress()
+	);
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(dmxAddressProperty));
+	_boxRgbSwitch.addPropertyDependency(dmxAddressProperty->getId());
 }
 
 static void _initMp3Sensor()

@@ -140,6 +140,27 @@ int RgbSwitchDmx::getColor() const
 	return _color;
 }
 
+void RgbSwitchDmx::setDmxAddress(int address)
+{
+	if(address < 1){
+		FB_DEBUG_LOG_E_OBJ("Illegal DMX address %d must be in [1; 512]", address);
+
+		address = 1;
+	}
+	if(address > 512){
+		FB_DEBUG_LOG_E_OBJ("Illegal DMX address %d must be in [1; 512]", address);
+
+		address = 512;
+	}
+
+	_address = address;
+}
+
+int RgbSwitchDmx::getDmxAddress() const
+{
+	return _address;
+}
+
 void RgbSwitchDmx::_applyColor(int color)
 {
 	const uint8_t white = (color >> 24) & 0xFF;
@@ -149,7 +170,7 @@ void RgbSwitchDmx::_applyColor(int color)
 
 	FB_DEBUG_LOG_I_OBJ("Apply color: R = %u, G = %u, B = %u, W = %u", red, green, blue, white);
 
-	uint8_t packet[4] = {red, green, blue, white};
+	uint8_t packet[3] = {red, green, blue};
 
 	dmx_write_slot(_dmx, 0, 0);
 	dmx_write_offset(_dmx, _address, packet, sizeof(packet));

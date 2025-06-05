@@ -47,6 +47,8 @@ namespace fb
 			PROPERTY_SWITCH_HIGH_HUMIDITY,
 			PROPERTY_SWITCH_DELTA_HUMIDITY,
 
+			PROPERTY_SWITCH_DMX_ADDRESS,
+
 			MAX
 		};
 
@@ -149,6 +151,9 @@ namespace fb
 
 					case Tid::PROPERTY_SWITCH_DELTA_HUMIDITY:
 						return {"Switch's day and night delta humidity", "Difference between day and night humidity", "float", "-100.0", "100.0"};
+
+					case Tid::PROPERTY_SWITCH_DMX_ADDRESS:
+						return {"Dmx address", "First DMX address", "int", "1", "512"};
 
 					default:
 						// abort();
