@@ -36,6 +36,10 @@ namespace fb
 				PropertyIface* getProperty(int id);
 				const Sensor* getSensor(int id) const;
 				const Switch* getSwitch(int id) const;
+				const std::vector<Sensor*>& getSensors() const;
+				const std::vector<Switch*>& getSwitches() const;
+				const ObjectIface::PropertyArray& getBoxsProperties() const;
+				const std::string& getName() const;
 
 				int generateSensorId();
 				int generateSwitchId();

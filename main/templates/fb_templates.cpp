@@ -10,6 +10,21 @@ using namespace templates;
 
 
 
+Argument::Argument(std::string_view val)
+	: value(val)
+{
+
+}
+
+Argument::Argument(const std::vector<std::string>& vals)
+	: values(vals)
+{
+
+}
+
+
+
+
 Engine::Engine(char* buffer, int bufferSize, const DataConsumerCb& onDataConsume)
 	: _buffer(buffer), _bufferSize(bufferSize), _dataConsumer(onDataConsume)
 {
@@ -46,10 +61,37 @@ bool Engine::process(const std::string& fileName)
 
 bool Engine::addIntArg(int val, const std::string& key)
 {
-	_args[key] = val;
+	_args.emplace(key, Argument(std::to_string(val)));
 
 	return true;
 }
+
+bool Engine::addArgStr(const std::string val, const std::string& key)
+{
+	_args.emplace(key, Argument(val));
+
+	return true;
+}
+
+bool Engine::addArgArray(const std::vector<std::string>& vals, const std::string& key)
+{
+	_args.emplace(key, Argument(vals));
+
+	return true;
+}
+
+bool Engine::appendArgArray(const std::string& val, const std::string& key)
+{
+	if(!_args.contains(key)){
+		_args.emplace(key, Argument(std::vector<std::string>{val}));
+		return true;
+	}
+
+	_args.at(key).values.push_back(val);
+
+	return true;
+}
+
 
 void Engine::_putToBuffer(char symbol)
 {
@@ -83,9 +125,77 @@ bool Engine::_getIntArg(int* out, const std::string& key)
 		return false;
 	}
 
-	*out = _args.at(key);
+	*out = std::atoi(_args.at(key).value.c_str());
 	return true;
 }
+
+std::optional<std::string> Engine::_getStrArg(std::string_view key)
+{
+	auto k = std::string(key);
+	if(!_args.contains(k)){
+		return {};
+	}
+
+	return {_args.at(k).value};
+}
+
+std::optional<std::string> Engine::_getStrArrayArg(std::string_view key, int index)
+{
+	auto k = std::string(key);
+	if(!_args.contains(k)){
+		return {};
+	}
+
+	if(index >= _args.at(k).values.size() || index < 0){
+		return {};
+	}
+
+	return {_args.at(k).values[index]};
+}
+
+bool Engine::_beginLoop(int count, FILE* f)
+{
+	if(_isInLoop()){
+		return false;
+	}
+
+	_inLoop = true;
+	_loopCount = count;
+	_loopI = 0;
+	_loopBeginIndex = std::ftell(f);
+
+	return true;
+}
+
+bool Engine::_incrementLoop()
+{
+	_loopI++;
+
+	return _loopI >= _loopCount;
+}
+
+bool Engine::_endLoop(FILE* f)
+{
+	if(!_isInLoop()){
+		return false;
+	}
+
+	if(_loopI >= _loopCount){
+		_inLoop = false;
+		return true;
+	}
+
+	//move file position back
+	std::fseek(f, _loopBeginIndex, SEEK_SET);
+
+	return true;
+}
+
+bool Engine::_isInLoop()
+{
+	return _inLoop;
+}
+
 
 
 
@@ -146,23 +256,34 @@ Engine::State& Engine::StateKeyword::process(Engine& context, FILE* f)
 
 	}else{
 		std::printf("Found keyword: %s\n", context._cmdBuffer);
+		context._currentArg = 0;
+
+		//no argument cmd
+		if(std::strcmp("end", context._cmdBuffer) == 0){
+			return context._stateEnd;
+		}
+
 		return context._stateArgs;
 	}
 }
 
 Engine::State& Engine::StateArgs::process(Engine& context, FILE* f)
 {
-	const int count = std::fscanf(f, "%s", context._argBuffer);
+	const int count = std::fscanf(f, "%s", context._argBuffer[context._currentArg]);
 	if(count == 0){
 		std::printf("Did not find args after keyword!\n");
-		return context._stateErr;
+		return context._stateEnd;
 
 	}else if (count == EOF){
 		std::printf("Unexpected EOF\n");
 		return context._stateErr;
 
 	}else{
-		std::printf("Found args: %s\n", context._argBuffer);
+		std::printf("Found args: %s\n", context._argBuffer[context._currentArg]);
+		if(std::strcmp("puta", context._cmdBuffer) == 0 && context._currentArg == 0){
+			context._currentArg++;
+			return context._stateArgs;
+		}
 		return context._stateEnd;
 	}
 }
@@ -190,12 +311,66 @@ Engine::State& Engine::StateProcess::process(Engine& context, FILE* f)
 	if(std::strcmp(context._cmdBuffer, "puti") == 0){
 		std::printf("Executing PUT command\n");
 		int arg;
-		if(!context._getIntArg(&arg, std::string(context._argBuffer))){
-			std::printf("Couldn't find arg with key: %s\n", context._argBuffer);
+		if(!context._getIntArg(&arg, std::string(context._argBuffer[0]))){
+			std::printf("Couldn't find arg with key: %s\n", context._argBuffer[0]);
 			return context._stateErr;
 		}
 
 		context._putStrToBuffer(std::to_string(arg));
+
+	}else if(std::strcmp(context._cmdBuffer, "puts") == 0){
+		std::printf("Executing PUT_S command\n");
+
+		auto arg = context._getStrArg(context._argBuffer[0]);
+		if(!arg){
+			std::printf("Couldn't find arg with key: %s\n", context._argBuffer[0]);
+			return context._stateErr;
+		}
+
+		context._putStrToBuffer(arg.value());
+
+	}else if(std::strcmp(context._cmdBuffer, "puta") == 0){
+		std::printf("Executing PUT_A command\n");
+
+		auto arg = context._getStrArrayArg(context._argBuffer[0], context._loopI);
+		if(!arg){
+			std::printf("Couldn't find arg with key: %s\n", context._argBuffer[0]);
+			return context._stateErr;
+		}
+
+		context._putStrToBuffer(arg.value());
+
+	}else if(std::strcmp(context._cmdBuffer, "begin") == 0){
+		std::printf("Executing BEGIN command\n");
+
+		auto arg = context._getStrArg(context._argBuffer[0]);
+		if(!arg){
+			std::printf("Couldn't find arg with key: %s\n", context._argBuffer[0]);
+			return context._stateErr;
+		}
+
+		if(!context._beginLoop(std::atoi(arg.value().c_str()), f)){
+			std::printf("Couldn't start loop with arg: %s\n", arg.value().c_str());
+			return context._stateErr;
+		}
+
+	}else if(std::strcmp(context._cmdBuffer, "end") == 0){
+		std::printf("Executing END command\n");
+
+		if(!context._isInLoop()){
+			std::printf("Not in a loop\n");
+			return context._stateErr;
+		}
+
+		if(context._incrementLoop()){
+			std::printf("Loop count is reached\n");
+
+		}
+
+		if(!context._endLoop(f)){
+			std::printf("Couldn't end loop with arg\n");
+			return context._stateErr;
+		}
 
 	}else{
 		std::printf("Unexpected keyword: %s\n", context._cmdBuffer);

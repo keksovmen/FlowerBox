@@ -5,7 +5,7 @@
 
 
 
-#define _DEVICE_NAME "Diploma"
+#define _DEVICE_NAME "Устройство квест Мафия"
 #define _DEVICE_VERSION "0.0.1"
 
 

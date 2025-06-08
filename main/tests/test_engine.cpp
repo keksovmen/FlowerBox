@@ -17,8 +17,10 @@ static void _consumer(const char* data, int size)
 int main()
 {
 	fb::templates::Engine engine(_buffer, sizeof(_buffer), _consumer);
-	engine.addIntArg(228, "LOH");
+	engine.addIntArg(3, "count");
+	engine.addArgArray({"Temperature", "Humidity", "Moisture"}, "s_name");
+	engine.addArgArray({"10", "20", "30"}, "s_id");
 
-	const bool result = engine.process("H:\\Projects\\Embeded\\esp\\FlowerBox\\spiffs_image\\index.html");
-	std::cout << std::endl << "Total consume cb:" << _counter << "\t" << "Result: " << result << std::endl; 
+	const bool result = engine.process("D:\\embeded\\FlowerBox\\spiffs_image\\sensors.html");
+	std::cout << std::endl << "Total consume cb:" << _counter << "\t" << "Result: " << result << std::endl;
 }

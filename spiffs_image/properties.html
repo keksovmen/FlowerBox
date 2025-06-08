@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Свойства</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="/html/test_style.css">
+</head>
+
+<body>
+	<div class="container">
+		<div class="top-right-button" onclick="loadPage('main_menu.html')">В главное меню</div>
+		<h1 class="page-header">Список свойств для {{ puts label }}</h1>
+		<div class="list-container">
+			{{ begin count }}
+			<div class="list-item" onclick="onPropertyClick('{{ puta id i }}')">
+				<div class="item-name">{{ puta name i }}</div>
+				<div class="item-description">{{ puta description i }}</div>
+				<div id="item-value-{{ puta id i }}" class="item-value">{{ puta value i }}</div>
+			</div>
+			{{ end }}
+		</div>
+
+		<div id="loading-overlay" class="loading-overlay" style="display: none;">
+			<div class="loading-spinner"></div>
+		</div>
+
+		<!-- окно изменения свойства -->
+		<div id="property-modal" class="modal-overlay" style="display: none;">
+			<div class="modal-content">
+				<div class="modal-title">Изменение свойства</div>
+				<div class="modal-description">Введите новое значение</div>
+				<input class="input-field" id="property-value" value="">
+				<div class="error-message" id="error-message" style="display: none;">Ошибка изменения</div>
+			</div>
+			<div class="modal-actions">
+				<div class="btn btn-secondary" onclick="onChangeCancel()">Отмена</div>
+				<div class="btn" onclick="onChangeApply()">Изменить</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="/html/nav.js"></script>
+	<script src="/html/properties.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Главное меню</title>
+    <link rel="stylesheet" href="/html/test_style.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="page-header">Главное меню</h1>
+        
+        <div class="nav-menu">
+            <button class="btn" onclick="loadPage('sensors.html')">Сенсоры</button>
+            <button class="btn" onclick="loadPage('switches.html')">Переключатели</button>
+            <button class="btn" onclick="loadPage('properties.html?source=device&id=0')">Свойства</button>
+        </div>
+    </div>
+
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <script src="/html/nav.js"></script>
+</body>
+</html>

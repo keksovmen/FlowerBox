@@ -1,0 +1,262 @@
+:root {
+	--primary-color: #4c662b;
+	/* темно-зеленый */
+	--secondary-color: #586249;
+	/* серо-зеленый */
+	--background-color: #386663;
+	/* темный бирюзовый */
+	--error-color: #ba1a1a;
+	/* насыщенный красный */
+	--text-color: #ffffff;
+	/* белый текст для контраста */
+	--text-secondary: #e0e0e0;
+	/* серый текст для второстепенной информации */
+	--card-bg: #2d3a1f;
+	/* фон карточек */
+}
+
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+body {
+	background-color: var(--background-color);
+	color: var(--text-color);
+	min-height: 100vh;
+	padding: 20px;
+}
+
+.container {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 15px;
+}
+
+/* Навигация и кнопки */
+.nav-menu {
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
+	margin-top: 30px;
+}
+
+.btn {
+	background-color: var(--primary-color);
+	color: var(--text-color);
+	border: none;
+	padding: 15px 20px;
+	border-radius: 8px;
+	font-size: 18px;
+	cursor: pointer;
+	transition: background-color 0.3s;
+	text-align: left;
+}
+
+.btn:hover {
+	background-color: #3a4f21;
+}
+
+.btn-secondary {
+	background-color: var(--secondary-color);
+}
+
+.btn-secondary:hover {
+	background-color: #454d38;
+}
+
+.top-right-button {
+	position: absolute;
+	top: 15px;
+	right: 15px;
+	background-color: var(--secondary-color);
+	color: var(--text-color);
+	border: none;
+	padding: 10px 15px;
+	border-radius: 6px;
+	font-size: 14px;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	z-index: 10;
+}
+
+/* Списки элементов */
+.list-container {
+	margin-top: 20px;
+}
+
+.list-item {
+	background-color: var(--card-bg);
+	border-radius: 8px;
+	padding: 15px;
+	margin-bottom: 15px;
+	cursor: pointer;
+	transition: transform 0.2s;
+}
+
+.list-item:hover {
+	transform: translateY(-3px);
+}
+
+.item-name {
+	font-size: 18px;
+	font-weight: bold;
+	color: var(--text-color);
+	margin-bottom: 5px;
+}
+
+.item-description {
+	font-size: 14px;
+	color: var(--text-secondary);
+	margin-bottom: 8px;
+}
+
+.item-value {
+	font-size: 16px;
+	color: var(--text-color);
+	padding: 5px 10px;
+	background-color: rgba(0, 0, 0, 0.2);
+	border-radius: 4px;
+	display: inline-block;
+}
+
+/* Модальные окна */
+.modal-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: rgba(0, 0, 0, 0.7);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 1000;
+	flex-direction: column;
+}
+
+.modal-content {
+	background-color: var(--card-bg);
+	padding: 25px;
+	border-radius: 10px;
+	width: 90%;
+	max-width: 500px;
+}
+
+.modal-title {
+	font-size: 20px;
+	margin-bottom: 15px;
+	color: var(--text-color);
+}
+
+.modal-description {
+	font-size: 14px;
+	color: var(--text-secondary);
+	margin-bottom: 20px;
+}
+
+.input-field {
+	width: 100%;
+	padding: 12px 15px;
+	margin-bottom: 20px;
+	border-radius: 6px;
+	border: 1px solid var(--secondary-color);
+	background-color: rgba(0, 0, 0, 0.2);
+	color: var(--text-color);
+	font-size: 16px;
+}
+
+.input-field:focus {
+	outline: none;
+	border-color: var(--primary-color);
+}
+
+.modal-actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: 10px;
+	margin-top: 20px;
+}
+
+/* Окно ожидания */
+.loading-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: rgba(0, 0, 0, 0.5);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 1001;
+}
+
+.loading-spinner {
+	border: 5px solid var(--secondary-color);
+	border-top: 5px solid var(--primary-color);
+	border-radius: 50%;
+	width: 50px;
+	height: 50px;
+	animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+	0% {
+		transform: rotate(0deg);
+	}
+
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+/* Адаптивность */
+@media (min-width: 768px) {
+	.nav-menu {
+		flex-direction: row;
+		justify-content: center;
+	}
+
+	.btn {
+		min-width: 200px;
+		text-align: center;
+	}
+
+	.list-container {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+		gap: 20px;
+	}
+
+	.list-item {
+		margin-bottom: 0;
+	}
+}
+
+/* Сообщения об ошибках */
+.error-message {
+	color: var(--error-color);
+	font-size: 14px;
+	margin-top: 5px;
+}
+
+/* Хлебные крошки или заголовок страницы */
+.page-header {
+	font-size: 24px;
+	margin-bottom: 20px;
+	color: var(--text-color);
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.back-button {
+	background: none;
+	border: none;
+	color: var(--text-color);
+	font-size: 24px;
+	cursor: pointer;
+}

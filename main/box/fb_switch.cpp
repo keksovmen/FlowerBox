@@ -41,7 +41,7 @@ std::string Switch::toJson() const
 	cJSON_AddStringToObject(obj, "description", getDescription().c_str());
 	cJSON_AddNumberToObject(obj, "id", getId());
 	cJSON_AddNumberToObject(obj, "tid", static_cast<int>(getTid()));
-	cJSON_AddNumberToObject(obj, "state", std::invoke(_stateCb) ? 1 : 0);
+	cJSON_AddNumberToObject(obj, "state", currentState() ? 1 : 0);
 	cJSON_AddItemToObject(obj, "property_ids", cJSON_CreateIntArray(getPropertyDependencies().data(), getPropertyDependencies().size()));
 	cJSON_AddItemToObject(obj, "sensors_ids", cJSON_CreateIntArray(_dependentSensors.data(), _dependentSensors.size()));
 
@@ -55,4 +55,9 @@ std::string Switch::toJson() const
 void Switch::addSensorDependency(int sensorId)
 {
 	_dependentSensors.push_back(sensorId);
+}
+
+bool Switch::currentState() const
+{
+	return std::invoke(_stateCb);
 }

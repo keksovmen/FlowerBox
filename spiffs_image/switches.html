@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Переключатели</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="/html/test_style.css">
+</head>
+
+<body>
+	<div class="container">
+		<div class="top-right-button" onclick="loadPage('main_menu.html')">В главное меню</div>
+		<h1 class="page-header">Список переключателей</h1>
+		<div class="list-container">
+			{{ begin count }}
+			<div class="list-item" onclick="loadPage('properties.html?source=switch&id={{ puta id i }}')">
+				<div class="item-name">{{ puta name i }}</div>
+				<div class="item-description">{{ puta description i }}</div>
+				<div class="item-value">{{ puta value i }}</div>
+			</div>
+			{{ end }}
+		</div>
+
+		<div id="loading-overlay" class="loading-overlay" style="display: none;">
+			<div class="loading-spinner"></div>
+		</div>
+	</div>
+
+	<script src="/html/nav.js"></script>
+</body>
+
+</html>

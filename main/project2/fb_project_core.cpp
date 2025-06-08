@@ -16,7 +16,7 @@ static CoreInfo _info = {
 
 
 
-static void _controlsCb(templates::Engine& engine)
+static void _controlsCb(templates::Engine& engine, const std::unordered_map<std::string, std::string>& query)
 {
 	engine.addIntArg(getRgbProperty().getId(), "rgb_color_id");
 	engine.addIntArg(getRgbSwitchProperty().getId(), "rgb_switch_id");

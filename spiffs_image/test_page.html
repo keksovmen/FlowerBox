@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Menu</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="test_style.css">
+</head>
+
+<body>
+	<div class="container">
+		<div class="top-right-button">В главное меню</div>
+		<div class="nav-menu">
+			<!-- <h2 class="title">Menu</h2> -->
+			<div class="btn">
+				<a href="/html/sensors.html">Sensors</a>
+			</div>
+			<div class="btn">
+				<a href="/html/switches.html">Switches</a>
+			</div>
+			<div class="btn">
+				<a href="/html/properties.html?source=box&id=0">Properties</a>
+			</div>
+		</div>
+		<div class="list-container">
+			<div class="list-item">
+				<div class="item-name">Название</div>
+				<div class="item-description">Описание</div>
+				<div class="item-value">1</div>
+			</div>
+			<div class="list-item">
+				<div class="item-name">Название</div>
+				<div class="item-description">Описание</div>
+				<div class="item-value">1</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- окно изменения свойства -->
+	<div class="modal-overlay" style="display: none;">
+		<div class="modal-content">
+			<div class="modal-title">Заголовок</div>
+			<div class="modal-description">Описание</div>
+			<label for="input_value">Значение:</label>
+			<input class="input-field" id="input_value" value="123">
+			<div class="error-message" id="eror_msg" style="display: none;">
+				Недопустимое значение! Температура должна быть между 20 и 90.
+			</div>
+		</div>
+		<div class="modal-actions">
+			<div class="btn btn-secondary">Отмена</div>
+			<div class="btn">Изменить</div>
+		</div>
+	</div>
+
+	<!-- окно загрузки -->
+	<div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="loading-spinner"></div>
+    </div>
+
+
+	</div>
+</body>
+
+</html>

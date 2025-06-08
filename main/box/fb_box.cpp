@@ -151,3 +151,23 @@ const Switch* Box::getSwitch(int id) const
 
 	return (*iter);
 }
+
+const std::vector<Sensor*>& Box::getSensors() const
+{
+	return _sensors;
+}
+
+const std::vector<Switch*>& Box::getSwitches() const
+{
+	return _switches;
+}
+
+const ObjectIface::PropertyArray& Box::getBoxsProperties() const
+{
+	return _boxProperties;
+}
+
+const std::string& Box::getName() const
+{
+	return _name;
+}
