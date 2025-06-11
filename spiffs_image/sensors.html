@@ -14,9 +14,9 @@
 		<h1 class="page-header">Список сенсоров</h1>
 		<div class="list-container">
 			{{ begin count }}
-			<div class="list-item" onclick="loadPage('properties.html?source=sensor&id={{ puta id i }}')">
-				<div class="item-name">{{ puta name i }}</div>
-				<div class="item-description">{{ puta description i }}</div>
+			<div class="list-item" onclick="loadPage('properties.html?source=sensor&id={{ puta id[i] }}')">
+				<div class="item-name">{{ puta name[i] }}</div>
+				<div class="item-description">{{ puta description[i] }}</div>
 			</div>
 			{{ end }}
 		</div>

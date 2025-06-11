@@ -14,10 +14,18 @@
 		<h1 class="page-header">Список свойств для {{ puts label }}</h1>
 		<div class="list-container">
 			{{ begin count }}
-			<div class="list-item" onclick="onPropertyClick('{{ puta id i }}')">
-				<div class="item-name">{{ puta name i }}</div>
-				<div class="item-description">{{ puta description i }}</div>
-				<div id="item-value-{{ puta id i }}" class="item-value">{{ puta value i }}</div>
+			<div class="list-item" {{ if tid[i] == 515 }} onclick="openColorPicker('{{ puta id[i] }}')"  {{ elseif tid[i] != 514 }} onclick="onPropertyClick('{{ puta id[i] }}')" {{ endif }}>
+				<div class="item-name">{{ puta name[i] }}</div>
+				<div class="item-description">{{ puta description[i] }}</div>
+				<div id="item-value-{{ puta id[i] }}" class="item-value {{ if tid[i] == 515 }} color-me {{ endif }}">{{ puta value[i] }}</div>
+
+				{{ if tid[i] == 514 }}
+				<div class="list-item-actions">
+					<button class="list-item-btn list-item-btn-secondary" onclick="onAutoButtonClicked({{ puta id[i] }}, 2)">Выкл.</button>
+					<button class="list-item-btn list-item-btn-primary" onclick="onAutoButtonClicked({{ puta id[i] }}, 0)">Авто</button>
+					<button class="list-item-btn list-item-btn-secondary" onclick="onAutoButtonClicked({{ puta id[i] }}, 1)">Вкл</button>
+				</div>
+				{{ endif }}
 			</div>
 			{{ end }}
 		</div>
@@ -37,6 +45,27 @@
 			<div class="modal-actions">
 				<div class="btn btn-secondary" onclick="onChangeCancel()">Отмена</div>
 				<div class="btn" onclick="onChangeApply()">Изменить</div>
+			</div>
+		</div>
+
+		<div id="colorPickerModal" class="modal-overlay color-picker-modal" style="display: none;">
+			<div class="modal-content">
+				<h2 class="modal-title">Выберите цвет</h2>
+	
+				<div class="color-picker-preview-container">
+					<div class="color-picker-preview" id="colorPreview"></div>
+					<div class="color-picker-preview" id="colorSelected"></div>
+				</div>
+				<div class="color-picker-hex" id="colorHex">#FFFFFF</div>
+	
+				<div class="color-wheel-container" id="colorWheel">
+					<div class="color-wheel-selector" id="colorSelector"></div>
+				</div>
+	
+				<div class="modal-actions">
+					<button class="btn btn-secondary" id="colorCancelBtn">Отмена</button>
+					<button class="btn" id="colorConfirmBtn">Выбрать</button>
+				</div>
 			</div>
 		</div>
 	</div>

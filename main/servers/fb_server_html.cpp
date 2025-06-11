@@ -21,6 +21,7 @@
 #define _TEMPLATE_KEYWORD_ARRAY_ID "id"
 #define _TEMPLATE_KEYWORD_ARRAY_VALUE "value"
 #define _TEMPLATE_KEYWORD_ARRAY_LABEL "label"
+#define _TEMPLATE_KEYWORD_ARRAY_TID "tid"
 
 #define _URL_PROPERTY_SOURCE_BOX "device"
 #define _URL_PROPERTY_SOURCE_SENSOR "sensor"
@@ -260,6 +261,7 @@ static void _properties_cb(templates::Engine& engine, const std::unordered_map<s
 			engine.appendArgArray(e->getDescription(), _TEMPLATE_KEYWORD_ARRAY_DESCRIPTION);
 			engine.appendArgArray(std::to_string(e->getId()), _TEMPLATE_KEYWORD_ARRAY_ID);
 			engine.appendArgArray(e->getValue(), _TEMPLATE_KEYWORD_ARRAY_VALUE);
+			engine.appendArgArray(std::to_string(std::to_underlying(e->getTid())), _TEMPLATE_KEYWORD_ARRAY_TID);
 		});
 }
 

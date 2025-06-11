@@ -122,6 +122,73 @@ body {
 	display: inline-block;
 }
 
+/* * Стили для контейнера кнопок внутри list-item */
+*/ .list-item-actions {
+	display: flex;
+	gap: 10px;
+	margin-top: 12px;
+	flex-wrap: wrap;
+	/* Позволяет кнопкам переноситься на новую строку при нехватке места */
+}
+
+/* Базовый стиль для кнопок в list-item */
+.list-item-btn {
+	padding: 8px 12px;
+	border-radius: 6px;
+	font-size: 14px;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	border: none;
+	white-space: nowrap;
+	/* Предотвращает перенос текста в кнопке */
+}
+
+/* Основная кнопка */
+.list-item-btn-primary {
+	background-color: var(--primary-color);
+	color: var(--text-color);
+}
+
+/* Вторичная кнопка */
+.list-item-btn-secondary {
+	background-color: var(--secondary-color);
+	color: var(--text-color);
+}
+
+/* Кнопка-предупреждение */
+/* .list-item-btn-warning {
+  background-color: var(--error-color);
+  color: var(--text-color);
+} */
+
+/* Состояния при наведении */
+.list-item-btn-primary:hover {
+	background-color: #3a4f21;
+	transform: translateY(-1px);
+}
+
+.list-item-btn-secondary:hover {
+	background-color: #454d38;
+	transform: translateY(-1px);
+}
+
+/* .list-item-btn-warning:hover {
+  background-color: #a01616;
+  transform: translateY(-1px);
+} */
+
+/* Адаптация для маленьких экранов */
+/* @media (max-width: 480px) {
+  .list-item-actions {
+    gap: 8px;
+  }
+  
+  .list-item-btn {
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+} */
+
 /* Модальные окна */
 .modal-overlay {
 	position: fixed;
@@ -175,7 +242,7 @@ body {
 
 .modal-actions {
 	display: flex;
-	justify-content: flex-end;
+	justify-content: space-between;
 	gap: 10px;
 	margin-top: 20px;
 }
@@ -259,4 +326,73 @@ body {
 	color: var(--text-color);
 	font-size: 24px;
 	cursor: pointer;
+}
+
+/* Стили для цветового круга */
+.color-wheel-container {
+	position: relative;
+	width: 250px;
+	height: 250px;
+	margin: 20px auto;
+	border-radius: 50%;
+	background: conic-gradient(red, yellow, lime, cyan, blue, magenta, red);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+	overflow: hidden;
+	cursor: crosshair;
+}
+
+.color-wheel-selector {
+	position: absolute;
+	width: 16px;
+	height: 16px;
+	border: 2px solid white;
+	border-radius: 50%;
+	box-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
+	pointer-events: none;
+	transform: translate(-8px, -8px);
+}
+
+.color-wheel-brightness {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: linear-gradient(to top, #000, rgba(0, 0, 0, 0));
+}
+
+.color-picker-preview-container {
+	display: flex;
+	justify-content: center;
+}
+
+.color-picker-preview {
+	width: 60px;
+	height: 60px;
+	border-radius: 8px;
+	margin: 0 10px 0px;
+	border: 1px solid var(--secondary-color);
+}
+
+.color-picker-hex {
+	text-align: center;
+	margin-top: 10px;
+	font-family: monospace;
+	font-size: 16px;
+	color: var(--text-color);
+	padding: 8px;
+	background: rgba(0, 0, 0, 0.1);
+	border-radius: 4px;
+}
+
+.color-me {
+	
+}
+
+/* Адаптация для мобильных */
+@media (max-width: 600px) {
+	.color-wheel-container {
+		width: 200px;
+		height: 200px;
+	}
 }

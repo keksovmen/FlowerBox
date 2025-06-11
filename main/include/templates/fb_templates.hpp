@@ -49,6 +49,15 @@ namespace fb
 				bool appendArgArray(const std::string& val, const std::string& key);
 
 			private:
+				enum class KeywordFamily
+				{
+					PUT,
+					LOOP,
+					IF,
+				};
+
+
+
 				class State
 				{
 					public:
@@ -71,6 +80,9 @@ namespace fb
 				{
 					public:
 						virtual State& process(Engine& context, FILE* f) override;
+					
+					private:
+						State& _switchOnKeyword(Engine& context);
 				};
 
 				class StateArgs : public State
@@ -89,6 +101,13 @@ namespace fb
 				{
 					public:
 						virtual State& process(Engine& context, FILE* f) override;
+					
+					private:
+						State& _processPutCmds(Engine& context, FILE* f);
+						State& _processLoopCmds(Engine& context, FILE* f);
+						State& _processIfCmds(Engine& context, FILE* f);
+
+						bool _processBranching(Engine& context);
 				};
 
 				class StateErr : public State
@@ -110,6 +129,9 @@ namespace fb
 				bool _incrementLoop();	//return true if count is reached
 				bool _endLoop(FILE* f);
 				bool _isInLoop();
+				bool _isKeyword(std::string_view expected) const;
+				KeywordFamily _keywordFamily() const;
+				bool _isWriteAllowed() const;
 			
 			private:
 				char* _buffer;
@@ -117,8 +139,9 @@ namespace fb
 				DataConsumerCb _dataConsumer;
 
 				char _cmdBuffer[32];
-				char _argBuffer[2][32];
+				char _argBuffer[4][32];
 				int _currentArg = 0;
+				int _expectedArgs = 0;
 				int _currentBuffer = 0;
 
 				//for cycles
@@ -126,6 +149,11 @@ namespace fb
 				int _loopI = 0;
 				int _loopCount = 0;
 				bool _inLoop = false;
+
+				//for conditions
+				bool _inBranching = false;
+				bool _isValidBranch = false;
+				bool _isBranchingCompleted = false;
 
 				//TODO: make it work in provided buffer not in dynamic memory
 				std::unordered_map<std::string, Argument> _args;
