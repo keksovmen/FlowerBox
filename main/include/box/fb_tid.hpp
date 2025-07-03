@@ -75,7 +75,8 @@ namespace fb
 						return {"Humidity", "General humidity sensor", "float", "0.0", "100.0"};
 
 					case Tid::SENSOR_MP3:
-						return {"Mp3 player", "", "int", "-1", "2000"};
+						// return {"Mp3 player", "", "int", "-1", "2000"};
+						return {"Mp3 плеер", "", "int", "-1", "2000"};
 
 					case Tid::SWITCH_LIGHT:
 						return {"Light switch", "", "bool", "0", "1"};
@@ -90,7 +91,8 @@ namespace fb
 						// return _TidHolder("Fun switch", "", "bool", "0", "1");
 
 					case Tid::SWITCH_RGB:
-						return {"RGB switch", "", "bool", "0", "1"};
+						// return {"RGB switch", "", "bool", "0", "1"};
+						return {"RGB контроллер", "", "bool", "0", "1"};
 
 					case Tid::PROPERTY_SENSOR_PERIOD_GLOBAL:
 						return {"Sensor mesure period", "measured in SEC", "int", "1", "600"};
@@ -101,20 +103,25 @@ namespace fb
 						// return _TidHolder("Changes description", "", "str", "0", "300");
 
 					case Tid::PROPERTY_SWITCH_FORSE:
-						return {"Forses state", "", "int", "0", "2"};
+						// return {"Forses state", "", "int", "0", "2"};
+						return {"Режим работы", "0 - авто, 1- вкл., 2 - выкл.", "int", "0", "2"};
 						// return _TidHolder("Forses state", "", "int", "0", "2");
 
 					case Tid::PROPERTY_SWITCH_RGB_VALUE:
-						return {"RGB", "Send in decimals not hex", "int", "0", "16777215"};
+						// return {"RGB", "Send in decimals not hex", "int", "0", "16777215"};
+						return {"RGB", "Данные должны быть в виде числа 32-бит WRGB не в HEX формате", "int", "0", "16777215"};
 
 					case Tid::PROPERTY_SWITCH_MP3_PLAY:
-						return {"Mp3 play", "Accepts track id and starts to play", "int", "0", "65535"};
+						// return {"Mp3 play", "Accepts track id and starts to play", "int", "0", "65535"};
+						return {"Mp3 воспроизвести", "Принимает ИД трека и начинает воспроизведение", "int", "0", "65535"};
 
 					case Tid::PROPERTY_SWITCH_MP3_STOP:
-						return {"Mp3 stop", "Stop playing", "none", "0", "0"};
+						// return {"Mp3 stop", "Stop playing", "none", "0", "0"};
+						return {"Mp3 стоп", "Прекращает проигрывание", "none", "0", "0"};
 
 					case Tid::PROPERTY_SWITCH_MP3_VOLUME:
-						return {"Mp3 volume", "Set volume", "int", "0", "30"};
+						// return {"Mp3 volume", "Set volume", "int", "0", "30"};
+						return {"Mp3 громкость", "Изменяет сразу, без плавного наростания", "int", "0", "30"};
 
 					case Tid::PROPERTY_SWITCH_LIGHT_ON:
 						return {"Start time", "At what time to turn ON, in seconds", "int", "0", "86399"};
@@ -126,10 +133,12 @@ namespace fb
 						return {"Current system time", "Unix time since 1970", "int", "0", "4294967295"};
 
 					case Tid::PROPERTY_SYSTEM_RESET_SETTINGS:
-						return {"Reset settings", "Deletes all WIFI settings", "none", "0", "0"};
+						// return {"Reset settings", "Deletes all WIFI settings", "none", "0", "0"};
+						return {"Сбросить настройки", "Удалит все настройки WIFI", "none", "0", "0"};
 
 					case Tid::PROPERTY_SYSTEM_RESTART:
-						return {"System restart", "Restarts the system", "none", "0", "0"};
+						// return {"System restart", "Restarts the system", "none", "0", "0"};
+						return {"Перезагрузка системы", "Перезагрузка", "none", "0", "0"};
 
 					case Tid::PROPERTY_SWITCH_SPEED:
 						return {"Switch speed", "PWM ", "int", "0", "100"};
@@ -153,7 +162,8 @@ namespace fb
 						return {"Switch's day and night delta humidity", "Difference between day and night humidity", "float", "-100.0", "100.0"};
 
 					case Tid::PROPERTY_SWITCH_DMX_ADDRESS:
-						return {"Dmx address", "First DMX address", "int", "1", "512"};
+						// return {"Dmx address", "First DMX address", "int", "1", "512"};
+						return {"Dmx адрес", "Первый адрес для данных", "int", "1", "512"};
 
 					default:
 						// abort();

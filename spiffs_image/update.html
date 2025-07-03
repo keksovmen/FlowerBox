@@ -1,18 +1,23 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<title>UpdateMenu</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<link rel="stylesheet" href="/html/style.css">
-	</head>
-	<body>
-		<div class="panel">
-			<h2 class="title">Update menu</h2>
-			<form method="post" enctype="multipart/form-data" action="/update">
-				<input type="file" name="file" class="button">
-				<input type="submit" class="button" value="Send">
+
+<head>
+	<title>Меню обновления</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="test_style.css">
+</head>
+
+<body>
+	<div class="container">
+		<h1 class="page-header">Меню обновления</h1>
+		<div class="list-container">
+			<form class="list-container" method="post" enctype="multipart/form-data" action="/update">
+				<input type="file" name="file" class="btn">
+				<input type="submit" class="btn" value="Отправить">
 			</form>
 		</div>
-	</body>
+	</div>
+</body>
+
 </html>

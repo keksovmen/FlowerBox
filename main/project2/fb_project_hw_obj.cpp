@@ -77,7 +77,7 @@ static void _dmx_send_task(void* arg)
 
 void project::initHwObjs()
 {
-	// _sensorService.addSensor(&getHwMp3Sensor());
+	_sensorService.addSensor(&getHwMp3Sensor());
 	_sensorService.addSensor(&getHwKeyboardSensor());
 
 	_swithService.addSwitch(&getHwRgbSwitch());

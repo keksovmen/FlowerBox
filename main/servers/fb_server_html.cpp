@@ -189,6 +189,11 @@ static esp_err_t _fileCb(httpd_req_t *r)
 	return err;
 }
 
+static void _menu_cb(templates::Engine& engine, const std::unordered_map<std::string, std::string>& query)
+{
+	engine.addArgStr(global::getFlowerBox()->getName(), _TEMPLATE_KEYWORD_ARRAY_LABEL);
+}
+
 static void _sensors_cb(templates::Engine& engine, const std::unordered_map<std::string, std::string>& query)
 {
 	const auto& entries = global::getFlowerBox()->getSensors();
@@ -270,6 +275,7 @@ static void _properties_cb(templates::Engine& engine, const std::unordered_map<s
 void server::registerServerHtml(Builder& builder)
 {
     builder.addEndpoint(Endpoint{_HTML_PATH "*", EndpointMethod::GET, reinterpret_cast<void*>(const_cast<char*>(_PATH_PREFIX)), &_fileCb});
+	htmlAddFileHandler("main_menu.html", &_menu_cb);
 	htmlAddFileHandler("sensors.html", &_sensors_cb);
 	htmlAddFileHandler("switches.html", &_switches_cb);
 	htmlAddFileHandler("properties.html", &_properties_cb);
