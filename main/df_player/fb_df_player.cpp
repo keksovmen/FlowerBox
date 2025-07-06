@@ -2,6 +2,9 @@
 
 #include <utility>
 
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+
 
 
 using namespace fb;
@@ -192,3 +195,43 @@ bool DfPlayer::writeStop()
 	return true;
 }
 
+bool DfPlayer::writeSetLoopFile()
+{
+	Packet p(Cmd::SET_LOOP_MODE, 0);
+	_writeCb(p.calculateCRC().getRaw());
+
+	vTaskDelay(pdMS_TO_TICKS(800));
+	writeStop();
+
+	return true;
+}
+
+bool DfPlayer::writeSetLoopFolder()
+{
+	Packet p(Cmd::SET_LOOP_MODE, 1);
+	_writeCb(p.calculateCRC().getRaw());
+
+	vTaskDelay(pdMS_TO_TICKS(300));
+	writeStop();
+
+	return true;
+}
+
+bool DfPlayer::writeDisableLoop()
+{
+	Packet p(Cmd::SET_LOOP_MODE, 2);
+	_writeCb(p.calculateCRC().getRaw());
+
+	vTaskDelay(pdMS_TO_TICKS(1000));
+	writeStop();
+
+	return true;
+}
+
+bool DfPlayer::writeReset()
+{
+	Packet p(Cmd::RESET);
+	_writeCb(p.calculateCRC().getRaw());
+
+	return true;
+}

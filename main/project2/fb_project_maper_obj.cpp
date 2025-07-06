@@ -95,6 +95,16 @@ static void _initMp3Sensor()
 
 	getBox().addProperty(std::unique_ptr<box::PropertyIface>(volumeProperty));
 	getBoxMp3Sensor().addPropertyDependency(volumeProperty->getId());
+
+
+	auto* volumeLoop = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_MP3_LOOP,
+		[](int val){
+			return getHwMp3Sensor().setLoop(static_cast<bool>(val));
+		}, getHwMp3Sensor().isLooping()
+	);
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(volumeLoop));
+	getBoxMp3Sensor().addPropertyDependency(volumeLoop->getId());
 }
 
 static void _init_box_properties()

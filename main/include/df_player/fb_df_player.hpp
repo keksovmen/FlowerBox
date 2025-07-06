@@ -22,6 +22,8 @@ namespace fb
 			PLAY_TRACK = 0x03,
 			GET_VOLUME = 0x43,
 			GET_SD_FILE_COUNT = 0x48,
+			SET_LOOP_MODE = 0x08,
+			RESET = 0x0C,
 		};
 
 
@@ -102,6 +104,10 @@ namespace fb
 				bool writeVolume(int volume);
 				bool writePlay(int fileId);
 				bool writeStop();
+				bool writeSetLoopFile();
+				bool writeSetLoopFolder();
+				bool writeDisableLoop();
+				bool writeReset();
 
 			private:
 				const ReadCb _readCb;

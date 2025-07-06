@@ -22,9 +22,11 @@ namespace fb
 				bool play(int fileId);
 				void stop();
 				bool setVolume(int volume);
+				bool setLoop(bool state);
 				//valid only if sensor is init
 				int getFilesCount() const;
 				int getVolume() const;
+				bool isLooping() const;
 
 			private:
 				interfaces::Uart _uart;
@@ -34,7 +36,7 @@ namespace fb
 
 				int _filesCount = 0;
 				int _volume = 15;
-				// bool _loopFlag = false;
+				bool _loopFlag = true;
 
 
 

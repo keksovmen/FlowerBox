@@ -49,6 +49,8 @@ namespace fb
 
 			PROPERTY_SWITCH_DMX_ADDRESS,
 
+			PROPERTY_SWITCH_MP3_LOOP,
+
 			MAX
 		};
 
@@ -164,6 +166,9 @@ namespace fb
 					case Tid::PROPERTY_SWITCH_DMX_ADDRESS:
 						// return {"Dmx address", "First DMX address", "int", "1", "512"};
 						return {"Dmx адрес", "Первый адрес для данных", "int", "1", "512"};
+					
+					case Tid::PROPERTY_SWITCH_MP3_LOOP:
+						return {"Зацикливание", "Если включен будет играть один и тот же трек постоянно, при изменении остановит текущее воспроизведение", "bool", "0", "1"};
 
 					default:
 						// abort();

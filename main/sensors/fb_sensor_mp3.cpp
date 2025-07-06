@@ -80,6 +80,27 @@ bool Mp3Sensor::setVolume(int volume)
 	return result;
 }
 
+bool Mp3Sensor::setLoop(bool state)
+{
+	FB_DEBUG_LOG_I_OBJ("Set loop(%d)", state);
+
+	if(!isInit()){
+		return false;
+	}
+
+	if(state){
+		_player.writeSetLoopFile();
+	}else{
+		_player.writeReset();
+		vTaskDelay(pdMS_TO_TICKS(700));
+		_player.writeVolume(_volume);
+	}
+
+	_loopFlag = state;
+
+	return true;
+}
+
 int Mp3Sensor::getFilesCount() const
 {
 	return _filesCount;
@@ -88,6 +109,11 @@ int Mp3Sensor::getFilesCount() const
 int Mp3Sensor::getVolume() const
 {
 	return _volume;
+}
+
+bool Mp3Sensor::isLooping() const
+{
+	return _loopFlag;
 }
 
 bool Mp3Sensor::_doInit()
@@ -106,6 +132,8 @@ bool Mp3Sensor::_doInit()
 	}
 
 	_volume = volume.value();
+
+	_player.writeSetLoopFile();
 
 	return true;
 }
