@@ -24,10 +24,14 @@
 			</div>
 		</div>
 		<div class="list-container">
-			<div class="list-item">
+			<div class="list-item" onclick="openColorPicker(1)">
 				<div class="item-name">Название</div>
 				<div class="item-description">Описание</div>
-				<div class="item-value">1</div>
+				<div class="item-value color-me" id="item-value-1">-15928489</div>
+				<div class="list-item-actions">
+					<button class="list-item-btn list-item-btn-primary">Редактировать</button>
+					<button class="list-item-btn list-item-btn-secondary">Подробнее</button>
+				</div>
 			</div>
 			<div class="list-item">
 				<div class="item-name">Название</div>
@@ -56,8 +60,31 @@
 
 	<!-- окно загрузки -->
 	<div class="loading-overlay" id="loadingOverlay" style="display: none;">
-        <div class="loading-spinner"></div>
-    </div>
+		<div class="loading-spinner"></div>
+	</div>
+
+	<div id="colorPickerModal" class="modal-overlay color-picker-modal">
+		<div class="modal-content">
+			<h2 class="modal-title">Выберите цвет</h2>
+
+			<div class="color-picker-preview-container">
+				<div class="color-picker-preview" id="colorPreview"></div>
+				<div class="color-picker-preview" id="colorSelected"></div>
+			</div>
+			<div class="color-picker-hex" id="colorHex">#FFFFFF</div>
+
+			<div class="color-wheel-container" id="colorWheel">
+				<div class="color-wheel-selector" id="colorSelector"></div>
+			</div>
+
+			<div class="modal-actions">
+				<button class="btn btn-secondary" id="colorCancelBtn">Отмена</button>
+				<button class="btn" id="colorConfirmBtn">Выбрать</button>
+			</div>
+		</div>
+	</div>
+
+	<script src="properties.js"></script>
 
 
 	</div>

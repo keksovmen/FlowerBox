@@ -50,6 +50,7 @@ namespace fb
 			PROPERTY_SWITCH_DMX_ADDRESS,
 
 			PROPERTY_SWITCH_MP3_LOOP,
+			PROPERTY_SWITCH_RGB_GRADIENT_MAFIA,
 
 			MAX
 		};
@@ -169,6 +170,9 @@ namespace fb
 					
 					case Tid::PROPERTY_SWITCH_MP3_LOOP:
 						return {"Зацикливание", "Если включен будет играть один и тот же трек постоянно, при изменении остановит текущее воспроизведение", "bool", "0", "1"};
+
+					case Tid::PROPERTY_SWITCH_RGB_GRADIENT_MAFIA:
+						return {"Цвет для мафии", "Задает цвет от красного к зеленому", "int", "0", "100"};
 
 					default:
 						// abort();

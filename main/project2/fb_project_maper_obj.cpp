@@ -20,6 +20,53 @@ static box::Switch _boxRgbSwitch(box::Tid::SWITCH_RGB,
 
 
 
+static int _value_to_rgbw_gradient(int value) {
+	// Ограничиваем значение в диапазоне 0-100
+	if (value < 0) value = 0;
+	if (value > 100) value = 100;
+	
+	uint8_t r, g, b = 0, w = 0;
+	// Вычисляем компоненты R и G
+	if (value <= 50) {
+		// Красный → Жёлтый (R=255, G растёт от 0 до 255)
+		float ratio = (float)value / 50.0f;
+		r = 255;
+		g = (uint8_t)(255 * ratio);
+	} else {
+		// Жёлтый → Зелёный (R уменьшается от 255 до 0, G=255)
+		float ratio = (float)(value - 50) / 50.0f;
+		r = (uint8_t)(255 * (1.0f - ratio));
+		g = 255;
+	}
+	
+	// Формируем 32-битное значение WRGB
+	return (w << 24) | (r << 16) | (g << 8) | b;
+}
+
+static int _rgbw_to_value_gradient(int rgbw) {
+	// Извлекаем компоненты цвета
+	// uint8_t w = (rgbw >> 24) & 0xFF;
+	uint8_t r = (rgbw >> 16) & 0xFF;
+	uint8_t g = (rgbw >> 8) & 0xFF;
+	// uint8_t b = rgbw & 0xFF;
+	
+	if (r == 255 && g == 0) return 0;    // Чистый красный
+	if (r == 255 && g == 255) return 50; // Чистый жёлтый
+	if (r == 0 && g == 255) return 100;  // Чистый зелёный
+
+	// Если больше зелёного (G > R → жёлтый-зелёная зона)
+	if (g > r) {
+		float ratio = (float)g / 255.0f;
+		return 50 + (int)(50.0f * ratio); // 50-100
+	}else {
+	// Иначе красный-жёлтая зона
+		float ratio = (float)g / 255.0f;
+		return (int)(50.0f * ratio); // 0-50
+	}
+}
+
+
+
 static void _create_and_register_forse_property(switches::SwitchIface& obj, box::Switch& dependy)
 {
 	auto* forseProperty = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_FORSE,
@@ -50,6 +97,16 @@ static void _initRgbSwitch()
 
 	getBox().addProperty(std::unique_ptr<box::PropertyIface>(colorProperty));
 	_boxRgbSwitch.addPropertyDependency(colorProperty->getId());
+
+	auto* gradientProperty = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_RGB_GRADIENT_MAFIA,
+		[](int val){
+			getHwRgbSwitch().setColor(_value_to_rgbw_gradient(val));
+			return true;
+		}, _rgbw_to_value_gradient(getHwRgbSwitch().getColor())
+	);
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(gradientProperty));
+	_boxRgbSwitch.addPropertyDependency(gradientProperty->getId());
 
 
 	auto* dmxAddressProperty = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_DMX_ADDRESS,
