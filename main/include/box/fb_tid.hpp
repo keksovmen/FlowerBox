@@ -21,6 +21,7 @@ namespace fb
 			SWITCH_HEAT,
 			SWITCH_FAN,
 			SWITCH_RGB,
+			SWITCH_GPIO_ARRAY,
 
 			PROPERTY_SENSOR_PERIOD_GLOBAL = 512,
 			PROPERTY_SENSOR_DESCRIPTION,
@@ -51,6 +52,8 @@ namespace fb
 
 			PROPERTY_SWITCH_MP3_LOOP,
 			PROPERTY_SWITCH_RGB_GRADIENT_MAFIA,
+
+			PROPERTY_GENERAL,
 
 			MAX
 		};
@@ -96,6 +99,10 @@ namespace fb
 					case Tid::SWITCH_RGB:
 						// return {"RGB switch", "", "bool", "0", "1"};
 						return {"RGB контроллер", "", "bool", "0", "1"};
+
+					case Tid::SWITCH_GPIO_ARRAY:
+						// return {"RGB switch", "", "bool", "0", "1"};
+						return {"GPIO array switch", "", "bool", "0", "1"};
 
 					case Tid::PROPERTY_SENSOR_PERIOD_GLOBAL:
 						return {"Sensor mesure period", "measured in SEC", "int", "1", "600"};
@@ -173,6 +180,9 @@ namespace fb
 
 					case Tid::PROPERTY_SWITCH_RGB_GRADIENT_MAFIA:
 						return {"Цвет для мафии", "Задает цвет от красного к зеленому", "int", "0", "100"};
+
+					case Tid::PROPERTY_GENERAL:
+						return {"Anything", "", "int", "0", "100"};
 
 					default:
 						// abort();

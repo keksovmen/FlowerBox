@@ -3,6 +3,7 @@
 #include <cstring>
 
 #include "fb_globals.hpp"
+#include "fb_gpio_switch.hpp"
 #include "fb_http_puller.hpp"
 #include "fb_keyboard_handler.hpp"
 #include "fb_pins.hpp"
@@ -28,7 +29,13 @@ using namespace project;
 static sensor::KeyboardSensor<1> _keyboardSensor({std::pair{pins::PIN_KEYBOARD_RESET, h::ButtonVK::VK_0}});
 
 // //переключатели туть
-			
+static switches::ArrayGpioSwitch<6> _gpioSwitch(
+	{switches::GpioSwitch{4},
+	switches::GpioSwitch{5},
+	switches::GpioSwitch{6},
+	switches::GpioSwitch{8},
+	switches::GpioSwitch{11},
+	switches::GpioSwitch{12}});
 
 // //сервисы туть
 static sensor::SensorService _sensorService;
@@ -49,7 +56,11 @@ static const char* TAG = "hw";
 
 void project::initHwObjs()
 {
+	_gpioSwitch.turnOffAll();
+
 	_sensorService.addSensor(&getHwKeyboardSensor());
+
+	_swithService.addSwitch(&_gpioSwitch);
 
 	//register key handler for dropping WIFI settings
 	global::getEventManager()->attachListener(&_keyboardHandler);
@@ -79,4 +90,9 @@ switches::SwitchService& project::getHwSwitchService()
 sensor::SensorStorage& project::getHwSensorStorage()
 {
 	return _sensorStorage;
+}
+
+switches::ArrayGpioSwitch<6>& project::getHwGpioSwitch()
+{
+	return _gpioSwitch;
 }

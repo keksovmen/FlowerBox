@@ -38,6 +38,7 @@ else()
 		"relay_project/fb_project_maper_obj.cpp"
 		"relay_project/fb_project_core.cpp"
 		"relay_project/fb_http_puller.cpp"
+		"switches/fb_gpio_switch.cpp"
 		)
 	set(_ADD_INCLUDES
 		"include/relay_project"

@@ -6,6 +6,7 @@
 #include "fb_sensor_service.hpp"
 #include "fb_sensor_storage.hpp"
 #include "fb_switch_service.hpp"
+#include "fb_gpio_switch.hpp"
 
 
 
@@ -20,5 +21,7 @@ namespace fb
 		sensor::SensorService& getHwSensorService();
 		switches::SwitchService& getHwSwitchService();
 		sensor::SensorStorage& getHwSensorStorage();
+
+		switches::ArrayGpioSwitch<6>& getHwGpioSwitch();
 	}
 }

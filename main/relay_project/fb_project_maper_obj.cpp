@@ -15,6 +15,11 @@ using namespace project;
 
 
 
+static box::Switch _gpioSwitch(box::Tid::SWITCH_GPIO_ARRAY,
+	[](){return getHwGpioSwitch().isOn(0);});
+
+
+
 static void _create_and_register_forse_property(switches::SwitchIface& obj, box::Switch& dependy)
 {
 	auto* forseProperty = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_FORSE,
@@ -54,75 +59,44 @@ static void _init_box_properties()
 }
 
 
-// static void _initMp3Sensor()
-// {
-// 	//must be write only
-// 	auto* playProperty = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_MP3_PLAY,
-// 		[](int val){
-// 			return getHwMp3Sensor().play(val);
-// 		}, 0
-// 	);
+static void _initGpioArray()
+{
+	_create_and_register_forse_property(getHwGpioSwitch(), _gpioSwitch);
 
-// 	getBox().addProperty(std::unique_ptr<box::PropertyIface>(playProperty));
-// 	getBoxMp3Sensor().addPropertyDependency(playProperty->getId());
+	auto* turnOnProperty = new box::PropertyInt("TurnOn", "Turns specific GPIO on",
+		box::Tid::PROPERTY_GENERAL,
+		[](int val){
+			getHwGpioSwitch().turnOn(val);
+			return true;
+		}, 0, 0, 6
+	);
 
-
-// 	auto* stopProperty = new box::PropertyNone(
-// 		box::Tid::PROPERTY_SWITCH_MP3_STOP,
-// 		[](std::string val){
-// 			getHwMp3Sensor().stop();
-// 			return true;
-// 		});
-
-// 	getBox().addProperty(std::unique_ptr<box::PropertyIface>(stopProperty));
-// 	getBoxMp3Sensor().addPropertyDependency(stopProperty->getId());
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(turnOnProperty));
+	_gpioSwitch.addPropertyDependency(turnOnProperty->getId());
 
 
-// 	auto* volumeProperty = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_MP3_VOLUME,
-// 		[](int val){
-// 			return getHwMp3Sensor().setVolume(val);
-// 		}, getHwMp3Sensor().getVolume()
-// 	);
+	auto* turnOffProperty = new box::PropertyInt("TurnOff", "Turns specific GPIO off",
+		box::Tid::PROPERTY_GENERAL,
+		[](int val){
+			getHwGpioSwitch().turnOff(val);
+			return true;
+		}, 0, 0, 6
+	);
 
-// 	getBox().addProperty(std::unique_ptr<box::PropertyIface>(volumeProperty));
-// 	getBoxMp3Sensor().addPropertyDependency(volumeProperty->getId());
-
-
-// 	auto* volumeLoop = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_MP3_LOOP,
-// 		[](int val){
-// 			return getHwMp3Sensor().setLoop(static_cast<bool>(val));
-// 		}, getHwMp3Sensor().isLooping()
-// 	);
-
-// 	getBox().addProperty(std::unique_ptr<box::PropertyIface>(volumeLoop));
-// 	getBoxMp3Sensor().addPropertyDependency(volumeLoop->getId());
-// }
-
-// static void _init_box_properties()
-// {
-// 	auto* settingsProp = new box::PropertyNone(box::Tid::PROPERTY_SYSTEM_RESET_SETTINGS,
-// 		[](auto val){
-// 			settings::clearWifi();
-// 			return true;
-// 		});
-// 	getBox().addProperty(std::unique_ptr<box::PropertyIface>(settingsProp));
-// 	getBox().addPropertyDependency(settingsProp->getId());
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(turnOffProperty));
+	_gpioSwitch.addPropertyDependency(turnOffProperty->getId());
 
 
-// 	auto* restartProp = new box::PropertyNone(box::Tid::PROPERTY_SYSTEM_RESTART,
-// 		[](auto val){
-// 			global::getTimeScheduler()->addActionDelayed([](){esp_restart();}, 5000, portMAX_DELAY);
-// 			return true;
-// 		});
-// 	getBox().addProperty(std::unique_ptr<box::PropertyIface>(restartProp));
-// 	getBox().addPropertyDependency(restartProp->getId());
-// }
+
+	getBox().addSwitch(&_gpioSwitch);
+}
 
 
 
 void project::initMaperObjs()
 {
 	_init_box_properties();
+	_initGpioArray();
 }
 
 int project::mapBoxSensorIdToAddres(int id)
@@ -136,10 +110,10 @@ int project::mapBoxSensorIdToAddres(int id)
 
 int project::mapBoxSwitchIdToAddres(int id)
 {
-	// if(id == _boxRgbSwitch.getId())
-	// {
-	// 	return reinterpret_cast<int>(&_boxRgbSwitch);
-	// }
+	if(id == _gpioSwitch.getId())
+	{
+		return reinterpret_cast<int>(&_gpioSwitch);
+	}
 
 	assert(0);
 }
