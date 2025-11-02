@@ -14,6 +14,12 @@ using namespace project;
 
 
 
+HttpPuller::HttpPuller(ActionCb onResult)
+	: _actionCb(std::move(onResult))
+{
+
+}
+
 const char* HttpPuller::getName() const
 {
 	return "HttpPuller";
@@ -103,47 +109,13 @@ bool HttpPuller::_onPerformRequest()
 void HttpPuller::_onFailure()
 {
 	FB_DEBUG_LOG_I_OBJ("Failed to get something or do request");
+	std::invoke(_actionCb, std::optional<std::string_view>{});
 }
 
 void HttpPuller::_onSuccess(std::string_view data)
 {
 	FB_DEBUG_LOG_I_OBJ("Data: %s", data.cbegin());
-
-	// Парсинг JSON
-	cJSON* json = cJSON_Parse(data.cbegin());
-	if(!json){
-		FB_DEBUG_LOG_E_OBJ("Failed to parse JSON");
-		return;
-	}
-
-	//parse json
-	cJSON* idJson = cJSON_GetObjectItemCaseSensitive(json, "id");
-	cJSON* valueJson = cJSON_GetObjectItemCaseSensitive(json, "value");
-
-	if (!cJSON_IsNumber(idJson) || !cJSON_IsString(valueJson)) {
-		//failure do nothing
-		FB_DEBUG_LOG_E_OBJ("Id is not an int and value is not a string");
-
-		// Освобождение памяти
-		cJSON_Delete(json);
-		return;
-	}
-
-	const int id = idJson->valueint;
-	const char* valuePtr = valueJson->valuestring;
-	FB_DEBUG_LOG_I_OBJ("ID=%d, value=%s", id, valuePtr);
-
-	const std::string value = valuePtr;
-
-	// Освобождение памяти
-	cJSON_Delete(json);
-
-
-	//изменение свойства
-	auto* prop = global::getFlowerBox()->getProperty(id);
-	if(prop){
-		prop->setFromJson(value);
-	}
+	std::invoke(_actionCb, std::optional<std::string_view>{data});
 }
 
 void HttpPuller::_initRequest()
