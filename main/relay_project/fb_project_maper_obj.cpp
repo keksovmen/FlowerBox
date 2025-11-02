@@ -18,6 +18,8 @@ using namespace project;
 static box::Switch _gpioSwitch(box::Tid::SWITCH_GPIO_ARRAY,
 	[](){return getHwGpioSwitch().isOn(0);});
 
+static box::Switch _hhtpPullerSwitch(box::Tid::SWITCH_HTTP_PULLER,
+	[](){return getHwHttpPuller().isWorking();});
 
 
 static void _create_and_register_forse_property(switches::SwitchIface& obj, box::Switch& dependy)
@@ -91,12 +93,29 @@ static void _initGpioArray()
 	getBox().addSwitch(&_gpioSwitch);
 }
 
+static void _initHttpPuller()
+{
+	auto* tuggleProperty = new box::PropertyInt("TurnOn/Off", "",
+		box::Tid::PROPERTY_GENERAL,
+		[](int val){
+			getHwHttpPuller().setPause(!static_cast<bool>(val));
+			return true;
+		}, getHwHttpPuller().isWorking(), 0, 1
+	);
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(tuggleProperty));
+	_hhtpPullerSwitch.addPropertyDependency(tuggleProperty->getId());
+
+	getBox().addSwitch(&_hhtpPullerSwitch);
+}
+
 
 
 void project::initMaperObjs()
 {
 	_init_box_properties();
 	_initGpioArray();
+	_initHttpPuller();
 }
 
 int project::mapBoxSensorIdToAddres(int id)

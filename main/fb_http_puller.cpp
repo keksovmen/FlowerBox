@@ -61,6 +61,16 @@ void HttpPuller::start()
 	FB_DEBUG_LOG_I_OBJ("Created task");
 }
 
+void HttpPuller::setPause(bool state)
+{
+	_pause = state;
+}
+
+bool HttpPuller::isWorking() const
+{
+	return !_pause;
+}
+
 void HttpPuller::_onWifiConnected()
 {
 	//need mutex
@@ -167,6 +177,10 @@ void HttpPuller::_taskFunc(void *arg)
 	// const char* TAG = self->getName();
 
 	for(;;){
+		if(self->_pause){
+			vTaskDelay(pdMS_TO_TICKS(100));
+			continue;
+		}
 		//wait for wifi connection
 		if(!self->_isWifiConnected){
 			vTaskDelay(pdMS_TO_TICKS(1000));

@@ -157,3 +157,8 @@ switches::ArrayGpioSwitch<6>& project::getHwGpioSwitch()
 {
 	return _gpioSwitch;
 }
+
+HttpPuller& project::getHwHttpPuller()
+{
+	return _httpPuller;
+}

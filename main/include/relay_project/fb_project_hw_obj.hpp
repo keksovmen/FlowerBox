@@ -2,11 +2,12 @@
 
 
 
+#include "fb_gpio_switch.hpp"
+#include "fb_http_puller.hpp"
 #include "fb_sensor_keyboard.hpp"
 #include "fb_sensor_service.hpp"
 #include "fb_sensor_storage.hpp"
 #include "fb_switch_service.hpp"
-#include "fb_gpio_switch.hpp"
 
 
 
@@ -23,5 +24,6 @@ namespace fb
 		sensor::SensorStorage& getHwSensorStorage();
 
 		switches::ArrayGpioSwitch<6>& getHwGpioSwitch();
+		HttpPuller& getHwHttpPuller();
 	}
 }

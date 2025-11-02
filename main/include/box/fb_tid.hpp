@@ -22,6 +22,7 @@ namespace fb
 			SWITCH_FAN,
 			SWITCH_RGB,
 			SWITCH_GPIO_ARRAY,
+			SWITCH_HTTP_PULLER,
 
 			PROPERTY_SENSOR_PERIOD_GLOBAL = 512,
 			PROPERTY_SENSOR_DESCRIPTION,
@@ -103,6 +104,10 @@ namespace fb
 					case Tid::SWITCH_GPIO_ARRAY:
 						// return {"RGB switch", "", "bool", "0", "1"};
 						return {"GPIO array switch", "", "bool", "0", "1"};
+
+					case Tid::SWITCH_HTTP_PULLER:
+						// return {"RGB switch", "", "bool", "0", "1"};
+						return {"HTTP puller", "pulls specific URL and does something", "bool", "0", "1"};
 
 					case Tid::PROPERTY_SENSOR_PERIOD_GLOBAL:
 						return {"Sensor mesure period", "measured in SEC", "int", "1", "600"};

@@ -37,6 +37,9 @@ namespace fb
 				std::string_view getUrl() const;
 
 				void start();
+				void setPause(bool state);
+				
+				bool isWorking() const;
 
 			private:
 				ActionCb _actionCb;
@@ -46,6 +49,7 @@ namespace fb
 				bool _isWifiConnected = false;
 				char _responseBuff[256];
 				int _length = 0; 
+				bool _pause = false;
 
 				/*
 				create task at startup, it will handle requests and current wifi state
