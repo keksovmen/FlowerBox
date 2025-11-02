@@ -19,12 +19,12 @@ namespace fb
 		static constexpr int PIN_KEYBOARD_RESET = 9;
 
 		//relay
-		static constexpr int PIN_RELAY_1 = 4;
-		static constexpr int PIN_RELAY_2 = 5;
-		static constexpr int PIN_RELAY_3 = 6;
-		static constexpr int PIN_RELAY_4 = 8;
-		static constexpr int PIN_RELAY_5 = 11;
-		static constexpr int PIN_RELAY_6 = 12;
+		static constexpr int PIN_RELAY_1 = 3;
+		static constexpr int PIN_RELAY_2 = 4;
+		static constexpr int PIN_RELAY_3 = 5;
+		static constexpr int PIN_RELAY_4 = 6;
+		static constexpr int PIN_RELAY_5 = 7;
+		static constexpr int PIN_RELAY_6 = 10;
 
 		static constexpr std::array<int, PIN_KEYBOARD_RESET> PINS_RELAY({
 			PIN_RELAY_1,
