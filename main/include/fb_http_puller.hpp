@@ -38,8 +38,10 @@ namespace fb
 
 				void start();
 				void setPause(bool state);
+				void setTimeoutMs(int ms);
 				
 				bool isWorking() const;
+				int getTimeoutMs() const;
 
 			private:
 				ActionCb _actionCb;
@@ -47,8 +49,9 @@ namespace fb
 				esp_http_client_handle_t _httpClient = NULL;
 				TaskHandle_t _task = NULL;
 				bool _isWifiConnected = false;
-				char _responseBuff[256];
+				char _responseBuff[512];
 				int _length = 0; 
+				int _timeoutMs = 300;
 				bool _pause = false;
 
 				/*

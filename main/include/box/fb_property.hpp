@@ -42,9 +42,6 @@ namespace fb
 					ActionSet action,
 					T value);
 				
-				virtual void setMinValueStr(const std::string& val) override;
-				virtual void setMaxValueStr(const std::string& val) override;
-
 				//TODO: create cJson and append key value as str
 				std::string toJson() const override;
 

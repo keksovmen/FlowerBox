@@ -33,18 +33,6 @@ PropertyBase<T>::PropertyBase(
 	setDescription(description);
 }
 
-template<class T>
-void PropertyBase<T>::setMinValueStr(const std::string& val)
-{
-	assert(0);
-}
-
-template<class T>
-void PropertyBase<T>::setMaxValueStr(const std::string& val)
-{
-	assert(0);
-}
-
 //TODO: create cJson and append key value as str
 template<class T>
 std::string PropertyBase<T>::toJson() const
@@ -107,6 +95,8 @@ PropertyInt::PropertyInt(
 	_minValue(minValue), _maxValue(maxValue) 
 {
 	setValueType("int");
+	setMinValueStr(std::to_string(minValue));
+	setMaxValueStr(std::to_string(maxValue));
 }
 
 PropertyInt::PropertyInt(Tid tid, ActionSet action, int value)

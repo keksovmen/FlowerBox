@@ -5,6 +5,7 @@
 #include "fb_globals.hpp"
 #include "fb_project_box_obj.hpp"
 #include "fb_project_hw_obj.hpp"
+#include "fb_project_settings.hpp"
 #include "fb_settings.hpp"
 #include "fb_switch.hpp"
 
@@ -95,7 +96,7 @@ static void _initGpioArray()
 
 static void _initHttpPuller()
 {
-	auto* tuggleProperty = new box::PropertyInt("TurnOn/Off", "",
+	auto* toggleProperty = new box::PropertyInt("TurnOn/Off", "",
 		box::Tid::PROPERTY_GENERAL,
 		[](int val){
 			getHwHttpPuller().setPause(!static_cast<bool>(val));
@@ -103,8 +104,35 @@ static void _initHttpPuller()
 		}, getHwHttpPuller().isWorking(), 0, 1
 	);
 
-	getBox().addProperty(std::unique_ptr<box::PropertyIface>(tuggleProperty));
-	_hhtpPullerSwitch.addPropertyDependency(tuggleProperty->getId());
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(toggleProperty));
+	_hhtpPullerSwitch.addPropertyDependency(toggleProperty->getId());
+
+
+	auto* delayProperty = new box::PropertyInt("Delay ms", "How long to wait for next fetch after successive attempt",
+		box::Tid::PROPERTY_GENERAL,
+		[](int val){
+			getHwHttpPuller().setTimeoutMs(val);
+			settings::setHttpDelay(val);
+			return true;
+		}, getHwHttpPuller().getTimeoutMs(), 0, 10000
+	);
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(delayProperty));
+	_hhtpPullerSwitch.addPropertyDependency(delayProperty->getId());
+
+
+	auto* urlProperty = new box::PropertyString("URL", "Where to call",
+		box::Tid::PROPERTY_GENERAL,
+		[](std::string val){
+			getHwHttpPuller().setUrl(val);
+			settings::setHttpUrl(val);
+			return true;
+		}, std::string(getHwHttpPuller().getUrl())
+	);
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(urlProperty));
+	_hhtpPullerSwitch.addPropertyDependency(urlProperty->getId());
+
 
 	getBox().addSwitch(&_hhtpPullerSwitch);
 }

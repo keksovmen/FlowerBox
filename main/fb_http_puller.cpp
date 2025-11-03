@@ -66,9 +66,20 @@ void HttpPuller::setPause(bool state)
 	_pause = state;
 }
 
+void HttpPuller::setTimeoutMs(int ms)
+{
+	_timeoutMs = ms;
+}
+
+
 bool HttpPuller::isWorking() const
 {
 	return !_pause;
+}
+
+int HttpPuller::getTimeoutMs() const
+{
+	return _timeoutMs;
 }
 
 void HttpPuller::_onWifiConnected()
@@ -126,6 +137,7 @@ void HttpPuller::_onSuccess(std::string_view data)
 {
 	FB_DEBUG_LOG_I_OBJ("Data: %s", data.cbegin());
 	std::invoke(_actionCb, std::optional<std::string_view>{data});
+	vTaskDelay(pdMS_TO_TICKS(_timeoutMs));
 }
 
 void HttpPuller::_initRequest()
@@ -202,6 +214,9 @@ esp_err_t HttpPuller::_requestHandler(esp_http_client_event_t *evt)
 		self->_length = 0;		
 
 	}else if(evt->event_id == HTTP_EVENT_ON_DATA){
+		if(self->_length + evt->data_len > sizeof(self->_responseBuff)){
+			return ESP_FAIL;
+		}
 		memcpy(self->_responseBuff + self->_length, evt->data, evt->data_len);
 		self->_length += evt->data_len;
 		self->_responseBuff[self->_length] = '\0';

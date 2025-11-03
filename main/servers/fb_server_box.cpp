@@ -121,7 +121,7 @@ static esp_err_t _property_set_cb(httpd_req_t* r)
 	tmp[read] = 0;
 
 	//TODO: made it hold max property length
-	char result[64];
+	char result[256];
 	memset(result, 0, sizeof(result));
 
 	err = httpd_query_key_value(tmp, "value", result, sizeof(result));

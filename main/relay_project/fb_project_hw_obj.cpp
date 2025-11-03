@@ -7,6 +7,7 @@
 #include "fb_http_puller.hpp"
 #include "fb_keyboard_handler.hpp"
 #include "fb_pins.hpp"
+#include "fb_project_settings.hpp"
 
 #include "cJSON.h"
 
@@ -19,7 +20,6 @@
 #define _DMX_TASK_STACK 4 * 1024
 #define _DMX_TASK_PRIORITY 20
 
-#define _DEFAULT_HTTP_PULLER_URL "https://gameofmind.ru/_projects/gameofmind_deti/test/lights/lights.json"
 
 
 
@@ -111,8 +111,6 @@ static void _httpRequestHandler(std::optional<std::string_view> data)
 			_gpioSwitch.turnOff(i);
 		}
 	}
-
-	vTaskDelay(pdMS_TO_TICKS(150));
 }
 
 
@@ -128,7 +126,8 @@ void project::initHwObjs()
 	global::getEventManager()->attachListener(&_keyboardHandler);
 
 	//read it from NVS
-	_httpPuller.setUrl(_DEFAULT_HTTP_PULLER_URL);
+	_httpPuller.setUrl(settings::getHttpUrl());
+	_httpPuller.setTimeoutMs(settings::getHttpDelay());
 	_httpPuller.start();
 	global::getEventManager()->attachListener(&_httpPuller);
 }
