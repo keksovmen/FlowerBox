@@ -33,7 +33,7 @@ void HttpPuller::handleEvent(const event::Event& event)
 
 	if(event.eventId == wifi::WifiEventId::CONNECTED){
 		_onWifiConnected();
-	}else if(event.eventId == wifi::WifiEventId::DISCONNECTED){
+	}else if(event.eventId == wifi::WifiEventId::FAILED_TO_CONNECT){
 		_onWifiDisconnected();
 	}
 }

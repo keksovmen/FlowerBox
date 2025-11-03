@@ -273,3 +273,9 @@ bool wifi::start(const WifiConfig& cfg)
 
 	return result == ESP_OK;
 }
+
+void wifi::reconnect()
+{
+	_reconnectAttempts = 0;
+	esp_wifi_connect();
+}

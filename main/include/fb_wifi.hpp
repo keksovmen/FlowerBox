@@ -129,5 +129,7 @@ namespace fb
 		 */
 
 		bool setStaCfg(const std::string& ssid, const std::string& pass);
+
+		void reconnect();
 	}
 }

@@ -36,8 +36,9 @@ void StateWifiInit::handleEvent(const event::Event& event)
 			}
 
 		}else if(event.eventId == wifi::WifiEventId::FAILED_TO_CONNECT){
-			FB_DEBUG_LOG_I_OBJ("Failed to connect");
-			abort();
+			FB_DEBUG_LOG_I_OBJ("Failed to connect, retrying");
+			wifi::reconnect();
+			// abort();
 			//TODO:
 			//go to provision state
 			//or try again until network is provided
