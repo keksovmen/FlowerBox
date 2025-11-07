@@ -62,7 +62,7 @@ static void _httpRequestHandler(std::optional<std::string_view> data)
 
 	for(auto i = 0; i < result.size(); i++){
 		//parse json
-		const std::string id = "light" + std::to_string(i + 1);	//+1 начинаем считать с 1
+		const std::string id = "device" + std::to_string(i + 1);	//+1 начинаем считать с 1
 		cJSON* valueJson = cJSON_GetObjectItemCaseSensitive(json, id.c_str());
 
 		if (!cJSON_IsNumber(valueJson)) {
