@@ -1,6 +1,6 @@
 #include "fb_sensor_service.hpp"
 
-#include <ranges>
+// #include <ranges>
 
 #include "fb_globals.hpp"
 
@@ -38,14 +38,14 @@ void SensorService::_onPull()
 {
 	//инициализируем тех кто не еще не инициализирован
 	auto notInitFilter = [](auto* val){return val->isInit() == false;};
-	for(auto* s : _sensors | std::views::filter(notInitFilter)){
-		if(s->init()){
+	for(auto* s : _sensors){
+		if(std::invoke(notInitFilter, s) && s->init()){
 			_dropEvent(SensorEvent::SENSOR_INITIALIZED, s);
 		}
 	}
 
 	if(!_initFlag){
-		if(_sensors.empty() || std::ranges::all_of(_sensors, [](const auto* s){return s->isInit();})){
+		if(_sensors.empty() || std::all_of(_sensors.begin(), _sensors.end(), [](const auto* s){return s->isInit();})){
 			_initFlag = true;
 			_dropEvent(SensorEvent::ALL_SENSORS_INIT, NULL);
 		}
@@ -53,7 +53,11 @@ void SensorService::_onPull()
 
 	//обновляем данные всех, кто инициализирован
 	auto initFilter = [&notInitFilter](auto* val){return !notInitFilter(val);};
-	for(auto* s : _sensors | std::views::filter(initFilter)){
+	for(auto* s : _sensors){
+		if(!std::invoke(initFilter, s)){
+			continue;
+		}
+		
 		if(s->update()){
 			_dropEvent(SensorEvent::SENSOR_VALUE_CHANGED, s);
 		}else{

@@ -38,12 +38,13 @@ bool NvsStorage::hasKey(std::string_view partition, std::string_view key) const
 		return false;
 	}
 
-	nvs_type_t _ = NVS_TYPE_ANY;
+	int _ = 0;
 
-	err = hndl->find_key(key.cbegin(), _);
+	err = hndl->get_item(key.cbegin(), _);
+	// err = hndl->find_key(key.cbegin(), _);
 	FB_DEBUG_LOG_I_OBJ("Has key: %s = %d", key.cbegin(), static_cast<int>(err));
 
-	return err == ESP_OK;
+	return err == ESP_ERR_NVS_NOT_FOUND || err == ESP_OK;
 }
 
 bool NvsStorage::writeValue(std::string_view partition, std::string_view key, std::string_view value)

@@ -2,7 +2,6 @@
 
 
 #include <cstring>
-#include <ranges>
 #include <stdlib.h>
 
 #include "fb_globals.hpp"
@@ -39,13 +38,13 @@ bool KeyboardSensor<N>::_doInit()
 
 		event::Event e (
 			event::EventGroup::KEYBOARD,
-			std::to_underlying(KeyboardEventId::ACTION),
+			static_cast<int>(KeyboardEventId::ACTION),
 			static_cast<void*>(eventData),
 			true);
 		global::getEventManager()->pushEvent(e);
 	});
 
-	std::ranges::for_each(_pins, [](auto p){
+	std::for_each(_pins.begin(), _pins.end(), [](auto p){
 		h::Keyboard::instance()->keyboardAddButton(static_cast<gpio_num_t>(p.first), p.second);
 	});
 

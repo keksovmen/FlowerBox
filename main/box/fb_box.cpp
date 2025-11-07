@@ -1,6 +1,7 @@
 #include "fb_box.hpp"
 
 #include <algorithm>
+#include <cassert>
 
 #include "fb_debug.hpp"
 #include "fb_dynamic_str_constructor.hpp"
@@ -58,7 +59,7 @@ std::string Box::toJson() const
 
 const PropertyIface* Box::addProperty(std::unique_ptr<PropertyIface> val)
 {
-	FB_DEBUG_LOG_I_TAG("Add property(%d)", std::to_underlying(val->getTid()));
+	FB_DEBUG_LOG_I_TAG("Add property(%d)", static_cast<int>(val->getTid()));
 
 	auto iter = std::find_if(_properties.begin(), _properties.end(),
 		[&val](const auto& left){return left->getId() == val->getId();});

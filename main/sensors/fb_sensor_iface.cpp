@@ -1,5 +1,6 @@
 #include "fb_sensor_iface.hpp"
 
+#include <cassert>
 #include <utility>
 
 
@@ -21,7 +22,7 @@ bool SensorIface::init()
 bool SensorIface::update()
 {
 	const UpdateResult result = _doUpdate();
-	FB_DEBUG_LOG_I_OBJ("update() = %d", std::to_underlying(result));
+	FB_DEBUG_LOG_I_OBJ("update() = %d", static_cast<int>(result));
 
 	switch(result)
 	{

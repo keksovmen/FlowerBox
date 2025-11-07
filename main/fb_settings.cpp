@@ -183,7 +183,7 @@ std::string settings::getStaPass()
 WifiMode settings::getWifiMode()
 {
 	return static_cast<WifiMode>(
-		getIntOrDefault(_PARTION_NET, _KEY_WIFI_MODE, std::to_underlying(_DEFAULT_WIFI_MODE)));
+		getIntOrDefault(_PARTION_NET, _KEY_WIFI_MODE, static_cast<int>(_DEFAULT_WIFI_MODE)));
 }
 
 std::string settings::getSntpServerUrl()
@@ -223,7 +223,7 @@ void settings::setStaPass(const std::string& val)
 
 void settings::setWifiMode(WifiMode val)
 {
-	setInt(_PARTION_NET, _KEY_WIFI_MODE, std::to_underlying(val));
+	setInt(_PARTION_NET, _KEY_WIFI_MODE, static_cast<int>(val));
 }
 
 void settings::clearWifi()
