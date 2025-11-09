@@ -13,8 +13,8 @@
 #define _KEY_HTTP_DELAY_MS "h_delay"
 #define _KEY_HTTP_URL "h_url"
 
-#define _DEFAULT_HTTP_PULLER_URL "https://gameofmind.ru/_projects/gameofmind_deti/test/lights/lights.json"
-// #define _DEFAULT_HTTP_PULLER_URL "http://en.cppreference.com/index.html/"
+// #define _DEFAULT_HTTP_PULLER_URL "https://gameofmind.ru/_projects/gameofmind_deti/mini_games/paloshki/devices.json"
+#define _DEFAULT_HTTP_PULLER_URL "https://gameofmind.ru/_projects/gameofmind_deti/mini_games/paloshki/get.php?reset=true"
 
 
 

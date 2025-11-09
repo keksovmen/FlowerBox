@@ -8,6 +8,7 @@
 #include "fb_pins.hpp"
 #include "fb_project_settings.hpp"
 #include "fb_http_puller_32.hpp"
+#include "fb_wrapper_i2c_gpio.hpp"
 
 #include "cJSON.h"
 
@@ -37,6 +38,7 @@ static sensor::SensorStorage _sensorStorage;
 //прочее туть
 static keyboard::KeyboardHandler _keyboardHandler;
 static HttpPuller _httpPuller(&_httpRequestHandler);
+static wrappers::WrapperI2cGpio _gpioExpander(0, 2);
 
 
 
@@ -60,10 +62,12 @@ static void _httpRequestHandler(std::optional<std::string_view> data)
 
 	std::array<bool, pins::RELAY_PINS_COUNT> result;
 
+	auto state = cJSON_GetObjectItem(json, "state");
 	for(auto i = 0; i < result.size(); i++){
 		//parse json
 		const std::string id = "device" + std::to_string(i + 1);	//+1 начинаем считать с 1
-		cJSON* valueJson = cJSON_GetObjectItemCaseSensitive(json, id.c_str());
+		cJSON* valueJson = cJSON_GetArrayItem(state, i);
+		// cJSON_GetNumberValue(valueJson)
 
 		if (!cJSON_IsNumber(valueJson)) {
 			//failure do nothing
@@ -86,12 +90,29 @@ static void _httpRequestHandler(std::optional<std::string_view> data)
 	cJSON_Delete(json);
 
 	//изменение свойства
+	int portValue = 0;
 	for(auto i = 0; i < result.size(); i++){
 		if(result[i]){
-			// _gpioSwitch.turnOn(i);
-		}else{
-			// _gpioSwitch.turnOff(i);
+			if(i == 1){
+				//remap pin 1 (not working) to pin 4
+				portValue |= 1 << 4;
+			}else if(i >= 4){
+				//remap starting from pin 4 to pin 4 + 1
+				portValue |= 1 << (i + 1);
+			}else{
+				portValue |= 1 << i;
+			}
 		}
+	}
+
+	_gpioExpander.setValue(portValue);
+	if(portValue != 0){
+		vTaskDelay(pdMS_TO_TICKS(100));
+		_gpioExpander.setValue(0);
+		vTaskDelay(pdMS_TO_TICKS(100));
+		_gpioExpander.setValue(portValue);
+		vTaskDelay(pdMS_TO_TICKS(100));
+		_gpioExpander.setValue(0);
 	}
 }
 
@@ -99,10 +120,9 @@ static void _httpRequestHandler(std::optional<std::string_view> data)
 
 void project::initHwObjs()
 {
-	_sensorService.addSensor(&getHwKeyboardSensor());
+	// _sensorService.addSensor(&getHwKeyboardSensor());
 
-	// _gpioSwitch.turnOffAll();
-	// _swithService.addSwitch(&_gpioSwitch);
+	_gpioExpander.init();
 
 	//register key handler for dropping WIFI settings
 	global::getEventManager()->attachListener(&_keyboardHandler);
