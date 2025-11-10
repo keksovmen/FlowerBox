@@ -9,6 +9,7 @@
 #include "fb_project_settings.hpp"
 #include "fb_http_puller_32.hpp"
 #include "fb_wrapper_i2c_gpio.hpp"
+#include "fb_stick_handler.hpp"
 
 #include "cJSON.h"
 
@@ -39,6 +40,7 @@ static sensor::SensorStorage _sensorStorage;
 static keyboard::KeyboardHandler _keyboardHandler;
 static HttpPuller _httpPuller(&_httpRequestHandler);
 static wrappers::WrapperI2cGpio _gpioExpander(0, 2);
+static StickHandler<pins::RELAY_PINS_COUNT> _stickHandler(_gpioExpander);
 
 
 
@@ -80,7 +82,7 @@ static void _httpRequestHandler(std::optional<std::string_view> data)
 		}
 
 		const int state = valueJson->valueint;
-		FB_DEBUG_LOG_I_TAG("Pin: %d = Value: %d", i, state);
+		// FB_DEBUG_LOG_I_TAG("Pin: %d = Value: %d", i, state);
 
 		result[i] = static_cast<bool>(state);
 	}
@@ -90,30 +92,7 @@ static void _httpRequestHandler(std::optional<std::string_view> data)
 	cJSON_Delete(json);
 
 	//изменение свойства
-	int portValue = 0;
-	for(auto i = 0; i < result.size(); i++){
-		if(result[i]){
-			if(i == 1){
-				//remap pin 1 (not working) to pin 4
-				portValue |= 1 << 4;
-			}else if(i >= 4){
-				//remap starting from pin 4 to pin 4 + 1
-				portValue |= 1 << (i + 1);
-			}else{
-				portValue |= 1 << i;
-			}
-		}
-	}
-
-	_gpioExpander.setValue(portValue);
-	if(portValue != 0){
-		vTaskDelay(pdMS_TO_TICKS(100));
-		_gpioExpander.setValue(0);
-		vTaskDelay(pdMS_TO_TICKS(100));
-		_gpioExpander.setValue(portValue);
-		vTaskDelay(pdMS_TO_TICKS(100));
-		_gpioExpander.setValue(0);
-	}
+	_stickHandler.applyStates(result);
 }
 
 
