@@ -21,7 +21,7 @@ bool RamStorage::hasKey(std::string_view partition, std::string_view key) const
 {
 	auto p = std::string(partition);
 	auto k = std::string(key);
-	return _data.contains({p}) && _data.at(p).contains(k);
+	return _contains(_data, {p}) && _contains(_data.at(p), k);
 }
 
 bool RamStorage::writeValue(std::string_view partition, std::string_view key, std::string_view value)
@@ -29,11 +29,11 @@ bool RamStorage::writeValue(std::string_view partition, std::string_view key, st
 	auto p = std::string(partition);
 	auto k = std::string(key);
 
-	if(!_data.contains(p)){
+	if(!_contains(_data, p)){
 		_data[p] = Page();
 	}
 
-	if(!_data[p].contains(k)){
+	if(!_contains(_data[p], k)){
 		_data[p][k] = Entry();
 	}
 
@@ -47,11 +47,11 @@ bool RamStorage::writeValue(std::string_view partition, std::string_view key, in
 	auto p = std::string(partition);
 	auto k = std::string(key);
 
-	if(!_data.contains(p)){
+	if(!_contains(_data, p)){
 		_data[p] = Page();
 	}
 
-	if(!_data[p].contains(k)){
+	if(!_contains(_data[p], k)){
 		_data[p][k] = Entry();
 	}
 
@@ -65,11 +65,11 @@ bool RamStorage::readValue(std::string_view partition, std::string_view key, std
 	auto p = std::string(partition);
 	auto k = std::string(key);
 
-	if(!_data.contains(p)){
+	if(!_contains(_data, p)){
 		return false;
 	}
 
-	if(!_data.at(p).contains(k)){
+	if(!_contains(_data.at(p), k)){
 		return false;
 	}
 
@@ -83,11 +83,11 @@ bool RamStorage::readValue(std::string_view partition, std::string_view key, int
 	auto p = std::string(partition);
 	auto k = std::string(key);
 
-	if(!_data.contains(p)){
+	if(!_contains(_data, p)){
 		return false;
 	}
 
-	if(!_data.at(p).contains(k)){
+	if(!_contains(_data.at(p), k)){
 		return false;
 	}
 
@@ -101,13 +101,23 @@ void RamStorage::clearValue(std::string_view partition, std::string_view key)
 	auto p = std::string(partition);
 	auto k = std::string(key);
 
-	if(!_data.contains(p)){
+	if(!_contains(_data, p)){
 		return;
 	}
 
-	if(!_data.at(p).contains(k)){
+	if(!_contains(_data.at(p), k)){
 		return;
 	}
 
 	_data.at(p).erase(k);
+}
+
+bool RamStorage::_contains(const std::unordered_map<std::string, Page>& map, const std::string& v)
+{
+	return map.find(v) != map.end();
+}
+
+bool RamStorage::_contains(const Page map, const std::string& v)
+{
+	return map.find(v) != map.end();
 }

@@ -7,6 +7,10 @@
 #include "esp_partition.h"
 #include "esp_ota_ops.h"
 
+#ifdef _ESP8266
+	#define OTA_WITH_SEQUENTIAL_WRITES OTA_SIZE_UNKNOWN
+#endif
+
 
 
 using namespace fb;
@@ -60,7 +64,9 @@ bool update::writeSequential(const char* data, int size)
 		FB_DEBUG_LOG_E_TAG("Failed to write ota, must abort! %d", err);
 		global::getEventManager()->pushEvent({event::EventGroup::UPDATE, static_cast<int>(UpdateEventId::FAILURE), NULL});
 
-		esp_ota_abort(_otaHndl);
+		#ifndef _ESP8266
+			esp_ota_abort(_otaHndl);
+		#endif
 
 		return false;
 	}

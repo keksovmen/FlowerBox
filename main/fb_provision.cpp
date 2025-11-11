@@ -7,8 +7,10 @@
 #include <wifi_provisioning/manager.h>
 #include <wifi_provisioning/scheme_softap.h>
 #include "esp_event.h"
-#include "esp_netif_types.h"
-#include "esp_wifi_default.h"
+#ifndef _ESP8266
+	#include "esp_netif_types.h"
+	#include "esp_wifi_default.h"
+#endif
 #include "esp_wifi.h"
 
 #include "fb_debug.hpp"
@@ -32,14 +34,15 @@ static const char* TAG = "fb_provision";
 
 
 
-static esp_netif_t* _staNetif = nullptr;
-static esp_netif_t* _apNetif = nullptr;
-
+#ifndef _ESP8266
+	static esp_netif_t* _staNetif = nullptr;
+	static esp_netif_t* _apNetif = nullptr;
+#endif
 
 
 static void _eventHandler(void* arg, esp_event_base_t eventBase, int32_t eventId, void* eventData)
 {
-	FB_DEBUG_LOG_I_TAG("Provision event %ld", eventId);
+	FB_DEBUG_LOG_I_TAG("Provision event %d", eventId);
 
 	if(eventId == static_cast<int32_t>(WIFI_PROV_CRED_RECV))
 	{
@@ -101,7 +104,7 @@ static esp_err_t _customProvisionHandler(uint32_t sessionId, const uint8_t* inBu
 		int wifiMode = static_cast<int>(cJSON_GetNumberValue(item));
 		FB_DEBUG_LOG_I_TAG("WIFI mode %d", wifiMode);
 
-		if(wifiMode < 0 || wifiMode >= std::to_underlying(settings::WifiMode::MAX)){
+		if(wifiMode < 0 || wifiMode >= static_cast<int>(settings::WifiMode::MAX)){
 			FB_DEBUG_LOG_E_TAG("WIFI mode ILLEGAL");
 		}else{
 			settings::setWifiMode(static_cast<settings::WifiMode>(wifiMode));
@@ -117,11 +120,13 @@ static esp_err_t _customProvisionHandler(uint32_t sessionId, const uint8_t* inBu
 
 static void _initWifi()
 {
-	_staNetif = esp_netif_create_default_wifi_sta();
-    _apNetif = esp_netif_create_default_wifi_ap();
+	#ifndef _ESP8266
+		_staNetif = esp_netif_create_default_wifi_sta();
+		_apNetif = esp_netif_create_default_wifi_ap();
 
-	assert(_staNetif);
-	assert(_apNetif);
+		assert(_staNetif);
+		assert(_apNetif);
+	#endif
 }
 
 static void _initManager()
@@ -153,8 +158,10 @@ static void _deinitWifi()
 	esp_wifi_disconnect();
 	esp_wifi_stop();
 	
-	esp_netif_destroy_default_wifi(_staNetif);
-	esp_netif_destroy_default_wifi(_apNetif);
+	#ifndef _ESP8266
+		esp_netif_destroy_default_wifi(_staNetif);
+		esp_netif_destroy_default_wifi(_apNetif);
+	#endif
 }
 
 static void _deinitManager()

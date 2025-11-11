@@ -25,21 +25,21 @@ static box::Switch _hhtpPullerSwitch(box::Tid::SWITCH_HTTP_PULLER,
 	[](){return getHwHttpPuller().isWorking();});
 
 
-static void _create_and_register_forse_property(switches::SwitchIface& obj, box::Switch& dependy)
-{
-	auto* forseProperty = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_FORSE,
-		[&obj](int val){
-			obj.setForseFlag(static_cast<switches::SwitchForseState>(val));
+// static void _create_and_register_forse_property(switches::SwitchIface& obj, box::Switch& dependy)
+// {
+// 	auto* forseProperty = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_FORSE,
+// 		[&obj](int val){
+// 			obj.setForseFlag(static_cast<switches::SwitchForseState>(val));
 
-			getHwSwitchService().forcePullAction();
+// 			getHwSwitchService().forcePullAction();
 
-			return true;
-		}, obj.isOn()
-	);
+// 			return true;
+// 		}, obj.isOn()
+// 	);
 
-	getBox().addProperty(std::unique_ptr<box::PropertyIface>(forseProperty));
-	dependy.addPropertyDependency(forseProperty->getId());
-}
+// 	getBox().addProperty(std::unique_ptr<box::PropertyIface>(forseProperty));
+// 	dependy.addPropertyDependency(forseProperty->getId());
+// }
 
 
 

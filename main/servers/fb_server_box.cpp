@@ -12,6 +12,11 @@
 #define _SENSOR_PATH "/sensor/*"
 #define _SWITCH_PATH "/switch/*"
 
+#ifdef _ESP8266
+	#define HTTPD_RESP_USE_STRLEN -1
+	#define httpd_resp_sendstr_chunk(req, str) (httpd_resp_send_chunk(req, str, ((req) == nullptr) ? 0 : HTTPD_RESP_USE_STRLEN))
+#endif
+
 
 
 using namespace fb;
@@ -257,7 +262,7 @@ static esp_err_t _switch_data_cb(httpd_req_t* r)
 
 static bool _is_data_request(httpd_req_t* r)
 {
-	return std::string(r->uri).contains("data");
+	return std::string(r->uri).find("data") != std::string::npos;
 }
 
 static esp_err_t _switch_cb(httpd_req_t* r)

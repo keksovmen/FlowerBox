@@ -2,10 +2,11 @@
 
 #include "fb_file_system.hpp"
 #include "fb_globals.hpp"
+#include "fb_project_core.hpp"
 #include "fb_sensor_event.hpp"
-#include "fb_state_wifi_init.hpp"
-#include "fb_state_provision.hpp"
 #include "fb_settings.hpp"
+#include "fb_state_provision.hpp"
+#include "fb_state_wifi_init.hpp"
 #include "fb_wifi.hpp"
 
 
@@ -28,12 +29,23 @@ const char* StateHwInit::getName() const
 
 void StateHwInit::handleEvent(const event::Event& event)
 {
-	if(event.groupId == event::EventGroup::SENSOR){
-		if(event.eventId == sensor::SensorEvent::ALL_SENSORS_INIT){
+	if(project::getInfo().requiresServices){
+		if(event.groupId == event::EventGroup::SENSOR){
+			if(event.eventId == sensor::SensorEvent::ALL_SENSORS_INIT){
+				if(settings::isWifiProvided()){
+					getContext().transition(std::make_unique<StateWifiInit>(getContext()));
+				}else{
+					getContext().transition(std::make_unique<StateProvision>(getContext()));
+				}
+			}
+		}
+	}else{
+		if(event.groupId == event::EventGroup::BOOT){
 			if(settings::isWifiProvided()){
 				getContext().transition(std::make_unique<StateWifiInit>(getContext()));
 			}else{
-				getContext().transition(std::make_unique<StateProvision>(getContext()));
+				getContext().transition(std::make_unique<StateWifiInit>(getContext()));
+				// getContext().transition(std::make_unique<StateProvision>(getContext()));
 			}
 		}
 	}
@@ -42,8 +54,10 @@ void StateHwInit::handleEvent(const event::Event& event)
 void StateHwInit::enter()
 {
 	fs::init();
-	global::getSensorService()->start();
-	global::getSwitchService()->start();
+	if(project::getInfo().requiresServices){
+		global::getSensorService()->start();
+		global::getSwitchService()->start();
+	}
 	assert(wifi::init());
 
 	// getContext().transition(std::make_unique<StateProvision>(getContext()));

@@ -13,7 +13,6 @@
 #include "esp_attr.h"
 #include "esp_event.h"
 #include "esp_log.h"
-#include "esp_netif_sntp.h"
 #include "esp_netif.h"
 #include "esp_sleep.h"
 #include "esp_sntp.h"
@@ -28,6 +27,13 @@
 
 
 
+#ifdef _ESP8266
+	#define xPortGetFreeHeapSize() esp_get_free_heap_size()
+	#define xPortGetMinimumEverFreeHeapSize() esp_get_minimum_free_heap_size()
+#endif
+
+
+
 static const char *TAG = "main";
 
 // RTC_DATA_ATTR static int _boot_count = 0;
@@ -37,7 +43,9 @@ static const char *TAG = "main";
 extern "C" void app_main(void)
 {
 	//init copy logs in to buffer for later transmiting
-	fb::server::initServerDebug();
+	#ifndef _ESP8266
+		fb::server::initServerDebug();
+	#endif
 	
 	// ESP_LOGI(TAG, "Booting times = %d", _boot_count);
 	ESP_LOGI(TAG, "Booting");

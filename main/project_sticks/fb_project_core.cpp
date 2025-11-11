@@ -9,6 +9,7 @@ using namespace project;
 
 static CoreInfo _info = {
 	.requiresTime = false,
+	.requiresServices = false,
 };
 
 

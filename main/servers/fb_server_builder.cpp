@@ -53,9 +53,11 @@ std::unique_ptr<Server> Builder::build()
 			.method = point.method == EndpointMethod::POST ? HTTP_POST : HTTP_GET,
 			.handler = point.callback,
 			.user_ctx = point.data,
-			.is_websocket = point.method == EndpointMethod::WEB_SOCKET,
-			.handle_ws_control_frames = true,
-			.supported_subprotocol = nullptr,
+			#ifndef _ESP8266
+				.is_websocket = point.method == EndpointMethod::WEB_SOCKET,
+				.handle_ws_control_frames = true,
+				.supported_subprotocol = nullptr,
+			#endif
 		};
 
 		httpd_register_uri_handler(server, &uriHandler);

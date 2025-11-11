@@ -3,13 +3,6 @@
 #
 # (Uses default behaviour of compiling all source files in directory, adding 'include' to include path.)
 
-# COMPONENT_OBJS += \
-# 	switches/fb_switch_iface.o \
-# 	switches/fb_switch_service.o \
-# 	sensors/fb_sensor_service.o \
-# 	sensors/fb_sensor_iface.o \
-# 	sensors/fb_sensor_keyboard.o \
-
 COMPONENT_SRCDIRS := . \
     box \
     storage \
@@ -26,7 +19,6 @@ COMPONENT_SRCDIRS := . \
 COMPONENT_OBJEXCLUDE := \
     fb_uart.o \
     fb_wrappers.o \
-    storage/fb_ram_storage.o \
     servers/fb_server_debug.o \
     servers/fb_server_html.o \
     servers/fb_server_update.o \
@@ -54,4 +46,7 @@ COMPONENT_ADD_INCLUDEDIRS := . \
     include/states/work \
     include/templates \
     include/project_sticks \
-	
+
+
+CFLAGS += -D_ESP8266
+CXXFLAGS += -D_ESP8266

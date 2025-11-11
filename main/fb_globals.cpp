@@ -2,10 +2,13 @@
 
 #include <memory>
 
-#include "esp_efuse.h"
-#include "esp_efuse_table.h"
+#ifdef _ESP8266
+	#include "esp_system.h"
+#else
+	#include "esp_efuse.h"
+	#include "esp_efuse_table.h"
+#endif
 
-#include "fb_heat_switch.hpp"
 #include "fb_nvs_storage.hpp"
 #include "fb_project_box_obj.hpp"
 #include "fb_project_hw_obj.hpp"
@@ -83,7 +86,11 @@ state::StateManager* global::getStateManager()
 id::UniqueId global::getUniqueId()
 {
 	uint8_t mac[8] = {0};
-    ESP_ERROR_CHECK(esp_efuse_read_field_blob(ESP_EFUSE_MAC_FACTORY, &mac, 6 * 8));
+	#ifdef _ESP8266
+		esp_read_mac(mac, ESP_MAC_WIFI_STA);
+	#else
+		ESP_ERROR_CHECK(esp_efuse_read_field_blob(ESP_EFUSE_MAC_FACTORY, &mac, 6 * 8));
+	#endif
 
 	return *reinterpret_cast<id::UniqueId*>(mac);
 }

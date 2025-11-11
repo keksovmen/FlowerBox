@@ -9,6 +9,7 @@ namespace fb
 		struct CoreInfo
 		{
 			bool requiresTime;
+			bool requiresServices = true;
 		};
 
 

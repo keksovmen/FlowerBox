@@ -37,6 +37,12 @@ namespace fb
 
 
 				std::unordered_map<std::string, Page> _data;
+
+
+
+				static bool _contains(const std::unordered_map<std::string, Page>& map, const std::string& v);
+				static bool _contains(const Page map, const std::string& v);
+				
 		};
 	}
 }

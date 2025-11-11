@@ -45,6 +45,6 @@ void WrapperI2cGpio::setValue(int value)
 	i2c_master_write(cmd, data, sizeof(data), true);
 	i2c_master_stop(cmd);
 	
-	esp_err_t ret = i2c_master_cmd_begin(I2C_NUM_0, cmd, 1000 / portTICK_PERIOD_MS);
+	i2c_master_cmd_begin(I2C_NUM_0, cmd, 1000 / portTICK_PERIOD_MS);
 	i2c_cmd_link_delete(cmd);
 }
