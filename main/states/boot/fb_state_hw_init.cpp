@@ -44,8 +44,7 @@ void StateHwInit::handleEvent(const event::Event& event)
 			if(settings::isWifiProvided()){
 				getContext().transition(std::make_unique<StateWifiInit>(getContext()));
 			}else{
-				getContext().transition(std::make_unique<StateWifiInit>(getContext()));
-				// getContext().transition(std::make_unique<StateProvision>(getContext()));
+				getContext().transition(std::make_unique<StateProvision>(getContext()));
 			}
 		}
 	}

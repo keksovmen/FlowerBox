@@ -22,6 +22,14 @@ namespace fb
 		class StorageIface : public debug::Named
 		{
 			public:
+				#ifdef _ESP8266
+					using Number = int32_t;
+				#else
+					using Number = int64_t;
+				#endif
+
+
+
 				static constexpr int MAX_STRING_SIZE = 256;
 
 
@@ -59,7 +67,7 @@ namespace fb
 				 */
 
 				virtual bool writeValue(std::string_view partition, std::string_view key, std::string_view value) = 0;
-				virtual bool writeValue(std::string_view partition, std::string_view key, int64_t value) = 0;
+				virtual bool writeValue(std::string_view partition, std::string_view key, Number value) = 0;
 
 				/**
 				 * @brief reads value by a key
@@ -72,7 +80,7 @@ namespace fb
 				 */
 
 				virtual bool readValue(std::string_view partition, std::string_view key, std::string& out) const = 0;
-				virtual bool readValue(std::string_view partition, std::string_view key, int64_t& out) const = 0;
+				virtual bool readValue(std::string_view partition, std::string_view key, Number& out) const = 0;
 
 				/**
 				 * @brief must delete key value pair, so

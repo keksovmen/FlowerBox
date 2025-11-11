@@ -81,23 +81,35 @@ std::string settings::getStrOrDefault(
 	return result;
 }
 
-int64_t settings::getIntOrDefault(std::string_view partition,
+Number settings::getIntOrDefault(std::string_view partition,
 			std::string_view key,
-			int64_t def)
+			Number def)
 {
 	if(!_storage){
-		FB_DEBUG_LOG_I_TAG("Has no store: %s, ret default %lld", key.cbegin(), def);
+		#ifdef _ESP8266
+			FB_DEBUG_LOG_I_TAG("Has no store: %s, ret default %d", key.cbegin(), def);
+		#else
+			FB_DEBUG_LOG_I_TAG("Has no store: %s, ret default %lld", key.cbegin(), def);
+		#endif
 		return def;
 	}
 
 	if(!_storage->hasKey(partition, key)){
-		FB_DEBUG_LOG_I_TAG("Has no key: %s, ret default %lld", key.cbegin(), def);
+		#ifdef _ESP8266
+			FB_DEBUG_LOG_I_TAG("Has no key: %s, ret default %d", key.cbegin(), def);
+		#else
+			FB_DEBUG_LOG_I_TAG("Has no key: %s, ret default %lld", key.cbegin(), def);
+		#endif
 		return def;
 	}
 
-	int64_t result;
+	Number result;
 	if(!_storage->readValue(partition, key, result)){
-		FB_DEBUG_LOG_I_TAG("Failed to read key: %s, ret default %lld", key.cbegin(), def);
+		#ifdef _ESP8266
+			FB_DEBUG_LOG_I_TAG("Failed to read key: %s, ret default %d", key.cbegin(), def);
+		#else
+			FB_DEBUG_LOG_I_TAG("Failed to read key: %s, ret default %lld", key.cbegin(), def);
+		#endif
 		return def;
 	}
 
@@ -135,7 +147,7 @@ void settings::setStr(std::string_view partion,
 
 void settings::setInt(std::string_view partion,
 			std::string_view key,
-			int64_t val)
+			Number val)
 {
 	if(!_storage){
 		FB_DEBUG_LOG_E_TAG("No storage");
@@ -143,11 +155,19 @@ void settings::setInt(std::string_view partion,
 	}
 
 	if(!_storage->writeValue(partion, key, val)){
-		FB_DEBUG_LOG_E_TAG("Failed to set key: %s, val: %lld", key.cbegin(), val);
+		#ifdef _ESP8266
+			FB_DEBUG_LOG_E_TAG("Failed to set key: %s, val: %d", key.cbegin(), val);
+		#else
+			FB_DEBUG_LOG_E_TAG("Failed to set key: %s, val: %lld", key.cbegin(), val);
+		#endif
 		return;
 	}
 
-	FB_DEBUG_LOG_I_TAG("Set key: %s, val: %lld", key.cbegin(), val);
+	#ifdef _ESP8266
+		FB_DEBUG_LOG_I_TAG("Set key: %s, val: %d", key.cbegin(), val);
+	#else
+		FB_DEBUG_LOG_I_TAG("Set key: %s, val: %lld", key.cbegin(), val);
+	#endif
 }
 
 void settings::setFloat(std::string_view partion,

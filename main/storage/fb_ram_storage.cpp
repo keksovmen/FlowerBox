@@ -42,7 +42,7 @@ bool RamStorage::writeValue(std::string_view partition, std::string_view key, st
 	return true;
 }
 
-bool RamStorage::writeValue(std::string_view partition, std::string_view key, int64_t value)
+bool RamStorage::writeValue(std::string_view partition, std::string_view key, Number value)
 {
 	auto p = std::string(partition);
 	auto k = std::string(key);
@@ -78,7 +78,7 @@ bool RamStorage::readValue(std::string_view partition, std::string_view key, std
 	return true;
 }
 
-bool RamStorage::readValue(std::string_view partition, std::string_view key, int64_t& out) const
+bool RamStorage::readValue(std::string_view partition, std::string_view key, Number& out) const
 {
 	auto p = std::string(partition);
 	auto k = std::string(key);

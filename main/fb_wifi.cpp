@@ -80,24 +80,23 @@ static void _on_wifi_ap_disconnect(void *arg, esp_event_base_t event_base,
 	// 	return;
 	// }
 
-	wifi_event_ap_stadisconnected_t *event = (wifi_event_ap_stadisconnected_t*) event_data;
-
-	ESP_LOGI(TAG, "Wi-Fi sta disconnected: AID = %d", event->aid);
+	#ifndef _ESP8266
+		wifi_event_ap_stadisconnected_t *event = (wifi_event_ap_stadisconnected_t*) event_data;
+		ESP_LOGI(TAG, "Wi-Fi sta disconnected: AID = %d", event->aid);
+	#endif
 
 	global::getEventManager()->pushEvent({event::EventGroup::WIFI, static_cast<int>(WifiEventId::DISCONNECTED), NULL});
-
 }
 
 static void _on_ap_gave_ip(void *arg, esp_event_base_t event_base,
 					  int32_t event_id, void *event_data)
 {
-	ip_event_ap_staipassigned_t *event = (ip_event_ap_staipassigned_t*) event_data;
-
-	// uint16_t aid = 0;
-
-	// esp_wifi_ap_get_sta_aid(event->mac, &aid);
-
-	ESP_LOGI(TAG, "Provided IPv4, event: address: " IPSTR, IP2STR(&event->ip));
+	#ifndef _ESP8266
+		// uint16_t aid = 0;
+		// esp_wifi_ap_get_sta_aid(event->mac, &aid);
+		ip_event_ap_staipassigned_t *event = (ip_event_ap_staipassigned_t*) event_data;
+		ESP_LOGI(TAG, "Provided IPv4, event: address: " IPSTR, IP2STR(&event->ip));
+	#endif
 
 	global::getEventManager()->pushEvent({event::EventGroup::WIFI, static_cast<int>(WifiEventId::CONNECTED), NULL});
 }
