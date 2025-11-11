@@ -61,6 +61,30 @@ static void _init_box_properties()
 		});
 	getBox().addProperty(std::unique_ptr<box::PropertyIface>(restartProp));
 	getBox().addPropertyDependency(restartProp->getId());
+
+
+	auto* wifiSsidProperty = new box::PropertyString("Wifi SSID", "Change wifi ssid",
+		box::Tid::PROPERTY_GENERAL,
+		[](std::string val){
+			settings::setStaSsid(val);
+			return true;
+		}, settings::getStaSsid()
+	);
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(wifiSsidProperty));
+	getBox().addPropertyDependency(wifiSsidProperty->getId());
+
+
+	auto* wifiPassProperty = new box::PropertyString("Wifi pass", "Change wifi password",
+		box::Tid::PROPERTY_GENERAL,
+		[](std::string val){
+			settings::setStaPass(val);
+			return true;
+		}, settings::getStaPass()
+	);
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(wifiPassProperty));
+	getBox().addPropertyDependency(wifiPassProperty->getId());
 }
 
 

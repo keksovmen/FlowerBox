@@ -111,6 +111,9 @@ void project::initHwObjs()
 	_httpPuller.setTimeoutMs(settings::getHttpDelay());
 	_httpPuller.start();
 	global::getEventManager()->attachListener(&_httpPuller);
+
+	//to forse change state from hw init to next
+	global::getEventManager()->pushEvent(event::Event(event::EventGroup::SENSOR, static_cast<int>(sensor::SensorEvent::ALL_SENSORS_INIT), nullptr));
 }
 
 sensor::KeyboardSensor<1>& project::getHwKeyboardSensor()
