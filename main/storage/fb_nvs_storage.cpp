@@ -38,8 +38,9 @@ bool NvsStorage::hasKey(std::string_view partition, std::string_view key) const
 		return false;
 	}
 
-	int _ = 0;
+	Number _ = 0;
 
+	// hndl->find_key();
 	err = hndl->get_item(key.cbegin(), _);
 	// err = hndl->find_key(key.cbegin(), _);
 	FB_DEBUG_LOG_I_OBJ("Has key: %s = %d", key.cbegin(), static_cast<int>(err));
