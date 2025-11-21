@@ -6,6 +6,7 @@
 
 #include "fb_debug.hpp"
 #include "fb_event_manager.hpp"
+#include "fb_sensor_iface.hpp"
 #include "fb_sensor_storage.hpp"
 
 

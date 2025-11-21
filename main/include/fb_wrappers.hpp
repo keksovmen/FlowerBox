@@ -4,6 +4,7 @@
 #include <utility>
 
 #include "driver/ledc.h"
+#include "driver/gpio.h"
 
 
 
@@ -52,7 +53,7 @@ namespace fb
 				virtual void setValue(int value) override;
 			
 			private:
-				static bool _timer_states[std::to_underlying(LEDC_TIMER_MAX)];
+				static bool _timer_states[static_cast<int>(LEDC_TIMER_MAX)];
 
 
 

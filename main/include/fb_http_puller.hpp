@@ -11,15 +11,13 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-#include "esp_http_client.h"
-
 
 
 namespace fb
 {
 	namespace project
 	{
-		class HttpPuller : public debug::Named, public event::EventListener
+		class AbstractHttpPuller : public debug::Named, public event::EventListener
 		{
 			public:
 				//if optional has value -> success, otherwise failed request
@@ -27,58 +25,46 @@ namespace fb
 
 
 
-				HttpPuller(ActionCb onResult);
+				AbstractHttpPuller(ActionCb onResult);
 
-				virtual const char* getName() const override;
 				//listen for wifi status state
 				virtual void handleEvent(const event::Event& event) override;
+
+				void start();
 
 				void setUrl(std::string_view str);
 				std::string_view getUrl() const;
 
-				void start();
 				void setPause(bool state);
 				void setTimeoutMs(int ms);
 				
 				bool isWorking() const;
 				int getTimeoutMs() const;
+			
+			protected:
+				//when get 404
+				void _onFailure();
+				//when get 200
+				void _onSuccess(std::string_view data);
 
 			private:
 				ActionCb _actionCb;
 				std::string _url;
-				esp_http_client_handle_t _httpClient = NULL;
 				TaskHandle_t _task = NULL;
-				bool _isWifiConnected = false;
-				char _responseBuff[512];
-				int _length = 0; 
 				int _timeoutMs = 300;
+				bool _isWifiConnected = false;
 				bool _pause = false;
 
-				/*
-				create task at startup, it will handle requests and current wifi state
-				first check current state if it allows to make request then proceed
-				else wait some delay repeat
-				Task won't exit
-				*/
 
+
+				static void _taskFunc(void* arg);
+
+				virtual void _initRequest() = 0;
+				virtual void _deinitRequest() = 0;
+				virtual bool _onPerformRequest() = 0;
 
 				void _onWifiConnected();
 				void _onWifiDisconnected();
-
-				bool _onPerformRequest();
-
-				//when get 404
-				void _onFailure();
-
-				//when get 200
-				void _onSuccess(std::string_view data);
-
-				void _initRequest();
-				void _deinitRequest();
-
-				//task
-				static void _taskFunc(void* arg);
-				static esp_err_t _requestHandler(esp_http_client_event_t *evt);
 		};
 	}
 }

@@ -22,10 +22,10 @@ namespace fb
 				virtual bool hasKey(std::string_view partition, std::string_view key) const override;
 
 				virtual bool writeValue(std::string_view partition, std::string_view key, std::string_view value) override;
-				virtual bool writeValue(std::string_view partition, std::string_view key, int64_t value) override;
+				virtual bool writeValue(std::string_view partition, std::string_view key, Number value) override;
 
 				virtual bool readValue(std::string_view partition, std::string_view key, std::string& out) const override;
-				virtual bool readValue(std::string_view partition, std::string_view key, int64_t& out) const override;
+				virtual bool readValue(std::string_view partition, std::string_view key, Number& out) const override;
 
 				virtual void clearValue(std::string_view partition, std::string_view key) override;
 		};

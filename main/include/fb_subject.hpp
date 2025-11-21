@@ -4,6 +4,7 @@
 
 #include <array>
 #include <algorithm>
+#include <cassert>
 #include <functional>
 #include <memory>
 
@@ -34,7 +35,7 @@ namespace fb
 		class BaseSubject : public Subject<T>
 		{
 			public:
-				virtual void attachListener(Subject<T>::Value listener) override
+				virtual void attachListener(typename Subject<T>::Value listener) override
 				{
 					assert(_listenersCount < _listeners.size());
 					_listeners[_listenersCount] = listener;
@@ -44,7 +45,7 @@ namespace fb
 				virtual void detachListener(const T* listener) override
 				{
 					auto iter = std::remove_if(_listeners.begin(), _listeners.begin() + _listenersCount,
-						[listener](const Subject<T>::Value& val){
+						[listener](const typename Subject<T>::Value& val){
 							return val == listener;
 					});
 
@@ -53,10 +54,10 @@ namespace fb
 					}
 				}
 
-				virtual void fireEvent(const Subject<T>::EventCb& cb) override
+				virtual void fireEvent(const typename Subject<T>::EventCb& cb) override
 				{
 					std::for_each(_listeners.begin(), _listeners.begin() + _listenersCount,
-						[cb](Subject<T>::Value& v){cb(v);});
+						[cb](typename Subject<T>::Value& v){cb(v);});
 				}
 
 			private:

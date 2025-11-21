@@ -31,7 +31,10 @@ void Keyboard::keyboardAddButton(gpio_num_t pin, ButtonVK vk)
 {
 	_buttons.push_back(KeyboardButton(pin, vk));
 
-	gpio_reset_pin(pin);
+	#ifndef _ESP8266
+		gpio_reset_pin(pin);
+	#endif
+	
 	gpio_set_direction(pin, GPIO_MODE_INPUT);
 	gpio_pullup_en(pin);
 

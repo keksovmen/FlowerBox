@@ -6,7 +6,11 @@ namespace fb
 {
 	namespace id
 	{
-		using UniqueId = unsigned long long;
+		#ifdef _ESP8266
+			using UniqueId = unsigned long;
+		#else
+			using UniqueId = unsigned long long;
+		#endif
 	} // namespace id
 	
 } // namespace fb

@@ -43,6 +43,10 @@ namespace fb
 
 
 
+		using Number = storage::StorageIface::Number;
+
+
+
 		void init(std::unique_ptr<storage::StorageIface> storage);
 
 		//for custom settings for each project
@@ -53,9 +57,9 @@ namespace fb
 			std::string_view key,
 			std::string_view def);
 		
-		int64_t getIntOrDefault(std::string_view partition,
+		Number getIntOrDefault(std::string_view partition,
 			std::string_view key,
-			int64_t def);
+			Number def);
 		
 		float getFloatOrDefault(std::string_view partition,
 			std::string_view key,
@@ -67,7 +71,7 @@ namespace fb
 
 		void setInt(std::string_view partion,
 			std::string_view key,
-			int64_t val);
+			Number val);
 
 		void setFloat(std::string_view partion,
 			std::string_view key,

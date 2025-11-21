@@ -11,6 +11,12 @@
 
 
 
+#ifndef ESP_HTTPD_DEF_CTRL_PORT
+	#define ESP_HTTPD_DEF_CTRL_PORT 32768
+#endif
+
+
+
 namespace fb
 {
 	namespace server

@@ -3,7 +3,6 @@
 #include "fb_tid.hpp"
 #include "fb_sensor_event.hpp"
 #include "fb_globals.hpp"
-#include "fb_sensor_aht20.hpp"
 #include "fb_project_core.hpp"
 
 

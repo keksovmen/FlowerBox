@@ -23,20 +23,26 @@ namespace fb
 				virtual bool hasKey(std::string_view partition, std::string_view key) const override;
 
 				virtual bool writeValue(std::string_view partition, std::string_view key, std::string_view value) override;
-				virtual bool writeValue(std::string_view partition, std::string_view key, int64_t value) override;
+				virtual bool writeValue(std::string_view partition, std::string_view key, Number value) override;
 
 				virtual bool readValue(std::string_view partition, std::string_view key, std::string& out) const override;
-				virtual bool readValue(std::string_view partition, std::string_view key, int64_t& out) const override;
+				virtual bool readValue(std::string_view partition, std::string_view key, Number& out) const override;
 
 				virtual void clearValue(std::string_view partition, std::string_view key) override;
 			
 			private:
-				using Entry = std::pair<int64_t, std::string>;
+				using Entry = std::pair<Number, std::string>;
 				using Page = std::unordered_map<std::string, Entry>;
 
 
 
 				std::unordered_map<std::string, Page> _data;
+
+
+
+				static bool _contains(const std::unordered_map<std::string, Page>& map, const std::string& v);
+				static bool _contains(const Page map, const std::string& v);
+				
 		};
 	}
 }

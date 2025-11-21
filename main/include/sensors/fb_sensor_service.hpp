@@ -6,7 +6,6 @@
 
 #include "fb_service_iface.hpp"
 #include "fb_sensor_event.hpp"
-#include "fb_sensor_temperature.hpp"
 #include "fb_sensor_iface.hpp"
 
 

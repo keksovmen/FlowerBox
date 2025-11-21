@@ -27,7 +27,7 @@ void fs::init()
 		.base_path = "/spiffs",
 		.partition_label = _PARTITION_NAME,
 		.max_files = 3,
-		.format_if_mount_failed = false
+		.format_if_mount_failed = true
 	};
 
 	ESP_ERROR_CHECK(esp_vfs_spiffs_register(&conf));

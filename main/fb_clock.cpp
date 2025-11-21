@@ -10,7 +10,9 @@
 #include "fb_settings.hpp"
 
 #include "esp_log.h"
-#include "esp_netif_sntp.h"
+#ifndef _ESP8266
+	#include "esp_netif_sntp.h"
+#endif
 #include "esp_sntp.h"
 #include "lwip/ip_addr.h"
 
@@ -34,36 +36,38 @@ static bool _isTimeSynced = false;
 
 
 
-static void _print_servers(void)
-{
-	FB_DEBUG_LOG_I_TAG("List of configured NTP servers:");
+#ifndef _ESP8266
+	static void _print_servers(void)
+	{
+		FB_DEBUG_LOG_I_TAG("List of configured NTP servers:");
 
-	for (uint8_t i = 0; i < SNTP_MAX_SERVERS; ++i){
-		if (esp_sntp_getservername(i)){
-			FB_DEBUG_LOG_I_TAG("server %d: %s", i, esp_sntp_getservername(i));
-		} else {
-			// we have either IPv4 or IPv6 address, let's print it
-			char buff[128];
-			ip_addr_t const *ip = esp_sntp_getserver(i);
-			if (ipaddr_ntoa_r(ip, buff, sizeof(buff)) != NULL)
-				FB_DEBUG_LOG_I_TAG("server %d: %s", i, buff);
+		for (uint8_t i = 0; i < SNTP_MAX_SERVERS; ++i){
+			if (esp_sntp_getservername(i)){
+				FB_DEBUG_LOG_I_TAG("server %d: %s", i, esp_sntp_getservername(i));
+			} else {
+				// we have either IPv4 or IPv6 address, let's print it
+				char buff[128];
+				ip_addr_t const *ip = esp_sntp_getserver(i);
+				if (ipaddr_ntoa_r(ip, buff, sizeof(buff)) != NULL)
+					FB_DEBUG_LOG_I_TAG("server %d: %s", i, buff);
+			}
 		}
 	}
-}
 
 
 
-static void _on_sntp_sync_event(struct timeval *tv)
-{
-	FB_DEBUG_ENTER_I_TAG();
+	static void _on_sntp_sync_event(struct timeval *tv)
+	{
+		FB_DEBUG_ENTER_I_TAG();
 
-	FB_DEBUG_LOG_W_TAG("Current time: %lld, or %lld", currentTimeStamp(), tv->tv_sec);
-	_isTimeSynced = true;
+		FB_DEBUG_LOG_W_TAG("Current time: %lld, or %ld", currentTimeStamp(), tv->tv_sec);
+		_isTimeSynced = true;
 
-	global::getEventManager()->pushEvent({event::EventGroup::CLOCK, std::to_underlying(clock::ClockEventId::SYNCED), nullptr});
-	//esp само обнволяет, настройка в меню конфиге, период обновления
-	// global::getTimeScheduler()->addActionDelayed({&syncRequest}, _SYNC_PERIOD_SEC * 1000, portMAX_DELAY);
-}
+		global::getEventManager()->pushEvent({event::EventGroup::CLOCK, static_cast<int>(clock::ClockEventId::SYNCED), nullptr});
+		//esp само обнволяет, настройка в меню конфиге, период обновления
+		// global::getTimeScheduler()->addActionDelayed({&syncRequest}, _SYNC_PERIOD_SEC * 1000, portMAX_DELAY);
+	}
+#endif
 
 
 
@@ -140,27 +144,33 @@ void clock::initClock()
 
 	assert(!_serverAddress.empty());
 
-	esp_sntp_config_t config = ESP_NETIF_SNTP_DEFAULT_CONFIG(_serverAddress.c_str());
-	config.wait_for_sync = false;
-	config.start = false;
-	config.sync_cb = &_on_sntp_sync_event;
-	esp_netif_sntp_init(&config);
+	#ifndef _ESP8266
+		esp_sntp_config_t config = ESP_NETIF_SNTP_DEFAULT_CONFIG(_serverAddress.c_str());
+		config.wait_for_sync = false;
+		config.start = false;
+		config.sync_cb = &_on_sntp_sync_event;
+		esp_netif_sntp_init(&config);
 
-	_print_servers();
+		_print_servers();
+	#endif
 }
 
 void clock::syncRequest()
 {
 	FB_DEBUG_ENTER_I_TAG();
 
-	esp_netif_sntp_start();
+	#ifndef _ESP8266
+		esp_netif_sntp_start();
+	#endif
 }
 
 void clock::deinitClock()
 {
 	FB_DEBUG_ENTER_I_TAG();
 
-	esp_netif_sntp_deinit();
+	#ifndef _ESP8266
+		esp_netif_sntp_deinit();
+	#endif
 }
 
 bool clock::isTimeSynced()

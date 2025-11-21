@@ -14,18 +14,13 @@ using namespace project;
 
 
 
-HttpPuller::HttpPuller(ActionCb onResult)
+AbstractHttpPuller::AbstractHttpPuller(ActionCb onResult)
 	: _actionCb(std::move(onResult))
 {
 
 }
 
-const char* HttpPuller::getName() const
-{
-	return "HttpPuller";
-}
-
-void HttpPuller::handleEvent(const event::Event& event)
+void AbstractHttpPuller::handleEvent(const event::Event& event)
 {
 	if(event.groupId != event::EventGroup::WIFI){
 		return;
@@ -38,154 +33,67 @@ void HttpPuller::handleEvent(const event::Event& event)
 	}
 }
 
-void HttpPuller::setUrl(std::string_view str)
-{
-	_url = str;
-}
-
-std::string_view HttpPuller::getUrl() const
-{
-	return _url;
-}
-
-void HttpPuller::start()
+void AbstractHttpPuller::start()
 {
 	if(_task){
 		FB_DEBUG_LOG_W_OBJ("Already started!");
 		return;
 	}
 
-	auto ret = xTaskCreate(&HttpPuller::_taskFunc, getName(), 4 * 1024, this, 15, &_task);
+	auto ret = xTaskCreate(&AbstractHttpPuller::_taskFunc, getName(), 4 * 1024, this, 15, &_task);
 	assert(ret == pdPASS);
 
 	FB_DEBUG_LOG_I_OBJ("Created task");
 }
 
-void HttpPuller::setPause(bool state)
+void AbstractHttpPuller::setUrl(std::string_view str)
+{
+	_url = str;
+}
+
+std::string_view AbstractHttpPuller::getUrl() const
+{
+	return _url;
+}
+
+
+void AbstractHttpPuller::setPause(bool state)
 {
 	_pause = state;
 }
 
-void HttpPuller::setTimeoutMs(int ms)
+void AbstractHttpPuller::setTimeoutMs(int ms)
 {
 	_timeoutMs = ms;
 }
 
 
-bool HttpPuller::isWorking() const
+bool AbstractHttpPuller::isWorking() const
 {
 	return !_pause;
 }
 
-int HttpPuller::getTimeoutMs() const
+int AbstractHttpPuller::getTimeoutMs() const
 {
 	return _timeoutMs;
 }
 
-void HttpPuller::_onWifiConnected()
-{
-	//need mutex
-	_deinitRequest();
-	_initRequest();
-
-	_isWifiConnected = true;
-}
-
-void HttpPuller::_onWifiDisconnected()
-{
-	_isWifiConnected = false;
-}
-
-bool HttpPuller::_onPerformRequest()
-{
-	esp_http_client_set_url(_httpClient, _url.c_str());
-	// Выполнение HTTPS-запроса (блокирующий режим)
-	esp_err_t err = esp_http_client_perform(_httpClient);
-
-	if (err == ESP_OK) {
-		// Получение статуса ответа
-		//need mutex due to missing 
-		int status_code = esp_http_client_get_status_code(_httpClient);
-		if (status_code == 200) {
-			_onSuccess(std::string_view(_responseBuff, _length));
-			return true;
-
-		} else if (status_code == 404) {
-			_onFailure();
-		} else {
-			FB_DEBUG_LOG_E_OBJ("Unexpected status code: %d", status_code);
-			_onFailure();
-		}
-	} else {
-		_onFailure();
-		//for safety close all connections and recreate client
-		//need mutex for this
-		_deinitRequest();
-		_initRequest();
-	}
-
-	return false;
-}
-
-void HttpPuller::_onFailure()
+void AbstractHttpPuller::_onFailure()
 {
 	FB_DEBUG_LOG_I_OBJ("Failed to get something or do request");
 	std::invoke(_actionCb, std::optional<std::string_view>{});
 }
 
-void HttpPuller::_onSuccess(std::string_view data)
+void AbstractHttpPuller::_onSuccess(std::string_view data)
 {
 	FB_DEBUG_LOG_I_OBJ("Data: %s", data.cbegin());
 	std::invoke(_actionCb, std::optional<std::string_view>{data});
 	vTaskDelay(pdMS_TO_TICKS(_timeoutMs));
 }
 
-void HttpPuller::_initRequest()
+void AbstractHttpPuller::_taskFunc(void *arg)
 {
-	if(_httpClient){
-		return;
-	}
-
-	FB_DEBUG_ENTER_I_OBJ();
-
-	esp_http_client_config_t config;
-	memset(&config, 0, sizeof(config));
-	
-	config.url = _url.c_str();
-	config.cert_pem = NULL; // Не использовать сертификат для проверки
-	config.skip_cert_common_name_check = true; // Пропустить проверку имени сертификата
-	config.disable_auto_redirect = false;
-	config.timeout_ms = 5000;
-	config.method = HTTP_METHOD_GET;
-	config.buffer_size = 512;
-	config.buffer_size_tx = 512;
-	config.event_handler = &HttpPuller::_requestHandler;
-	config.user_data = this;
-	config.keep_alive_enable = true;
-	config.keep_alive_idle = 5;
-	config.keep_alive_interval = 5;
-	config.keep_alive_count = 3;
-
-	// Инициализация HTTP-клиента
-	_httpClient = esp_http_client_init(&config);
-}
-
-void HttpPuller::_deinitRequest()
-{
-	if(!_httpClient){
-		return;
-	}
-
-	FB_DEBUG_ENTER_I_OBJ();
-
-	// Завершение работы HTTP-клиента
-	esp_http_client_cleanup(_httpClient);
-	_httpClient = nullptr;
-}
-
-void HttpPuller::_taskFunc(void *arg)
-{
-	auto* self = static_cast<HttpPuller*>(arg);
+	auto* self = static_cast<AbstractHttpPuller*>(arg);
 	// const char* TAG = self->getName();
 
 	for(;;){
@@ -206,21 +114,16 @@ void HttpPuller::_taskFunc(void *arg)
 
 }
 
-esp_err_t HttpPuller::_requestHandler(esp_http_client_event_t *evt)
+void AbstractHttpPuller::_onWifiConnected()
 {
-	auto* self = static_cast<HttpPuller*>(evt->user_data);
+	//need mutex
+	_deinitRequest();
+	_initRequest();
 
-	if(evt->event_id == HTTP_EVENT_ON_HEADER){
-		self->_length = 0;		
+	_isWifiConnected = true;
+}
 
-	}else if(evt->event_id == HTTP_EVENT_ON_DATA){
-		if(self->_length + evt->data_len > sizeof(self->_responseBuff)){
-			return ESP_FAIL;
-		}
-		memcpy(self->_responseBuff + self->_length, evt->data, evt->data_len);
-		self->_length += evt->data_len;
-		self->_responseBuff[self->_length] = '\0';
-	}
-
-	return ESP_OK;
+void AbstractHttpPuller::_onWifiDisconnected()
+{
+	_isWifiConnected = false;
 }

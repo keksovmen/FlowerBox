@@ -38,10 +38,16 @@ bool NvsStorage::hasKey(std::string_view partition, std::string_view key) const
 		return false;
 	}
 
-	nvs_type_t _ = NVS_TYPE_ANY;
+	int _ = 0;
 
-	err = hndl->find_key(key.cbegin(), _);
+	err = hndl->get_item(key.cbegin(), _);
+	// err = hndl->find_key(key.cbegin(), _);
 	FB_DEBUG_LOG_I_OBJ("Has key: %s = %d", key.cbegin(), static_cast<int>(err));
+	if(err == ESP_ERR_NVS_NOT_FOUND){
+		size_t s;
+		err = hndl->get_item_size(nvs::ItemType::SZ, key.cbegin(), s);
+		FB_DEBUG_LOG_I_OBJ("Has key as str: %s = %d", key.cbegin(), static_cast<int>(err));
+	}
 
 	return err == ESP_OK;
 }
@@ -61,7 +67,7 @@ bool NvsStorage::writeValue(std::string_view partition, std::string_view key, st
 	return err == ESP_OK;
 }
 
-bool NvsStorage::writeValue(std::string_view partition, std::string_view key, int64_t value)
+bool NvsStorage::writeValue(std::string_view partition, std::string_view key, Number value)
 {
 	esp_err_t err = ESP_OK;
 	auto hndl = nvs::open_nvs_handle(partition.cbegin(), NVS_READWRITE, &err);
@@ -69,9 +75,13 @@ bool NvsStorage::writeValue(std::string_view partition, std::string_view key, in
 		return false;
 	}
 
-	err = hndl->set_item<int64_t>(key.cbegin(), value);
+	err = hndl->set_item<Number>(key.cbegin(), value);
 	hndl->commit();
-	FB_DEBUG_LOG_I_OBJ("Write int: %s -> %lld, = %d", key.cbegin(), value, static_cast<int>(err));
+	#ifdef _ESP8266
+		FB_DEBUG_LOG_I_OBJ("Write int: %s -> %d, = %d", key.cbegin(), value, static_cast<int>(err));
+	#else
+		FB_DEBUG_LOG_I_OBJ("Write int: %s -> %lld, = %d", key.cbegin(), value, static_cast<int>(err));
+	#endif
 
 	return err == ESP_OK;
 }
@@ -93,7 +103,7 @@ bool NvsStorage::readValue(std::string_view partition, std::string_view key, std
 	return err == ESP_OK;
 }
 
-bool NvsStorage::readValue(std::string_view partition, std::string_view key, int64_t& out) const
+bool NvsStorage::readValue(std::string_view partition, std::string_view key, Number& out) const
 {
 	esp_err_t err = ESP_OK;
 	auto hndl = nvs::open_nvs_handle(partition.cbegin(), NVS_READWRITE, &err);
@@ -101,9 +111,13 @@ bool NvsStorage::readValue(std::string_view partition, std::string_view key, int
 		return false;
 	}
 
-	err = hndl->get_item<int64_t>(key.cbegin(), out);
+	err = hndl->get_item<Number>(key.cbegin(), out);
 
-	FB_DEBUG_LOG_I_OBJ("Read int: %s -> %lld, = %d", key.cbegin(), out, static_cast<int>(err));
+	#ifdef _ESP8266
+		FB_DEBUG_LOG_I_OBJ("Read int: %s -> %d, = %d", key.cbegin(), out, static_cast<int>(err));
+	#else
+		FB_DEBUG_LOG_I_OBJ("Read int: %s -> %lld, = %d", key.cbegin(), out, static_cast<int>(err));
+	#endif
 
 	return err == ESP_OK;
 }

@@ -2,7 +2,7 @@
 
 
 
-#include <concepts>
+#include <type_traits>
 
 #include "esp_log.h"
 
@@ -61,7 +61,7 @@ namespace fb
 				EntryExitProxy(const T& obj, const char* function, Color col)
 					: _color(col)
 				{
-					static_assert(std::derived_from<T, Named> == true);
+					static_assert(std::is_base_of_v<Named, T> == true);
 
 					_tag = obj.getName();
 					_fName = function;

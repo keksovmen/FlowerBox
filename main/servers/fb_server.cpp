@@ -44,19 +44,23 @@ void server::startProvision()
 	auto builder = Builder();
 	builder.setPort(80);
 
-	registerServerUpdate(builder);
-	registerServerHtml(builder);
+	#ifndef _ESP8266
+		registerServerUpdate(builder);
+		registerServerHtml(builder);
+		registerServerDebug(builder);
+	#endif
 	registerServerBox(builder);
-	// registerServerDebug(builder);
 
 	_server = builder.build();
 
-	builder = Builder();
-	builder.setPort(8080);
-	builder.setCtrlPort(ESP_HTTPD_DEF_CTRL_PORT + 1);
-	registerServerDebug(builder);
+	#ifndef _ESP8266
+		builder = Builder();
+		builder.setPort(8080);
+		builder.setCtrlPort(ESP_HTTPD_DEF_CTRL_PORT + 1);
+		registerServerDebug(builder);
 
-	_serverDebug = builder.build();
+		_serverDebug = builder.build();
+	#endif
 }
 
 void server::startWorking()

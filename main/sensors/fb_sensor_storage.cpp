@@ -1,5 +1,7 @@
 #include "fb_sensor_storage.hpp"
 
+#include <cassert>
+
 
 
 using namespace fb;
@@ -83,12 +85,12 @@ const SensorStorage::Buffer* SensorStorage::_getSensorValueBuffer(int address) c
 
 int SensorStorage::_mapAddresToIndex(int address) const
 {
-	return _addressMap.contains(address) ? _addressMap.at(address) : SensorStorage::_ILLEGAL_INDEX;
+	return (_addressMap.find(address) != _addressMap.end()) ? _addressMap.at(address) : SensorStorage::_ILLEGAL_INDEX;
 }
 
 int SensorStorage::_addAddres(int address)
 {
-	if(_addressMap.contains(address)){
+	if(_addressMap.find(address) != _addressMap.end()){
 		return _addressMap.at(address);
 	}
 

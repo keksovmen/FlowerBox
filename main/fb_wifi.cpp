@@ -23,8 +23,10 @@ using namespace fb::wifi;
 static const char* TAG = "fb_wifi";
 
 
+#ifndef _ESP8266
+	static esp_netif_t *_netif = NULL;
+#endif
 
-static esp_netif_t *_netif = NULL;
 
 static int _reconnectAttempts = 0;
 static WifiConfig cfg;
@@ -61,10 +63,10 @@ static void _on_sta_got_ip(void *arg, esp_event_base_t event_base,
 	_reconnectAttempts = 0;
 	ip_event_got_ip_t *event = (ip_event_got_ip_t *)event_data;
 
-	ESP_LOGI(TAG, "Got IPv4 event: Interface \"%s\" address: " IPSTR, esp_netif_get_desc(event->esp_netif), IP2STR(&event->ip_info.ip));
+	ESP_LOGI(TAG, "Got IPv4 event: address: " IPSTR, IP2STR(&event->ip_info.ip));
 	ESP_LOGI(TAG, "- IPv4 address: " IPSTR ",", IP2STR(&event->ip_info.ip));
 
-	global::getEventManager()->pushEvent({event::EventGroup::WIFI, std::to_underlying(WifiEventId::CONNECTED), NULL});
+	global::getEventManager()->pushEvent({event::EventGroup::WIFI, static_cast<int>(WifiEventId::CONNECTED), NULL});
 }
 
 
@@ -78,26 +80,25 @@ static void _on_wifi_ap_disconnect(void *arg, esp_event_base_t event_base,
 	// 	return;
 	// }
 
-	wifi_event_ap_stadisconnected_t *event = (wifi_event_ap_stadisconnected_t*) event_data;
-
-	ESP_LOGI(TAG, "Wi-Fi sta disconnected: AID = %d", event->aid);
+	#ifndef _ESP8266
+		wifi_event_ap_stadisconnected_t *event = (wifi_event_ap_stadisconnected_t*) event_data;
+		ESP_LOGI(TAG, "Wi-Fi sta disconnected: AID = %d", event->aid);
+	#endif
 
 	global::getEventManager()->pushEvent({event::EventGroup::WIFI, static_cast<int>(WifiEventId::DISCONNECTED), NULL});
-
 }
 
 static void _on_ap_gave_ip(void *arg, esp_event_base_t event_base,
 					  int32_t event_id, void *event_data)
 {
-	ip_event_ap_staipassigned_t *event = (ip_event_ap_staipassigned_t*) event_data;
+	#ifndef _ESP8266
+		// uint16_t aid = 0;
+		// esp_wifi_ap_get_sta_aid(event->mac, &aid);
+		ip_event_ap_staipassigned_t *event = (ip_event_ap_staipassigned_t*) event_data;
+		ESP_LOGI(TAG, "Provided IPv4, event: address: " IPSTR, IP2STR(&event->ip));
+	#endif
 
-	uint16_t aid = 0;
-
-	esp_wifi_ap_get_sta_aid(event->mac, &aid);
-
-	ESP_LOGI(TAG, "Provided IPv4, event: Interface \"%s\", AID = %d, address: " IPSTR, esp_netif_get_desc(event->esp_netif), aid, IP2STR(&event->ip));
-
-	global::getEventManager()->pushEvent({event::EventGroup::WIFI, std::to_underlying(WifiEventId::CONNECTED), NULL});
+	global::getEventManager()->pushEvent({event::EventGroup::WIFI, static_cast<int>(WifiEventId::CONNECTED), NULL});
 }
 
 static void _on_wifi_ap_start(void *arg, esp_event_base_t event_base,
@@ -105,7 +106,7 @@ static void _on_wifi_ap_start(void *arg, esp_event_base_t event_base,
 {
 	FB_DEBUG_LOG_I_TAG("AP started");
 
-	global::getEventManager()->pushEvent({event::EventGroup::WIFI, std::to_underlying(WifiEventId::AP_STARTED), NULL});
+	global::getEventManager()->pushEvent({event::EventGroup::WIFI, static_cast<int>(WifiEventId::AP_STARTED), NULL});
 
 }
 
@@ -190,7 +191,9 @@ static void _launchWifi(const WifiConfig& cfg)
 {
 	if(cfg.state == WifiState::STA){
 		ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
-		_netif = esp_netif_create_default_wifi_sta();
+		#ifndef _ESP8266
+			_netif = esp_netif_create_default_wifi_sta();
+		#endif
 
 		ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, WIFI_EVENT_STA_CONNECTED, &_on_wifi_connect, NULL));
 		ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, WIFI_EVENT_STA_DISCONNECTED, &_on_wifi_sta_disconnect, NULL));
@@ -198,7 +201,9 @@ static void _launchWifi(const WifiConfig& cfg)
 
 	}else if(cfg.state == WifiState::AP){
 		ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_AP));
-		_netif = esp_netif_create_default_wifi_ap();
+		#ifndef _ESP8266
+			_netif = esp_netif_create_default_wifi_ap();
+		#endif
 
 		ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, WIFI_EVENT_AP_STADISCONNECTED, &_on_wifi_ap_disconnect, NULL));
 		ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, WIFI_EVENT_AP_START, &_on_wifi_ap_start, NULL));
@@ -223,8 +228,12 @@ bool wifi::init()
 {
 	FB_DEBUG_ENTER_I_TAG();
 
-	static std::once_flag flag;
-	std::call_once(flag, &_init);
+	#ifndef _ESP8266
+		static std::once_flag flag;
+		std::call_once(flag, &_init);
+	#else
+		_init();
+	#endif
 
 	return true;
 }

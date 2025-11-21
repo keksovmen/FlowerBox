@@ -1,6 +1,7 @@
 #include "fb_object_base.hpp"
 
 #include <algorithm>
+#include <cassert>
 
 
 
