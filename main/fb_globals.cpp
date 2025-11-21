@@ -6,7 +6,6 @@
 #include "esp_efuse_table.h"
 
 #include "fb_heat_switch.hpp"
-#include "fb_main_state_manager.hpp"
 #include "fb_nvs_storage.hpp"
 #include "fb_project_box_obj.hpp"
 #include "fb_project_hw_obj.hpp"
