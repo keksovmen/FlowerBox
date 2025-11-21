@@ -4,6 +4,7 @@
 #include <string.h>
 #include <sys/time.h>
 #include <time.h>
+#include <inttypes.h>
 
 #include "fb_debug.hpp"
 #include "fb_globals.hpp"
@@ -60,7 +61,7 @@ static bool _isTimeSynced = false;
 	{
 		FB_DEBUG_ENTER_I_TAG();
 
-		FB_DEBUG_LOG_W_TAG("Current time: %lld, or %ld", currentTimeStamp(), tv->tv_sec);
+		FB_DEBUG_LOG_W_TAG("Current time: %lld, or %lld", currentTimeStamp(), tv->tv_sec);
 		_isTimeSynced = true;
 
 		global::getEventManager()->pushEvent({event::EventGroup::CLOCK, static_cast<int>(clock::ClockEventId::SYNCED), nullptr});

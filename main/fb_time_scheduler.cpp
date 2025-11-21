@@ -2,6 +2,8 @@
 
 #include "fb_lock_wrapper.hpp"
 
+#include <inttypes.h>
+
 
 
 using namespace fb;
@@ -40,7 +42,7 @@ bool TimeScheduler::addActionDelayed(Action action, int afterMs, int maxWaitMs)
 
 	auto fireAt = pdTICKS_TO_MS(xTaskGetTickCount()) + afterMs;
 
-	FB_DEBUG_LOG_I_OBJ("Adding action after %d ms, will fire at %u, current size %d", afterMs, fireAt, _queue.size());
+	FB_DEBUG_LOG_I_OBJ("Adding action after %d ms, will fire at %lu, current size %d", afterMs, fireAt, _queue.size());
 
 	_queue.emplace(fireAt, action);
 	_startTimer();

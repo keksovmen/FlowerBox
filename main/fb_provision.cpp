@@ -3,6 +3,8 @@
 #include <utility>
 #include <cstring>
 
+#include <inttypes.h>
+
 #include <cJSON.h>
 #include <wifi_provisioning/manager.h>
 #include <wifi_provisioning/scheme_softap.h>
@@ -42,7 +44,7 @@ static const char* TAG = "fb_provision";
 
 static void _eventHandler(void* arg, esp_event_base_t eventBase, int32_t eventId, void* eventData)
 {
-	FB_DEBUG_LOG_I_TAG("Provision event %d", eventId);
+	FB_DEBUG_LOG_I_TAG("Provision event %ld", eventId);
 
 	if(eventId == static_cast<int32_t>(WIFI_PROV_CRED_RECV))
 	{
