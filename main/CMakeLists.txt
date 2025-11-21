@@ -1,5 +1,6 @@
-set(_PROJECT MINE)
+# set(_PROJECT MINE)
 # set(_PROJECT DIPLOM)
+set(_PROJECT RELAY)
 
 message(STATUS "Selected project: " ${_PROJECT})
 
@@ -14,13 +15,13 @@ if(${_PROJECT} STREQUAL "MINE")
 		)
 	set(_ADD_INCLUDES
 		"include/project")
-else()
+elseif(${_PROJECT} STREQUAL "MINE")
 	set(_ADD_SRC 
 		"project2/fb_project_box_obj.cpp"
 		"project2/fb_project_hw_obj.cpp"
 		"project2/fb_project_maper_obj.cpp"
 		"project2/fb_project_core.cpp"
-"project2/fb_http_puller.cpp"
+		"fb_http_puller.cpp"
 		"switches/fb_rgb_switch.cpp"
 		"switches/fb_mp3_switch.cpp"
 		"sensors/fb_sensor_mp3.cpp"
@@ -30,6 +31,20 @@ else()
 	set(_ADD_INCLUDES
 		"include/project2"
 		"include/df_player")
+else()
+	set(_ADD_SRC 
+		"relay_project/fb_project_box_obj.cpp"
+		"relay_project/fb_project_hw_obj.cpp"
+		"relay_project/fb_project_maper_obj.cpp"
+		"relay_project/fb_project_core.cpp"
+		"relay_project/fb_project_settings.cpp"
+		"fb_http_puller.cpp"
+		"switches/fb_gpio_switch.cpp"
+		)
+	set(_ADD_INCLUDES
+		"include/relay_project"
+		)
+
 endif()
 
 message(STATUS "ADD SRC: " ${_ADD_SRC})
@@ -109,4 +124,8 @@ idf_component_register(
 # 	target_compile_options(${COMPONENT_LIB} PRIVATE -D_PROJECT=1)
 # endif()
 
-spiffs_create_partition_image(storage ../spiffs_image FLASH_IN_PROJECT)
+# if(${_PROJECT} STREQUAL "RELAY")
+# 	message(STATUS "No SPIFF image for: " ${_PROJECT})
+# else()
+	spiffs_create_partition_image(storage ../spiffs_image FLASH_IN_PROJECT)
+# endif()

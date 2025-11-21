@@ -37,6 +37,11 @@ namespace fb
 
 
 
+				static constexpr auto MockCondition = [](SwitchIface* me){return false;};
+				static constexpr auto MockAction = [](SwitchIface* me, bool){};
+
+
+
 				SwitchIface(const ConditionCb& conditionCb, const ActionCb actionCb);
 				virtual ~SwitchIface() = default;
 

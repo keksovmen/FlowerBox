@@ -25,12 +25,14 @@ const char* StateWifiConnected::getName() const
 
 void StateWifiConnected::handleEvent(const event::Event& event)
 {
-	// if(event.groupId == event::EventGroup::WIFI){
-	// 	if(event.eventId == wifi::WifiEventId::DISCONNECTED){
-	// 		getContext().transition(std::make_unique<StateWifiConnect>(getContext()));
-	// 		return;
-	// 	}
-	// }
+	if(event.groupId == event::EventGroup::WIFI){
+		if(event.eventId == wifi::WifiEventId::FAILED_TO_CONNECT){
+			// getContext().transition(std::make_unique<StateWifiConnect>(getContext()));
+			// return;
+			//TODO: made proper state for no wifi and reconnect in there
+			wifi::reconnect();
+		}
+	}
 
 	// _childManager.handleEvent(event);
 }

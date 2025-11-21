@@ -3,6 +3,7 @@
 
 
 #include <string_view>
+#include <optional>
 
 #include "fb_debug.hpp"
 #include "fb_event_manager.hpp"
@@ -21,7 +22,12 @@ namespace fb
 		class HttpPuller : public debug::Named, public event::EventListener
 		{
 			public:
-				// HttpPuller();
+				//if optional has value -> success, otherwise failed request
+				using ActionCb = std::function<void(std::optional<std::string_view>)>;
+
+
+
+				HttpPuller(ActionCb onResult);
 
 				virtual const char* getName() const override;
 				//listen for wifi status state
@@ -31,14 +37,22 @@ namespace fb
 				std::string_view getUrl() const;
 
 				void start();
+				void setPause(bool state);
+				void setTimeoutMs(int ms);
+				
+				bool isWorking() const;
+				int getTimeoutMs() const;
 
 			private:
+				ActionCb _actionCb;
 				std::string _url;
-				bool _isWifiConnected = false;
-				TaskHandle_t _task = NULL;
 				esp_http_client_handle_t _httpClient = NULL;
-				char _responseBuff[256];
+				TaskHandle_t _task = NULL;
+				bool _isWifiConnected = false;
+				char _responseBuff[512];
 				int _length = 0; 
+				int _timeoutMs = 300;
+				bool _pause = false;
 
 				/*
 				create task at startup, it will handle requests and current wifi state

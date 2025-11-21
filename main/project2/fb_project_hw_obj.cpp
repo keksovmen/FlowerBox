@@ -8,6 +8,7 @@
 #include "fb_pins.hpp"
 
 #include "esp_dmx.h"
+#include "cJSON.h"
 
 
 
@@ -23,6 +24,11 @@
 
 using namespace fb;
 using namespace project;
+
+
+
+//function declarations
+static void _httpRequestHandler(std::optional<std::string_view>);
 
 
 
@@ -43,11 +49,57 @@ static sensor::SensorStorage _sensorStorage;
 
 //прочее туть
 static keyboard::KeyboardHandler _keyboardHandler;
-static HttpPuller _httpPuller;
+static HttpPuller _httpPuller(&_httpRequestHandler);
 
 
 
 static const char* TAG = "hw";
+
+
+
+static void _httpRequestHandler(std::optional<std::string_view> data)
+{
+	//failure case
+	if(!data){
+		return;
+	}
+
+	// Парсинг JSON
+	cJSON* json = cJSON_Parse(data.cbegin());
+	if(!json){
+		FB_DEBUG_LOG_E_OBJ("Failed to parse JSON");
+		return;
+	}
+
+	//parse json
+	cJSON* idJson = cJSON_GetObjectItemCaseSensitive(json, "id");
+	cJSON* valueJson = cJSON_GetObjectItemCaseSensitive(json, "value");
+
+	if (!cJSON_IsNumber(idJson) || !cJSON_IsString(valueJson)) {
+		//failure do nothing
+		FB_DEBUG_LOG_E_OBJ("Id is not an int and value is not a string");
+
+		// Освобождение памяти
+		cJSON_Delete(json);
+		return;
+	}
+
+	const int id = idJson->valueint;
+	const char* valuePtr = valueJson->valuestring;
+	FB_DEBUG_LOG_I_OBJ("ID=%d, value=%s", id, valuePtr);
+
+	const std::string value = valuePtr;
+
+	// Освобождение памяти
+	cJSON_Delete(json);
+
+
+	//изменение свойства
+	auto* prop = global::getFlowerBox()->getProperty(id);
+	if(prop){
+		prop->setFromJson(value);
+	}
+}
 
 
 

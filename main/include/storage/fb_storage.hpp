@@ -22,7 +22,7 @@ namespace fb
 		class StorageIface : public debug::Named
 		{
 			public:
-				static constexpr int MAX_STRING_SIZE = 64;
+				static constexpr int MAX_STRING_SIZE = 256;
 
 
 

@@ -14,6 +14,12 @@ using namespace project;
 
 
 
+HttpPuller::HttpPuller(ActionCb onResult)
+	: _actionCb(std::move(onResult))
+{
+
+}
+
 const char* HttpPuller::getName() const
 {
 	return "HttpPuller";
@@ -27,7 +33,7 @@ void HttpPuller::handleEvent(const event::Event& event)
 
 	if(event.eventId == wifi::WifiEventId::CONNECTED){
 		_onWifiConnected();
-	}else if(event.eventId == wifi::WifiEventId::DISCONNECTED){
+	}else if(event.eventId == wifi::WifiEventId::FAILED_TO_CONNECT){
 		_onWifiDisconnected();
 	}
 }
@@ -53,6 +59,27 @@ void HttpPuller::start()
 	assert(ret == pdPASS);
 
 	FB_DEBUG_LOG_I_OBJ("Created task");
+}
+
+void HttpPuller::setPause(bool state)
+{
+	_pause = state;
+}
+
+void HttpPuller::setTimeoutMs(int ms)
+{
+	_timeoutMs = ms;
+}
+
+
+bool HttpPuller::isWorking() const
+{
+	return !_pause;
+}
+
+int HttpPuller::getTimeoutMs() const
+{
+	return _timeoutMs;
 }
 
 void HttpPuller::_onWifiConnected()
@@ -103,47 +130,14 @@ bool HttpPuller::_onPerformRequest()
 void HttpPuller::_onFailure()
 {
 	FB_DEBUG_LOG_I_OBJ("Failed to get something or do request");
+	std::invoke(_actionCb, std::optional<std::string_view>{});
 }
 
 void HttpPuller::_onSuccess(std::string_view data)
 {
 	FB_DEBUG_LOG_I_OBJ("Data: %s", data.cbegin());
-
-	// Парсинг JSON
-	cJSON* json = cJSON_Parse(data.cbegin());
-	if(!json){
-		FB_DEBUG_LOG_E_OBJ("Failed to parse JSON");
-		return;
-	}
-
-	//parse json
-	cJSON* idJson = cJSON_GetObjectItemCaseSensitive(json, "id");
-	cJSON* valueJson = cJSON_GetObjectItemCaseSensitive(json, "value");
-
-	if (!cJSON_IsNumber(idJson) || !cJSON_IsString(valueJson)) {
-		//failure do nothing
-		FB_DEBUG_LOG_E_OBJ("Id is not an int and value is not a string");
-
-		// Освобождение памяти
-		cJSON_Delete(json);
-		return;
-	}
-
-	const int id = idJson->valueint;
-	const char* valuePtr = valueJson->valuestring;
-	FB_DEBUG_LOG_I_OBJ("ID=%d, value=%s", id, valuePtr);
-
-	const std::string value = valuePtr;
-
-	// Освобождение памяти
-	cJSON_Delete(json);
-
-
-	//изменение свойства
-	auto* prop = global::getFlowerBox()->getProperty(id);
-	if(prop){
-		prop->setFromJson(value);
-	}
+	std::invoke(_actionCb, std::optional<std::string_view>{data});
+	vTaskDelay(pdMS_TO_TICKS(_timeoutMs));
 }
 
 void HttpPuller::_initRequest()
@@ -195,6 +189,10 @@ void HttpPuller::_taskFunc(void *arg)
 	// const char* TAG = self->getName();
 
 	for(;;){
+		if(self->_pause){
+			vTaskDelay(pdMS_TO_TICKS(100));
+			continue;
+		}
 		//wait for wifi connection
 		if(!self->_isWifiConnected){
 			vTaskDelay(pdMS_TO_TICKS(1000));
@@ -216,6 +214,9 @@ esp_err_t HttpPuller::_requestHandler(esp_http_client_event_t *evt)
 		self->_length = 0;		
 
 	}else if(evt->event_id == HTTP_EVENT_ON_DATA){
+		if(self->_length + evt->data_len > sizeof(self->_responseBuff)){
+			return ESP_FAIL;
+		}
 		memcpy(self->_responseBuff + self->_length, evt->data, evt->data_len);
 		self->_length += evt->data_len;
 		self->_responseBuff[self->_length] = '\0';
