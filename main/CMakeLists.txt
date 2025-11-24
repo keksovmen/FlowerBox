@@ -1,49 +1,52 @@
-set(_PROJECT MINE)
+# set(_PROJECT MINE)
 # set(_PROJECT DIPLOM)
-# set(_PROJECT RELAY)
+# set(_PROJECT STICKS)
+set(_PROJECT RELAY)
 
 message(STATUS "Selected project: " ${_PROJECT})
 
 if(${_PROJECT} STREQUAL "MINE")
 	set(_ADD_SRC 
-		"green_house/fb_project_box_obj.cpp"
-		"green_house/fb_project_hw_obj.cpp"
-		"green_house/fb_project_maper_obj.cpp"
-		"green_house/fb_project_core.cpp"
-		"green_house/fb_project_settings.cpp"
+		"projects/green_house/fb_project_box_obj.cpp"
+		"projects/green_house/fb_project_hw_obj.cpp"
+		"projects/green_house/fb_project_maper_obj.cpp"
+		"projects/green_house/fb_project_core.cpp"
+		"projects/green_house/fb_project_settings.cpp"
 		"sensors/fb_sensor_aht20.cpp"
 		)
 	set(_ADD_INCLUDES
-		"include/green_house")
-elseif(${_PROJECT} STREQUAL "MINE")
+		"include/projects/green_house")
+elseif(${_PROJECT} STREQUAL "DIPLOM")
 	set(_ADD_SRC 
-		"project2/fb_project_box_obj.cpp"
-		"project2/fb_project_hw_obj.cpp"
-		"project2/fb_project_maper_obj.cpp"
-		"project2/fb_project_core.cpp"
-		"fb_http_puller.cpp"
+		"projects/dmx_light/fb_project_box_obj.cpp"
+		"projects/dmx_light/fb_project_hw_obj.cpp"
+		"projects/dmx_light/fb_project_maper_obj.cpp"
+		"projects/dmx_light/fb_project_core.cpp"
 		"switches/fb_rgb_switch.cpp"
 		"switches/fb_mp3_switch.cpp"
 		"sensors/fb_sensor_mp3.cpp"
 		"df_player/fb_df_player.cpp"
+		"fb_http_puller.cpp"
 		"fb_uart.cpp"
 		)
 	set(_ADD_INCLUDES
-		"include/project2"
+		"include/projects/dmx_light"
 		"include/df_player")
-else()
+elseif(${_PROJECT} STREQUAL "RELAY")
 	set(_ADD_SRC 
-		"relay_project/fb_project_box_obj.cpp"
-		"relay_project/fb_project_hw_obj.cpp"
-		"relay_project/fb_project_maper_obj.cpp"
-		"relay_project/fb_project_core.cpp"
-		"relay_project/fb_project_settings.cpp"
-		"fb_http_puller.cpp"
+		"projects/relay/fb_project_box_obj.cpp"
+		"projects/relay/fb_project_hw_obj.cpp"
+		"projects/relay/fb_project_maper_obj.cpp"
+		"projects/relay/fb_project_core.cpp"
+		"projects/relay/fb_project_settings.cpp"
 		"switches/fb_gpio_switch.cpp"
+		"fb_http_puller.cpp"
+		"fb_http_puller32.cpp"
 		)
 	set(_ADD_INCLUDES
-		"include/relay_project"
+		"include/projects/relay"
 		)
+elseif(${_PROJECT} STREQUAL "STICKS")
 
 endif()
 

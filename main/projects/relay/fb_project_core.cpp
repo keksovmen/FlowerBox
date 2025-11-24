@@ -1,7 +1,6 @@
-#include "fb_project_core.hpp"
+#include "fb_core.hpp"
 
 #include "fb_server_html.hpp"
-#include "fb_project_maper_obj.hpp"
 
 
 
@@ -10,7 +9,12 @@ using namespace project;
 
 
 
+static BaseCore _core{{}, "Relay"};
+
+
+
 static CoreInfo _info = {
+	.core = _core,
 	.requiresTime = false,
 };
 

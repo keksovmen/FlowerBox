@@ -1,13 +1,14 @@
-#include "fb_project_hw_obj.hpp"
+#include "fb_relay_hw_obj.hpp"
 
 #include <cstring>
 
+#include "fb_core.hpp"
 #include "fb_globals.hpp"
 #include "fb_gpio_switch.hpp"
-#include "fb_http_puller.hpp"
+#include "fb_http_puller_32.hpp"
 #include "fb_keyboard_handler.hpp"
-#include "fb_pins.hpp"
-#include "fb_project_settings.hpp"
+#include "fb_relay_pins.hpp"
+#include "fb_relay_settings.hpp"
 
 #include "cJSON.h"
 
@@ -157,7 +158,7 @@ switches::ArrayGpioSwitch<6>& project::getHwGpioSwitch()
 	return _gpioSwitch;
 }
 
-HttpPuller& project::getHwHttpPuller()
+AbstractHttpPuller& project::getHwHttpPuller()
 {
 	return _httpPuller;
 }
