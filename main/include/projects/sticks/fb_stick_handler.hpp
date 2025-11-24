@@ -37,7 +37,7 @@ namespace fb
 
 					void updateClock()
 					{
-						const char* TAG = "DEBUG";
+						// const char* TAG = "DEBUG";
 
 						if(!enabled){
 							return;
@@ -45,7 +45,7 @@ namespace fb
 
 						auto current = xTaskGetTickCount();
 						//probably we turned off already
-						FB_DEBUG_LOG_W_TAG("Activated at: %u, current %u, delta %u, in MS %u", activatedAt, current, current - activatedAt, pdTICKS_TO_MS(current - activatedAt));
+						// FB_DEBUG_LOG_W_TAG("Activated at: %u, current %u, delta %u, in MS %u", activatedAt, current, current - activatedAt, pdTICKS_TO_MS(current - activatedAt));
 						if(pdTICKS_TO_MS(current - activatedAt) >= SHUTDOWN_TIME_MS){
 							enabled = false;
 						}
@@ -124,7 +124,7 @@ namespace fb
 					}
 
 					if(pulseOnce){
-						FB_DEBUG_LOG_I_OBJ("Pulse once: 0x%X, twice: 0x%X", pulseOnce, pulseTwice);
+						// FB_DEBUG_LOG_I_OBJ("Pulse once: 0x%X, twice: 0x%X", pulseOnce, pulseTwice);
 						_pulse(pulseOnce);
 						_pulse(pulseTwice);
 					}

@@ -2,11 +2,9 @@
 
 
 
+#include "fb_core_hw_obj.hpp"
 #include "fb_http_puller.hpp"
 #include "fb_sensor_keyboard.hpp"
-#include "fb_sensor_service.hpp"
-#include "fb_sensor_storage.hpp"
-#include "fb_switch_service.hpp"
 
 
 

@@ -48,7 +48,20 @@ elseif(${_PROJECT} STREQUAL "RELAY")
 		"include/projects/relay"
 		)
 elseif(${_PROJECT} STREQUAL "STICKS")
-
+	set(_ADD_SRC 
+		"projects/sticks/fb_project_box_obj.cpp"
+		"projects/sticks/fb_project_hw_obj.cpp"
+		"projects/sticks/fb_project_maper_obj.cpp"
+		"projects/sticks/fb_project_core.cpp"
+		"projects/sticks/fb_project_settings.cpp"
+		"switches/fb_gpio_switch.cpp"
+		"fb_http_puller.cpp"
+		"fb_http_puller32.cpp"
+		"fb_wrapper_i2c_gpio.cpp"
+		)
+	set(_ADD_INCLUDES
+		"include/projects/sticks"
+		)
 endif()
 
 message(STATUS "ADD SRC: " ${_ADD_SRC})

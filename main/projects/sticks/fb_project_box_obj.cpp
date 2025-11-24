@@ -1,4 +1,4 @@
-#include "fb_project_box_obj.hpp"
+#include "fb_core.hpp"
 
 #include "fb_globals.hpp"
 #include "fb_property.hpp"
@@ -17,13 +17,10 @@ using namespace project;
 
 static box::Box _flowerBox(_DEVICE_NAME, _DEVICE_VERSION, global::getUniqueId());
 
-// static box::Sensor _boxMp3Sensor(box::Tid::SENSOR_MP3);
-
 
 
 void project::initBoxObjs()
 {
-	// getBox().addSensor(&getBoxMp3Sensor());
 }
 
 box::Box& project::getBox()

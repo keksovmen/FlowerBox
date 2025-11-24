@@ -1,4 +1,4 @@
-#include "fb_project_core.hpp"
+#include "fb_core.hpp"
 
 
 
@@ -7,7 +7,12 @@ using namespace project;
 
 
 
+static BaseCore _core{{}, ""};
+
+
+
 static CoreInfo _info = {
+	.core = _core,
 	.requiresTime = false,
 	.requiresServices = false,
 };

@@ -1,12 +1,12 @@
-#include "fb_project_hw_obj.hpp"
+#include "fb_sticks_hw_obj.hpp"
 
 #include <cstring>
 
 #include "fb_globals.hpp"
 #include "fb_http_puller.hpp"
 #include "fb_keyboard_handler.hpp"
-#include "fb_pins.hpp"
-#include "fb_project_settings.hpp"
+#include "fb_sticks_pins.hpp"
+#include "fb_sticks_settings.hpp"
 #include "fb_http_puller_32.hpp"
 #include "fb_wrapper_i2c_gpio.hpp"
 #include "fb_stick_handler.hpp"

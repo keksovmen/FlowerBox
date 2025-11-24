@@ -20,13 +20,23 @@ WrapperI2cGpio::WrapperI2cGpio(int gpioScl, int gpioSda)
 void WrapperI2cGpio::init()
 {
 	i2c_config_t conf;
+	#ifdef _ESP8266
+		conf.clk_stretch_tick = 300; // 300 ticks, Clock stretch is about 210us, you can make changes according to the actual situation.
+	#else
+		conf.master.clk_speed = 100000;
+	#endif
     conf.mode = I2C_MODE_MASTER;
     conf.sda_io_num = static_cast<gpio_num_t>(_gpioSda);
     conf.sda_pullup_en = GPIO_PULLUP_ENABLE;
     conf.scl_io_num = static_cast<gpio_num_t>(_gpioScl);
     conf.scl_pullup_en = GPIO_PULLUP_ENABLE;
-    conf.clk_stretch_tick = 300; // 300 ticks, Clock stretch is about 210us, you can make changes according to the actual situation.
-    ESP_ERROR_CHECK(i2c_driver_install(I2C_NUM_0, conf.mode));
+
+	#ifdef _ESP8266
+		ESP_ERROR_CHECK(i2c_driver_install(I2C_NUM_0, conf.mode));
+	#else
+		ESP_ERROR_CHECK(i2c_driver_install(I2C_NUM_0, conf.mode, 0, 0, 0));
+	#endif
+	
     ESP_ERROR_CHECK(i2c_param_config(I2C_NUM_0, &conf));
 }
 
