@@ -22,48 +22,10 @@ static box::Switch _hhtpPullerSwitch(box::Tid::SWITCH_HTTP_PULLER,
 	[](){return getHwHttpPuller().isWorking();});
 
 
-static void _create_and_register_forse_property(switches::SwitchIface& obj, box::Switch& dependy)
-{
-	auto* forseProperty = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_FORSE,
-		[&obj](int val){
-			obj.setForseFlag(static_cast<switches::SwitchForseState>(val));
-
-			getHwSwitchService().forcePullAction();
-
-			return true;
-		}, obj.isOn()
-	);
-
-	getBox().addProperty(std::unique_ptr<box::PropertyIface>(forseProperty));
-	dependy.addPropertyDependency(forseProperty->getId());
-}
-
-
-
-static void _init_box_properties()
-{
-	auto* settingsProp = new box::PropertyNone(box::Tid::PROPERTY_SYSTEM_RESET_SETTINGS,
-		[](auto val){
-			settings::clearWifi();
-			return true;
-		});
-	getBox().addProperty(std::unique_ptr<box::PropertyIface>(settingsProp));
-	getBox().addPropertyDependency(settingsProp->getId());
-
-
-	auto* restartProp = new box::PropertyNone(box::Tid::PROPERTY_SYSTEM_RESTART,
-		[](auto val){
-			global::restart();
-			return true;
-		});
-	getBox().addProperty(std::unique_ptr<box::PropertyIface>(restartProp));
-	getBox().addPropertyDependency(restartProp->getId());
-}
-
 
 static void _initGpioArray()
 {
-	_create_and_register_forse_property(getHwGpioSwitch(), _gpioSwitch);
+	util::createAndRegisterForceProperty(getHwGpioSwitch(), _gpioSwitch);
 
 	auto* turnOnProperty = new box::PropertyInt("TurnOn", "Turns specific GPIO on",
 		box::Tid::PROPERTY_GENERAL,
@@ -140,7 +102,7 @@ static void _initHttpPuller()
 
 void project::initMaperObjs()
 {
-	_init_box_properties();
+	util::createAndRegisterDefaultBoxProperties();
 	_initGpioArray();
 	_initHttpPuller();
 }

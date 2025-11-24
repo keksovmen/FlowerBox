@@ -22,21 +22,21 @@ static box::Sensor _outsideTempSensor(box::Tid::SENSOR_TEMPERATURE);
 
 
 
-static void _create_register_description_prop(box::ObjectIface& obj)
-{
-	const auto *prop = _flowerBox.addProperty(std::make_unique<box::PropertyString>(
-		box::Tid::PROPERTY_SENSOR_DESCRIPTION,
-		[&obj](std::string val)
-		{ 
-			obj.setDescription(val);
-			return true;
-		},
-		obj.getDescription())
-	);
-	assert(prop);
+// static void _create_register_description_prop(box::ObjectIface& obj)
+// {
+// 	const auto *prop = _flowerBox.addProperty(std::make_unique<box::PropertyString>(
+// 		box::Tid::PROPERTY_SENSOR_DESCRIPTION,
+// 		[&obj](std::string val)
+// 		{ 
+// 			obj.setDescription(val);
+// 			return true;
+// 		},
+// 		obj.getDescription())
+// 	);
+// 	assert(prop);
 
-	obj.addPropertyDependency(prop->getId());
-}
+// 	obj.addPropertyDependency(prop->getId());
+// }
 
 
 void project::initBoxObjs()
@@ -52,9 +52,9 @@ void project::initBoxObjs()
 	_outsideTempSensor.setDescription("Outside temperature sensor");
 
 	// change to static somehow
-	_create_register_description_prop(_insideTempSensor);
-	_create_register_description_prop(_outsideTempSensor);
-	_create_register_description_prop(_insideHumiditySensor);
+	// _create_register_description_prop(_insideTempSensor);
+	// _create_register_description_prop(_outsideTempSensor);
+	// _create_register_description_prop(_insideHumiditySensor);
 }
 
 box::Box& project::getBox()

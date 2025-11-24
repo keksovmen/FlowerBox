@@ -1,5 +1,5 @@
-# set(_PROJECT MINE)
-set(_PROJECT DIPLOM)
+set(_PROJECT MINE)
+# set(_PROJECT DIPLOM)
 # set(_PROJECT STICKS)
 # set(_PROJECT RELAY)
 
@@ -78,6 +78,7 @@ idf_component_register(
 		"box/fb_switch.cpp"
 		"box/fb_data_entry.cpp"
 		"box/fb_object_base.cpp"
+		"core/fb_core_mapper_obj.cpp"
 		"storage/fb_ram_storage.cpp"
 		"storage/fb_nvs_storage.cpp"
 		"sensors/fb_sensor_iface.cpp"
