@@ -10,10 +10,8 @@
 #endif
 #include "esp_system.h"
 
+#include "fb_core.hpp"
 #include "fb_nvs_storage.hpp"
-#include "fb_project_base_box_obj.hpp"
-#include "fb_project_base_hw_obj.hpp"
-#include "fb_project_base_maper_obj.hpp"
 #include "fb_ram_storage.hpp"
 #include "fb_sensor_store_service.hpp"
 #include "fb_settings.hpp"
@@ -72,6 +70,7 @@ void global::init()
 	project::initMaperObjs();
 
 	_eventManager.attachListener(&_sensorStoreService);
+	_eventManager.attachListener(&project::getInfo().core);
 }
 
 void global::restart()

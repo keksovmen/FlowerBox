@@ -1,4 +1,4 @@
-#include "fb_project_core.hpp"
+#include "fb_core.hpp"
 
 #include "fb_globals.hpp"
 #include "fb_green_house_hw_obj.hpp"
@@ -10,12 +10,28 @@ using namespace project;
 
 
 
+static void _handleEvent(const event::Event& event);
+ 
+
+
+
+static BaseCore _core{&_handleEvent, "GreenHouse"};
+
 static CoreInfo _info = {
+	.core = _core,
 	.requiresTime = true,
 };
 
 
-void project::init()
+
+static void _handleEvent(const event::Event& event)
+{
+	//do stuff
+}
+
+
+
+void project::bootInit()
 {
 	global::getSensorStoreService()->registerSensor({
 		&getHwAhtSensor(),

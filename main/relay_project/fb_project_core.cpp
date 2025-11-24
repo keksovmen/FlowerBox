@@ -16,7 +16,7 @@ static CoreInfo _info = {
 
 
 
-void project::init()
+void project::bootInit()
 {
 }
 

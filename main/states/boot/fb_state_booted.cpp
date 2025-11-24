@@ -1,6 +1,6 @@
 #include "fb_state_booted.hpp"
 
-#include "fb_project_core.hpp"
+#include "fb_core.hpp"
 #include "fb_state_hw_init.hpp"
 #include "fb_state_work.hpp"
 
@@ -29,7 +29,7 @@ bool StateBooted::_onCompositeEventHandler(const event::Event& event)
 
 void StateBooted::_onCompositeEnter()
 {
-	project::init();
+	project::bootInit();
 }
 
 std::unique_ptr<State> StateBooted::_createInitialState()

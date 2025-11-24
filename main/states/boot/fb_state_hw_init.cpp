@@ -1,8 +1,8 @@
 #include "fb_state_hw_init.hpp"
 
+#include "fb_core.hpp"
 #include "fb_file_system.hpp"
 #include "fb_globals.hpp"
-#include "fb_project_core.hpp"
 #include "fb_sensor_event.hpp"
 #include "fb_settings.hpp"
 #include "fb_state_provision.hpp"

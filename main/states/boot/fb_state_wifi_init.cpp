@@ -1,7 +1,7 @@
 #include "fb_state_wifi_init.hpp"
 
+#include "fb_core.hpp"
 #include "fb_globals.hpp"
-#include "fb_project_core.hpp"
 #include "fb_settings.hpp"
 #include "fb_state_time_init.hpp"
 #include "fb_wifi.hpp"

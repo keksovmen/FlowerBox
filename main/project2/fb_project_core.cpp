@@ -30,7 +30,7 @@ static void _controlsCb(templates::Engine& engine, const std::unordered_map<std:
 
 
 
-void project::init()
+void project::bootInit()
 {
 	server::htmlAddFileHandler("controls.html", &_controlsCb);	
 }
