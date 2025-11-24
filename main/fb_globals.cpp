@@ -11,9 +11,9 @@
 #include "esp_system.h"
 
 #include "fb_nvs_storage.hpp"
-#include "fb_project_box_obj.hpp"
-#include "fb_project_hw_obj.hpp"
-#include "fb_project_maper_obj.hpp"
+#include "fb_project_base_box_obj.hpp"
+#include "fb_project_base_hw_obj.hpp"
+#include "fb_project_base_maper_obj.hpp"
 #include "fb_ram_storage.hpp"
 #include "fb_sensor_store_service.hpp"
 #include "fb_settings.hpp"

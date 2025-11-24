@@ -2,7 +2,7 @@
 
 
 
-#include "fb_box.hpp"
+#include "fb_project_base_box_obj.hpp"
 #include "fb_sensor.hpp"
 
 
@@ -11,10 +11,6 @@ namespace fb
 {
 	namespace project
 	{
-		void initBoxObjs();
-
-
-		box::Box& getBox();
 		box::Sensor& getBoxInsideTempSensor();
 		box::Sensor& getBoxInsideHumiditySensor();
 		box::Sensor& getBoxOutsideTempSensor();

@@ -1,20 +1,20 @@
-# set(_PROJECT MINE)
+set(_PROJECT MINE)
 # set(_PROJECT DIPLOM)
-set(_PROJECT RELAY)
+# set(_PROJECT RELAY)
 
 message(STATUS "Selected project: " ${_PROJECT})
 
 if(${_PROJECT} STREQUAL "MINE")
 	set(_ADD_SRC 
-		"project/fb_project_box_obj.cpp"
-		"project/fb_project_hw_obj.cpp"
-		"project/fb_project_maper_obj.cpp"
-		"project/fb_project_core.cpp"
-		"project/fb_project_settings.cpp"
+		"green_house/fb_project_box_obj.cpp"
+		"green_house/fb_project_hw_obj.cpp"
+		"green_house/fb_project_maper_obj.cpp"
+		"green_house/fb_project_core.cpp"
+		"green_house/fb_project_settings.cpp"
 		"sensors/fb_sensor_aht20.cpp"
 		)
 	set(_ADD_INCLUDES
-		"include/project")
+		"include/green_house")
 elseif(${_PROJECT} STREQUAL "MINE")
 	set(_ADD_SRC 
 		"project2/fb_project_box_obj.cpp"
@@ -116,6 +116,7 @@ idf_component_register(
 		"include/states/update"
 		"include/states/work"
 		"include/templates"
+		"include/core"
 		)
 
 # if(${_PROJECT} STREQUAL "MINE")
