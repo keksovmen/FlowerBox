@@ -1,10 +1,10 @@
-#include "fb_project_maper_obj.hpp"
+#include "fb_dmx_light_maper_obj.hpp"
 
 #include <ranges>
 
+#include "fb_dmx_light_box_obj.hpp"
+#include "fb_dmx_light_hw_obj.hpp"
 #include "fb_globals.hpp"
-#include "fb_project_box_obj.hpp"
-#include "fb_project_hw_obj.hpp"
 #include "fb_settings.hpp"
 #include "fb_switch.hpp"
 

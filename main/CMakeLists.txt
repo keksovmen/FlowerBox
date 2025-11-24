@@ -1,7 +1,7 @@
 # set(_PROJECT MINE)
-# set(_PROJECT DIPLOM)
+set(_PROJECT DIPLOM)
 # set(_PROJECT STICKS)
-set(_PROJECT RELAY)
+# set(_PROJECT RELAY)
 
 message(STATUS "Selected project: " ${_PROJECT})
 
@@ -27,6 +27,7 @@ elseif(${_PROJECT} STREQUAL "DIPLOM")
 		"sensors/fb_sensor_mp3.cpp"
 		"df_player/fb_df_player.cpp"
 		"fb_http_puller.cpp"
+		"fb_http_puller32.cpp"
 		"fb_uart.cpp"
 		)
 	set(_ADD_INCLUDES

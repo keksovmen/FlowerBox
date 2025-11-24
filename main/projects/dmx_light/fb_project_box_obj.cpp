@@ -1,4 +1,4 @@
-#include "fb_project_box_obj.hpp"
+#include "fb_dmx_light_box_obj.hpp"
 
 #include "fb_globals.hpp"
 #include "fb_property.hpp"

@@ -1,11 +1,11 @@
-#include "fb_project_hw_obj.hpp"
+#include "fb_dmx_light_hw_obj.hpp"
 
 #include <cstring>
 
+#include "fb_dmx_light_pins.hpp"
 #include "fb_globals.hpp"
-#include "fb_http_puller.hpp"
+#include "fb_http_puller_32.hpp"
 #include "fb_keyboard_handler.hpp"
-#include "fb_pins.hpp"
 
 #include "esp_dmx.h"
 #include "cJSON.h"
@@ -65,9 +65,9 @@ static void _httpRequestHandler(std::optional<std::string_view> data)
 	}
 
 	// Парсинг JSON
-	cJSON* json = cJSON_Parse(data.cbegin());
+	cJSON* json = cJSON_Parse(data->cbegin());
 	if(!json){
-		FB_DEBUG_LOG_E_OBJ("Failed to parse JSON");
+		FB_DEBUG_LOG_E_TAG("Failed to parse JSON");
 		return;
 	}
 
@@ -77,7 +77,7 @@ static void _httpRequestHandler(std::optional<std::string_view> data)
 
 	if (!cJSON_IsNumber(idJson) || !cJSON_IsString(valueJson)) {
 		//failure do nothing
-		FB_DEBUG_LOG_E_OBJ("Id is not an int and value is not a string");
+		FB_DEBUG_LOG_E_TAG("Id is not an int and value is not a string");
 
 		// Освобождение памяти
 		cJSON_Delete(json);
@@ -86,7 +86,7 @@ static void _httpRequestHandler(std::optional<std::string_view> data)
 
 	const int id = idJson->valueint;
 	const char* valuePtr = valueJson->valuestring;
-	FB_DEBUG_LOG_I_OBJ("ID=%d, value=%s", id, valuePtr);
+	FB_DEBUG_LOG_I_TAG("ID=%d, value=%s", id, valuePtr);
 
 	const std::string value = valuePtr;
 
