@@ -22,6 +22,10 @@ namespace fb
 	namespace global
 	{
 		void init();
+		/**
+		 * @brief will do it after brief delay and in separate thread
+		 */
+		void restart();
 
 
 

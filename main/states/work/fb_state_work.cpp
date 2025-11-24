@@ -37,7 +37,7 @@ bool StateWork::_onCompositeEventHandler(const event::Event& e)
 	if(e.groupId == event::EventGroup::UPDATE){
 		if(e.eventId == update::UpdateEventId::END){
 			//restart the system, but not right now, but with a delay, so http can send response
-			global::getTimeScheduler()->addActionDelayed([](){esp_restart();}, 5000, portMAX_DELAY);
+			global::restart();
 		}
 
 		// return false;

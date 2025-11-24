@@ -8,6 +8,7 @@
 	#include "esp_efuse.h"
 	#include "esp_efuse_table.h"
 #endif
+#include "esp_system.h"
 
 #include "fb_nvs_storage.hpp"
 #include "fb_project_box_obj.hpp"
@@ -71,6 +72,11 @@ void global::init()
 	project::initMaperObjs();
 
 	_eventManager.attachListener(&_sensorStoreService);
+}
+
+void global::restart()
+{
+	getTimeScheduler()->addActionDelayed([](){esp_restart();}, 5000, portMAX_DELAY);
 }
 
 event::EventManager* global::getEventManager()

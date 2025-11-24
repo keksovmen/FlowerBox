@@ -271,7 +271,7 @@ static void _init_box_properties()
 
 	auto* restartProp = new box::PropertyNone(box::Tid::PROPERTY_SYSTEM_RESTART,
 		[](auto val){
-			global::getTimeScheduler()->addActionDelayed([](){esp_restart();}, 5000, portMAX_DELAY);
+			global::restart();
 			return true;
 		});
 	getBox().addProperty(std::unique_ptr<box::PropertyIface>(restartProp));

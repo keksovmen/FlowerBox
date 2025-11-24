@@ -34,6 +34,6 @@ void KeyboardHandler::_handleButtonAction(const h::ButtonAction& action)
 		//drop settings
 		settings::clearWifi();
 		//reboot???
-		// global::getTimeScheduler()->addActionDelayed([](){esp_restart();}, 1000, portMAX_DELAY);
+		// global::restart();
 	}
 }
