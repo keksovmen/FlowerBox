@@ -1,0 +1,17 @@
+# settings.yml
+project: tressure
+name: TressureBox
+version: 0.0.1
+settings:
+  - name: PulseDuration
+    type: int
+    default: 100
+    key: f_pulse
+  - name: BoostDelay
+    type: int
+    default: 100
+    key: f_boost
+  - name: MqttId
+    type: int
+    default: 0
+    key: l_mqtt_id

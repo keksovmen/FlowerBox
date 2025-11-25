@@ -1,0 +1,48 @@
+#include "fb_{{project}}_settings.hpp"
+
+#include <cstring>
+#include <cstdlib>
+
+#include "fb_settings.hpp"
+
+
+
+#define _PARTITION "prj_set"
+
+{% for s in settings %}
+#define _KEY_{{s.name|upper}} "{{s.key}}"
+{% endfor %}
+
+
+
+
+using namespace fb;
+using namespace settings;
+
+
+
+/* ---------- setters ---------- */
+{% for s in settings %}
+void settings::set{{s.name}}({{s.type}} value)
+{
+    {% if s.type == 'int' or s.type == 'Timestamp' %}
+    settings::setInt(_PARTITION, _KEY_{{s.name|upper}}, value);
+    {% else %}
+    settings::setFloat(_PARTITION, _KEY_{{s.name|upper}}, value);
+    {% endif %}
+}
+{% endfor %}
+
+
+
+/* ---------- getters ---------- */
+{% for s in settings %}
+{{s.type}} settings::get{{s.name}}()
+{
+    {% if s.type == 'int' or s.type == 'Timestamp' %}
+    return settings::getIntOrDefault(_PARTITION, _KEY_{{s.name|upper}}, {{s.default}});
+    {% else %}
+    return settings::getFloatOrDefault(_PARTITION, _KEY_{{s.name|upper}}, {{s.default}}f);
+    {% endif %}
+}
+{% endfor %}

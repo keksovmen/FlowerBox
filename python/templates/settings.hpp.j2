@@ -1,0 +1,23 @@
+#pragma once
+
+
+
+#include "fb_clock.hpp"
+
+
+
+namespace fb {
+	namespace settings {
+
+		/* ------- setters ------- */
+		{% for s in settings %}
+		void set{{s.name}}({{s.type}} value);
+		{% endfor %}
+
+		/*  ------- getters ------- */
+		{% for s in settings %}
+		{{s.type}} get{{s.name}}();
+		{% endfor %}
+
+	} // namespace settings
+} // namespace fb

@@ -1,7 +1,8 @@
-set(_PROJECT MINE)
+# set(_PROJECT MINE)
 # set(_PROJECT DIPLOM)
-# set(_PROJECT STICKS)
 # set(_PROJECT RELAY)
+# set(_PROJECT STICKS)
+set(_PROJECT TRESSURE)
 
 message(STATUS "Selected project: " ${_PROJECT})
 
@@ -61,6 +62,14 @@ elseif(${_PROJECT} STREQUAL "STICKS")
 		)
 	set(_ADD_INCLUDES
 		"include/projects/sticks"
+		)
+elseif(${_PROJECT} STREQUAL "TRESSURE")
+	file(GLOB _ADD_SRC
+		"projects/tressure/*.cpp"
+		)
+
+	set(_ADD_INCLUDES
+		"include/projects/tressure"
 		)
 endif()
 
