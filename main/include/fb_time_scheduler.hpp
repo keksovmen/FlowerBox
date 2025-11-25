@@ -30,11 +30,22 @@ namespace fb
 				void start();
 
 				bool addActionPrecise(Action action, int unixAt, int maxWaitMs);
-				bool addActionDelayed(Action action, int afterMs, int maxWaitMs);
+				bool addActionDelayed(Action action, int afterMs, int maxWaitMs, bool repeated = false);
 
 			
 			private:
-				using Entry = std::pair<uint32_t, Action>;
+				struct ActionWrapper
+				{
+					Action action;
+					int period;
+					bool repeated;
+
+					void operator()(){std::invoke(action);}
+				};
+
+
+
+				using Entry = std::pair<uint32_t, ActionWrapper>;
 				struct _Comparator
 				{
 					bool operator()(const Entry& lhs, const Entry& rhs){return lhs.first > rhs.first;};

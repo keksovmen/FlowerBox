@@ -33,7 +33,7 @@ bool TimeScheduler::addActionPrecise(Action action, int unixAt, int maxWaitMs)
 	return false;
 }
 
-bool TimeScheduler::addActionDelayed(Action action, int afterMs, int maxWaitMs)
+bool TimeScheduler::addActionDelayed(Action action, int afterMs, int maxWaitMs, bool repeated)
 {
 	auto lock = LockWrapper(_mutex, pdMS_TO_TICKS(maxWaitMs));
 	if(!lock){
@@ -44,7 +44,7 @@ bool TimeScheduler::addActionDelayed(Action action, int afterMs, int maxWaitMs)
 
 	FB_DEBUG_LOG_I_OBJ("Adding action after %d ms, will fire at %lu, current size %d", afterMs, fireAt, _queue.size());
 
-	_queue.emplace(fireAt, action);
+	_queue.emplace(fireAt, ActionWrapper{action, afterMs, repeated});
 	_startTimer();
 	
 	return true;
@@ -68,7 +68,7 @@ void TimeScheduler::_prefromAction()
 {
 	FB_DEBUG_ENTER_I_OBJ();
 
-	Action action;
+	ActionWrapper action;
 
 	{
 		auto lock = LockWrapper(_mutex, portMAX_DELAY);
@@ -77,6 +77,10 @@ void TimeScheduler::_prefromAction()
 	}
 
 	std::invoke(action);
+	
+	if(action.repeated){
+		addActionDelayed(action.action, action.period, portMAX_DELAY, true);
+	}
 }
 
 void TimeScheduler::_startTimer()
