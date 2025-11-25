@@ -16,7 +16,7 @@ static void _handleEvent(const event::Event& event);
  
 
 
-static BaseCore _core{&_handleEvent, ""};
+static BaseCore _core{&_handleEvent, "TressureBox"};
 
 static CoreInfo _info = {
 	.core = _core,

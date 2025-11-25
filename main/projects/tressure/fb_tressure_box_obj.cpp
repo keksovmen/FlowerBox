@@ -4,8 +4,8 @@
 
 
 
-#define _DEVICE_NAME ""
-#define _DEVICE_VERSION ""
+#define _DEVICE_NAME "TressureBox"
+#define _DEVICE_VERSION "0.0.1"
 
 
 

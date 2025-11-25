@@ -47,7 +47,7 @@ def generate_project(yaml_file: pathlib.Path):
 	proj     = cfg['project']
 	settings = cfg['settings']
 
-	ctx = {'project': proj, 'settings': settings}
+	ctx = {'project': proj, 'settings': settings, 'name' : cfg['name'], 'version' : cfg['version']}
 
 	out_dir = pathlib.Path(REPO_ROOT / f'main')
 	out_dir.mkdir(exist_ok=True)
