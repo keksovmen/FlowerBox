@@ -2,6 +2,8 @@
 
 
 
+#include <string>
+
 #include "fb_clock.hpp"
 
 
@@ -17,6 +19,14 @@ namespace fb {
 		
 		void setMqttId(int value);
 		
+		void setBatteryMax(int value);
+		
+		void setBatteryMin(int value);
+		
+		void setIp(std::string value);
+		
+		void setPort(int value);
+		
 
 		/*  ------- getters ------- */
 		
@@ -25,6 +35,14 @@ namespace fb {
 		int getBoostDelay();
 		
 		int getMqttId();
+		
+		int getBatteryMax();
+		
+		int getBatteryMin();
+		
+		std::string getIp();
+		
+		int getPort();
 		
 
 	} // namespace settings

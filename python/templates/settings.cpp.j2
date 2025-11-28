@@ -27,7 +27,9 @@ void settings::set{{s.name}}({{s.type}} value)
 {
     {% if s.type == 'int' or s.type == 'Timestamp' %}
     settings::setInt(_PARTITION, _KEY_{{s.name|upper}}, value);
-    {% else %}
+    {% elif s.type == 'std::string' %}
+    settings::setStr(_PARTITION, _KEY_{{s.name|upper}}, value);
+	{% else %}
     settings::setFloat(_PARTITION, _KEY_{{s.name|upper}}, value);
     {% endif %}
 }
@@ -41,6 +43,8 @@ void settings::set{{s.name}}({{s.type}} value)
 {
     {% if s.type == 'int' or s.type == 'Timestamp' %}
     return settings::getIntOrDefault(_PARTITION, _KEY_{{s.name|upper}}, {{s.default}});
+    {% elif s.type == 'std::string' %}
+    return settings::getStrOrDefault(_PARTITION, _KEY_{{s.name|upper}}, "{{s.default}}");
     {% else %}
     return settings::getFloatOrDefault(_PARTITION, _KEY_{{s.name|upper}}, {{s.default}}f);
     {% endif %}

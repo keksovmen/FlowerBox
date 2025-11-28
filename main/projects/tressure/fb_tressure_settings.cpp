@@ -16,6 +16,14 @@
 
 #define _KEY_MQTTID "l_mqtt_id"
 
+#define _KEY_BATTERYMAX "b_max"
+
+#define _KEY_BATTERYMIN "b_min"
+
+#define _KEY_IP "mq_ip"
+
+#define _KEY_PORT "mq_port"
+
 
 
 
@@ -48,6 +56,34 @@ void settings::setMqttId(int value)
     
 }
 
+void settings::setBatteryMax(int value)
+{
+    
+    settings::setInt(_PARTITION, _KEY_BATTERYMAX, value);
+    
+}
+
+void settings::setBatteryMin(int value)
+{
+    
+    settings::setInt(_PARTITION, _KEY_BATTERYMIN, value);
+    
+}
+
+void settings::setIp(std::string value)
+{
+    
+    settings::setStr(_PARTITION, _KEY_IP, value);
+	
+}
+
+void settings::setPort(int value)
+{
+    
+    settings::setInt(_PARTITION, _KEY_PORT, value);
+    
+}
+
 
 
 
@@ -71,5 +107,33 @@ int settings::getMqttId()
 {
     
     return settings::getIntOrDefault(_PARTITION, _KEY_MQTTID, 0);
+    
+}
+
+int settings::getBatteryMax()
+{
+    
+    return settings::getIntOrDefault(_PARTITION, _KEY_BATTERYMAX, 3150);
+    
+}
+
+int settings::getBatteryMin()
+{
+    
+    return settings::getIntOrDefault(_PARTITION, _KEY_BATTERYMIN, 2315);
+    
+}
+
+std::string settings::getIp()
+{
+    
+    return settings::getStrOrDefault(_PARTITION, _KEY_IP, "192.168.0.111");
+    
+}
+
+int settings::getPort()
+{
+    
+    return settings::getIntOrDefault(_PARTITION, _KEY_PORT, 8081);
     
 }
