@@ -92,6 +92,7 @@ idf_component_register(
 		"fb_time_scheduler.cpp"
 		"fb_keyboard_handler.cpp"
 		"fb_wrappers.cpp"
+		"fb_mqtt_client.cpp"
 		"h_keyboard.cpp"
 		"main.cpp"
 		"box/fb_box.cpp"
