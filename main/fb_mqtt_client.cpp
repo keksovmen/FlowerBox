@@ -145,8 +145,8 @@ void MqttClient::_handler(void *handler_args, esp_event_base_t base, int32_t eve
 			FB_DEBUG_LOG_I_TAG("MQTT_EVENT_DATA: %s = %s", event->topic, event->data);
 			if(me->_dataHandler){
 				std::invoke(me->_dataHandler,
-					std::string_view{event->topic, event->topic_len},
-					std::string_view{event->data, event->data_len});
+					std::string_view{event->topic, static_cast<std::string_view::size_type>(event->topic_len)},
+					std::string_view{event->data, static_cast<std::string_view::size_type>(event->data_len)});
 			}
 			break;
 		case MQTT_EVENT_ERROR:
