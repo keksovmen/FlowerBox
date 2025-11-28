@@ -256,6 +256,7 @@ bool wifi::start(const WifiConfig& cfg)
 		_reconnectAttempts = 0;
 
 		wifi_config_t wifi_config;
+		wifi_config.sta.listen_interval = 6;
 		memset(&wifi_config, 0, sizeof(wifi_config));
 
 		memcpy(wifi_config.sta.ssid, cfg.staSsid.c_str(), cfg.staSsid.length() + 1);

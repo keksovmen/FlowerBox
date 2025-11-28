@@ -33,7 +33,7 @@ void StateTimeInit::handleEvent(const event::Event& event)
 		}
 	}else if(event.groupId == event::EventGroup::WIFI){
 		//handle on wifi connect and on wifi failure events
-		if(event.eventId == wifi::WifiEventId::DISCONNECTED){
+		if(event.eventId == wifi::WifiEventId::FAILED_TO_CONNECT){
 			getContext().transition(std::make_unique<StateWifiInit>(getContext()));
 		}
 	}
