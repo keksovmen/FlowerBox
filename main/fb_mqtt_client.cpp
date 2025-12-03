@@ -64,7 +64,7 @@ void MqttClient::publish(std::string_view topic, std::string_view data)
 	}
 
 	const auto err = esp_mqtt_client_publish(_handle, topic.begin(), data.begin(), 0, 2, 0);
-	if(err >= 0){
+	if(err <= 0){
 		FB_DEBUG_LOG_E_OBJ("Failed to publish!: %s = %s", topic.begin(), data.begin());
 	}
 }
@@ -73,6 +73,15 @@ void MqttClient::addDataHandler(const DataHandler& handler)
 {
 	_dataHandler = handler;
 }
+
+void MqttClient::registerSubscribeHandler(const SubscribeHandler& handler)
+{
+	_subscribeHandler = handler;
+	if(_connected && _subscribeHandler){
+		_callSubscribeHandler();	
+	}
+}
+
 
 void MqttClient::_onBoot()
 {
@@ -102,6 +111,13 @@ void MqttClient::_onWifiDisconnected()
 	}
 }
 
+void MqttClient::_callSubscribeHandler()
+{
+	std::invoke(_subscribeHandler, [this](std::string_view topic, int qos){
+		esp_mqtt_client_subscribe_single(_handle, topic.begin(), qos);
+	});
+}
+
 void MqttClient::_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data)
 {
 	MqttClient* me = static_cast<MqttClient*>(handler_args);
@@ -109,31 +125,26 @@ void MqttClient::_handler(void *handler_args, esp_event_base_t base, int32_t eve
 
 	FB_DEBUG_LOG_I_TAG("Event dispatched from event loop base=%s, event_id=%" PRIi32, base, event_id);
     esp_mqtt_event_handle_t event = static_cast<esp_mqtt_event_handle_t>(event_data);
-    esp_mqtt_client_handle_t client = event->client;
-    int msg_id;
+    // esp_mqtt_client_handle_t client = event->client;
+    // int msg_id;
     switch ((esp_mqtt_event_id_t)event_id)
 	{
 		case MQTT_EVENT_CONNECTED:
 			FB_DEBUG_LOG_I_TAG("MQTT_EVENT_CONNECTED");
-			// msg_id = esp_mqtt_client_publish(client, "/topic/qos1", "data_3", 0, 1, 0);
-			// FB_DEBUG_LOG_I_TAG("sent publish successful, msg_id=%d", msg_id);
-			msg_id = esp_mqtt_client_subscribe(client, "/controls", 2);
-			FB_DEBUG_LOG_I_TAG("sent subscribe successful, msg_id=%d", msg_id);
-
-			// msg_id = esp_mqtt_client_subscribe(client, "/topic/qos1", 1);
+			me->_connected = true;
+			if(me->_subscribeHandler){
+				me->_callSubscribeHandler();	
+			}
+			// msg_id = esp_mqtt_client_subscribe(client, "/controls", 2);
 			// FB_DEBUG_LOG_I_TAG("sent subscribe successful, msg_id=%d", msg_id);
-
-			// msg_id = esp_mqtt_client_unsubscribe(client, "/topic/qos1");
-			// FB_DEBUG_LOG_I_TAG("sent unsubscribe successful, msg_id=%d", msg_id);
 			break;
 		case MQTT_EVENT_DISCONNECTED:
 			FB_DEBUG_LOG_I_TAG("MQTT_EVENT_DISCONNECTED");
+			me->_connected = true;
 			break;
 
 		case MQTT_EVENT_SUBSCRIBED:
 			FB_DEBUG_LOG_I_TAG("MQTT_EVENT_SUBSCRIBED, msg_id=%d", event->msg_id);
-			msg_id = esp_mqtt_client_publish(client, "/status", "{0:1}", 0, 2, 0);
-			FB_DEBUG_LOG_I_TAG("sent publish successful, msg_id=%d", msg_id);
 			break;
 		case MQTT_EVENT_UNSUBSCRIBED:
 			FB_DEBUG_LOG_I_TAG("MQTT_EVENT_UNSUBSCRIBED, msg_id=%d", event->msg_id);
@@ -142,7 +153,7 @@ void MqttClient::_handler(void *handler_args, esp_event_base_t base, int32_t eve
 			FB_DEBUG_LOG_I_TAG("MQTT_EVENT_PUBLISHED, msg_id=%d", event->msg_id);
 			break;
 		case MQTT_EVENT_DATA:
-			FB_DEBUG_LOG_I_TAG("MQTT_EVENT_DATA: %s = %s", event->topic, event->data);
+			FB_DEBUG_LOG_I_TAG("MQTT_EVENT_DATA: %.*s = %.*s", event->topic_len, event->topic, event->data_len, event->data);
 			if(me->_dataHandler){
 				std::invoke(me->_dataHandler,
 					std::string_view{event->topic, static_cast<std::string_view::size_type>(event->topic_len)},

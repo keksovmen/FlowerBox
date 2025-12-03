@@ -18,6 +18,7 @@ namespace fb
 		{
 			public:
 				using DataHandler = std::function<void(std::string_view topic, std::string_view data)>;
+				using SubscribeHandler = std::function<void(const std::function<void(std::string_view topic, int qos)>&)>;
 
 
 
@@ -32,16 +33,20 @@ namespace fb
 				//add publish action
 				void publish(std::string_view topic, std::string_view data);
 				void addDataHandler(const DataHandler& handler);
+				void registerSubscribeHandler(const SubscribeHandler& handler);
 			
 			private:
 				esp_mqtt_client_handle_t _handle;
 				DataHandler _dataHandler;
+				SubscribeHandler _subscribeHandler;
+				bool _connected = false;
 
 
 
 				void _onBoot();
 				void _onWifiConnected();
 				void _onWifiDisconnected();
+				void _callSubscribeHandler();
 
 				static void _handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data);
 		};
