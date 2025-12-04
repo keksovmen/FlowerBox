@@ -27,6 +27,9 @@ static sensor::KeyboardSensor<1> _keyboardSensor({std::pair{pins::PIN_KEYBOARD, 
 static adc::AdcPin _adc;
 static adc::Battery _battery(_adc);
 static wrappers::WrapperGpio _lockPin(static_cast<gpio_num_t>(pins::PIN_LOCK), false);
+static wrappers::WrapperPwm _ledRPin(LEDC_TIMER_0, LEDC_CHANNEL_0, static_cast<gpio_num_t>(pins::PIN_LED_R), false);
+static wrappers::WrapperPwm _ledGPin(LEDC_TIMER_0, LEDC_CHANNEL_1, static_cast<gpio_num_t>(pins::PIN_LED_G), false);
+static wrappers::WrapperPwm _ledBPin(LEDC_TIMER_0, LEDC_CHANNEL_2, static_cast<gpio_num_t>(pins::PIN_LED_B), false);
 static periph::MqttClient _mqtt;
 
 static sensor::SensorService _sensorService;
@@ -39,31 +42,34 @@ static esp_pm_lock_handle_t _lock;
 
 
 
+static int _getIntFromJsonOrDefault(cJSON* json, std::string_view key, int def)
+{
+	auto* obj = cJSON_GetObjectItem(json, key.cbegin());
+	if(obj != nullptr){
+		return static_cast<int>(cJSON_GetNumberValue(obj));
+	}
+
+	return def;
+}
+
+
+
 static void _pulse()
 {
 	esp_pm_lock_acquire(_lock);
 
 	_lockPin.setValue(1);
 	//TODO: add duration to settings
-	vTaskDelay(pdMS_TO_TICKS(50));
+	vTaskDelay(pdMS_TO_TICKS(150));
 	_lockPin.setValue(0);
 
 	esp_pm_lock_release(_lock);
 }
 
-static void _dataHandler(std::string_view topic, std::string_view data)
+static void _handleLockTopic(std::string_view data)
 {
-	//parse json data and see if you must fire
-	FB_DEBUG_LOG_I_TAG("Data handler: %.*s -> %.*s", topic.length(), topic.cbegin(), data.length(), data.cbegin());
-	int id = -1;
-
 	cJSON* obj = cJSON_ParseWithLength(data.begin(), data.length());
-	cJSON* item = cJSON_GetObjectItem(obj, "ID");
-	if(item != nullptr){
-		id = cJSON_GetNumberValue(item);
-	}
-
-	FB_DEBUG_LOG_W_TAG("OBJ -> %p, item -> %p", obj, item);
+	const int id = _getIntFromJsonOrDefault(obj, "ID", -1);
 
 	cJSON_Delete(obj);
 
@@ -76,9 +82,43 @@ static void _dataHandler(std::string_view topic, std::string_view data)
 	_pulse();
 }
 
+static void _handleRGBTopic(std::string_view data)
+{
+	cJSON* obj = cJSON_ParseWithLength(data.begin(), data.length());
+	const int id = _getIntFromJsonOrDefault(obj, "ID", -1);
+	const int r = _getIntFromJsonOrDefault(obj, "R", 0);
+	const int g = _getIntFromJsonOrDefault(obj, "G", 0);
+	const int b = _getIntFromJsonOrDefault(obj, "B", 0);
+
+	cJSON_Delete(obj);
+
+	if(id != settings::getMqttId()){
+		FB_DEBUG_LOG_I_TAG("Not my MQTT id: %d != %d", id, settings::getMqttId());
+		return;
+	}
+	
+	_ledRPin.setValue(r);
+	_ledGPin.setValue(g);
+	_ledBPin.setValue(b);
+}
+
+static void _dataHandler(std::string_view topic, std::string_view data)
+{
+	//parse json data and see if you must fire
+	FB_DEBUG_LOG_I_TAG("Data handler: %.*s -> %.*s", topic.length(), topic.cbegin(), data.length(), data.cbegin());
+
+	if(topic == "/controls/lock"){
+		_handleLockTopic(data);
+	}else if(topic == "/controls/rgb"){
+		_handleRGBTopic(data);
+	}
+}
+
+
+
 static void _batteryAction()
 {
-	int avg = _adc.readRaw(100);
+	int avg = _adc.readRaw(1000);
 	int percents = _battery.readCharge();
 	const std::string data = "{" + std::to_string(settings::getMqttId()) + ":" + std::to_string(avg) + ", " + std::to_string(percents) + "%}";
 	_mqtt.publish("/status", data);
@@ -98,12 +138,16 @@ void project::initHwObjs()
 {
 	_adc.init(ADC_UNIT_1, static_cast<adc_channel_t>(pins::PIN_BATTERY), ADC_ATTEN_DB_12);
 	_lockPin.init();
+	_ledRPin.init();
+	_ledGPin.init();
+	_ledBPin.init();
 
 	//read from settings
 	_mqtt.init("mqtt://" + settings::getIp() + ":" + std::to_string(settings::getPort()));
 	_mqtt.addDataHandler(&_dataHandler);
 	_mqtt.registerSubscribeHandler([](const auto& handler){
-		std::invoke(handler, "/controls", 2);
+		std::invoke(handler, "/controls/lock", 2);
+		std::invoke(handler, "/controls/rgb", 2);
 	});
 
 	esp_pm_lock_create(ESP_PM_NO_LIGHT_SLEEP, 0, "pin_action", &_lock);
@@ -121,6 +165,8 @@ void project::initHwObjs()
 	// 	FB_DEBUG_LOG_W_TAG("RSSI: %d", ap_info.rssi);
 
 	// }, 500, 1000, true);
+
+	_sensorService.addSensor(&_keyboardSensor);
 }
 
 sensor::SensorService& project::getHwSensorService()
