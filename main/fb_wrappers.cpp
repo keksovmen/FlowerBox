@@ -61,7 +61,7 @@ void WrapperPwm::init()
 			.duty_resolution = LEDC_TIMER_8_BIT,
 			.timer_num = _timer,
 			.freq_hz = _isHighSpeed ? 300000ul : 4000,
-			.clk_cfg = LEDC_AUTO_CLK,
+			.clk_cfg = LEDC_USE_RC_FAST_CLK,
 			.deconfigure = false,
 		};
 		ESP_ERROR_CHECK(ledc_timer_config(&timerCfg));
@@ -77,6 +77,7 @@ void WrapperPwm::init()
 		.timer_sel = _timer,
 		.duty = 0,
 		.hpoint = 0,
+		.sleep_mode = LEDC_SLEEP_MODE_KEEP_ALIVE,
 		.flags = 0,
 	};
 	ESP_ERROR_CHECK(ledc_channel_config(&channelCfg));

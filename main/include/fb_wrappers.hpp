@@ -20,6 +20,12 @@ namespace fb
 				virtual void init() = 0;
 
 				virtual void setValue(bool value) = 0;
+				
+				/**
+				 * @brief Set the Value object
+				 * 
+				 * @param value [0; 100]
+				 */
 				virtual void setValue(int value) = 0;
 		};
 

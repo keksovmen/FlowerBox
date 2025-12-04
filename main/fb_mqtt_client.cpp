@@ -48,7 +48,7 @@ void MqttClient::handleEvent(const event::Event& event)
 
 void MqttClient::init(std::string_view uri)
 {
-	esp_mqtt_client_config_t mqtt_cfg = {0};
+	esp_mqtt_client_config_t mqtt_cfg{};
 	mqtt_cfg.broker.address.uri = uri.begin();
 
     _handle = esp_mqtt_client_init(&mqtt_cfg);
