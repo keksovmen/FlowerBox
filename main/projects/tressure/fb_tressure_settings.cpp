@@ -24,6 +24,12 @@
 
 #define _KEY_PORT "mq_port"
 
+#define _KEY_LEDRED "led_red"
+
+#define _KEY_LEDGREEN "led_green"
+
+#define _KEY_LEDBLUE "led_blue"
+
 
 
 
@@ -84,6 +90,27 @@ void settings::setPort(int value)
     
 }
 
+void settings::setLedRed(int value)
+{
+    
+    settings::setInt(_PARTITION, _KEY_LEDRED, value);
+    
+}
+
+void settings::setLedGreen(int value)
+{
+    
+    settings::setInt(_PARTITION, _KEY_LEDGREEN, value);
+    
+}
+
+void settings::setLedBlue(int value)
+{
+    
+    settings::setInt(_PARTITION, _KEY_LEDBLUE, value);
+    
+}
+
 
 
 
@@ -135,5 +162,26 @@ int settings::getPort()
 {
     
     return settings::getIntOrDefault(_PARTITION, _KEY_PORT, 8081);
+    
+}
+
+int settings::getLedRed()
+{
+    
+    return settings::getIntOrDefault(_PARTITION, _KEY_LEDRED, 30);
+    
+}
+
+int settings::getLedGreen()
+{
+    
+    return settings::getIntOrDefault(_PARTITION, _KEY_LEDGREEN, 30);
+    
+}
+
+int settings::getLedBlue()
+{
+    
+    return settings::getIntOrDefault(_PARTITION, _KEY_LEDBLUE, 30);
     
 }

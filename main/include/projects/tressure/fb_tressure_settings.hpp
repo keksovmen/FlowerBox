@@ -27,6 +27,12 @@ namespace fb {
 		
 		void setPort(int value);
 		
+		void setLedRed(int value);
+		
+		void setLedGreen(int value);
+		
+		void setLedBlue(int value);
+		
 
 		/*  ------- getters ------- */
 		
@@ -43,6 +49,12 @@ namespace fb {
 		std::string getIp();
 		
 		int getPort();
+		
+		int getLedRed();
+		
+		int getLedGreen();
+		
+		int getLedBlue();
 		
 
 	} // namespace settings

@@ -16,6 +16,7 @@ namespace fb
 				Battery(AdcPin& pin);
 
 				int readCharge();
+				float readVolts();
 
 				void setMaxRaw(int raw);
 				void setMinRaw(int raw);

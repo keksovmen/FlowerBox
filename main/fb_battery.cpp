@@ -23,6 +23,11 @@ int Battery::readCharge()
 	return percents;
 }
 
+float Battery::readVolts()
+{
+	return 3.4f + (0.8f * readCharge() / 100);
+}
+
 void Battery::setMaxRaw(int raw)
 {
 	_maxRaw = raw;

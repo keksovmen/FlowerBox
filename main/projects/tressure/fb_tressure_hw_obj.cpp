@@ -1,5 +1,6 @@
 #include "fb_tressure_hw_obj.hpp"
 
+#include "fb_clock.hpp"
 #include "fb_globals.hpp"
 #include "fb_keyboard_handler.hpp"
 #include "fb_sensor_keyboard.hpp"
@@ -9,7 +10,13 @@
 #include <cJSON.h>
 
 #include "esp_pm.h"
-// #include "esp_wifi.h"
+#include "esp_wifi.h"
+
+
+
+#define _MQTT_PATH_STATUS "/status"
+#define _MQTT_PATH_LOCK "/controls/lock"
+#define _MQTT_PATH_RGB "/controls/rgb"
 
 
 
@@ -99,10 +106,10 @@ static void _handleRGBTopic(std::string_view data)
 		FB_DEBUG_LOG_I_TAG("Not my MQTT id: %d != %d", id, settings::getMqttId());
 		return;
 	}
-	
-	_ledRPin.setValue(r);
-	_ledGPin.setValue(g);
-	_ledBPin.setValue(b);
+
+	settings::setLedRed(r);
+	settings::setLedGreen(g);
+	settings::setLedBlue(b);
 }
 
 static void _dataHandler(std::string_view topic, std::string_view data)
@@ -110,10 +117,12 @@ static void _dataHandler(std::string_view topic, std::string_view data)
 	//parse json data and see if you must fire
 	FB_DEBUG_LOG_I_TAG("Data handler: %.*s -> %.*s", topic.length(), topic.cbegin(), data.length(), data.cbegin());
 
-	if(topic == "/controls/lock"){
+	if(topic == _MQTT_PATH_LOCK){
 		_handleLockTopic(data);
-	}else if(topic == "/controls/rgb"){
+	}else if(topic == _MQTT_PATH_RGB){
 		_handleRGBTopic(data);
+	}else{
+		FB_DEBUG_LOG_W_TAG("Unexpected MQTT topic!");
 	}
 }
 
@@ -121,13 +130,21 @@ static void _dataHandler(std::string_view topic, std::string_view data)
 
 static void _batteryAction()
 {
-	//TODO: ADD RSSI reading in to status
+	wifi_ap_record_t ap_info;
+	esp_wifi_sta_get_ap_info(&ap_info);
+	FB_DEBUG_LOG_I_TAG("RSSI: %d", ap_info.rssi);
+
 	int avg = _adc.readRaw(1000);
 	int percents = _battery.readCharge();
-	const std::string data = "{" + std::to_string(settings::getMqttId()) + ":" + std::to_string(avg) + ", " + std::to_string(percents) + "%}";
-	_mqtt.publish("/status", data);
+	int volts = _battery.readVolts();
 
-	FB_DEBUG_LOG_I_TAG("Battery: %d raw, %d %%", avg, percents);
+	char buff[256];
+	sprintf(buff, "{\"ID\":%d, \"RSSI\":%d, \"time\":%lld, \"battery\":{\"raw\":%d, \"percents\":%d, \"volts\":%d}}",
+		settings::getMqttId(), ap_info.rssi, static_cast<clock::Timestamp>(clock::getCurrentTime()), avg, percents, volts);
+
+	_mqtt.publish(_MQTT_PATH_STATUS, buff);
+
+	FB_DEBUG_LOG_I_TAG("Battery: %d raw, %d %%, volts %d", avg, percents, volts);
 }
 
 static void _init_from_settings()
@@ -150,8 +167,8 @@ void project::initHwObjs()
 	_mqtt.init("mqtt://" + settings::getIp() + ":" + std::to_string(settings::getPort()));
 	_mqtt.addDataHandler(&_dataHandler);
 	_mqtt.registerSubscribeHandler([](const auto& handler){
-		std::invoke(handler, "/controls/lock", 2);
-		std::invoke(handler, "/controls/rgb", 2);
+		std::invoke(handler, _MQTT_PATH_LOCK, 2);
+		std::invoke(handler, _MQTT_PATH_RGB, 2);
 	});
 
 	esp_pm_lock_create(ESP_PM_NO_LIGHT_SLEEP, 0, "pin_action", &_lock);
@@ -214,9 +231,9 @@ void project::doorIsOpened()
 	_doorClosed = false;
 	//enable GPIO if not enabled yet
 	//read from NVS
-	_ledRPin.setValue(100);
-	_ledGPin.setValue(100);
-	_ledBPin.setValue(100);
+	_ledRPin.setValue(settings::getLedRed());
+	_ledGPin.setValue(settings::getLedGreen());
+	_ledBPin.setValue(settings::getLedBlue());
 }
 
 void project::doorIsClosed()

@@ -31,3 +31,15 @@ settings:
     type: int
     default: 8081
     key: mq_port
+  - name: LedRed
+    type: int
+    default: 30
+    key: led_red
+  - name: LedGreen
+    type: int
+    default: 30
+    key: led_green
+  - name: LedBlue
+    type: int
+    default: 30
+    key: led_blue
