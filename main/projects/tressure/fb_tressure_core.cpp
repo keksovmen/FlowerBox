@@ -1,15 +1,13 @@
 #include "fb_core.hpp"
 
 #include "fb_globals.hpp"
+#include "fb_sleep.hpp"
 #include "fb_tressure_box_obj.hpp"
 #include "fb_tressure_hw_obj.hpp"
 #include "fb_tressure_mapper_obj.hpp"
 #include "fb_tressure_pins.hpp"
 #include "fb_wifi.hpp"
-
-#include "esp_wifi.h"
-#include "esp_pm.h"
-#include "esp_sleep.h"
+#include "fb_sensor_keyboard.hpp"
 
 
 
@@ -38,16 +36,23 @@ static void _handleEvent(const event::Event& event)
 	//do stuff
 	if(event.groupId == event::EventGroup::WIFI && event.eventId == wifi::WifiEventId::CONNECTED){
 		// ESP_ERROR_CHECK(esp_wifi_set_protocol(WIFI_IF_STA, WIFI_PROTOCOL_11N));
-		ESP_ERROR_CHECK(esp_wifi_set_ps(WIFI_PS_MAX_MODEM));
-		esp_pm_config_t pm_config = {
-			.max_freq_mhz = 160,
-			.min_freq_mhz = 80,
-			.light_sleep_enable = true
-		};
-		esp_sleep_enable_timer_wakeup(1000000);
-		esp_sleep_enable_wifi_beacon_wakeup();
-		esp_sleep_enable_wifi_wakeup();
-		ESP_ERROR_CHECK(esp_pm_configure(&pm_config));
+		sleep::enable();
+	}else if(event.groupId == event::EventGroup::KEYBOARD){
+		h::ButtonAction* action = static_cast<h::ButtonAction*>(event.data);
+		if(action->isJustPressed(h::ButtonKeys::MODE)){
+			//tell HW that we are closed
+			project::doorIsClosed();
+		}else if(action->isStillPressed(h::ButtonKeys::MODE)){
+			//tell HW that we are open
+			project::doorIsOpened();
+		}
+	}else if(event.groupId == event::EventGroup::SENSOR && event.eventId == sensor::SensorEvent::ALL_SENSORS_INIT){
+			bool door = gpio_get_level(static_cast<gpio_num_t>(pins::PIN_LOCK_SENSOR));
+			if(door){
+				doorIsClosed();
+			}else{
+				doorIsOpened();
+			}
 	}
 }
 

@@ -22,7 +22,9 @@ static const char* TAG = "HW";
 
 
 
-static sensor::KeyboardSensor<1> _keyboardSensor({std::pair{pins::PIN_KEYBOARD, h::ButtonVK::VK_0}});
+static sensor::KeyboardSensor<2> _keyboardSensor({
+	std::pair{pins::PIN_KEYBOARD, h::ButtonVK::VK_0},
+	std::pair{pins::PIN_LOCK_SENSOR, h::ButtonVK::VK_1}});
 
 static adc::AdcPin _adc;
 static adc::Battery _battery(_adc);
@@ -39,6 +41,7 @@ static sensor::SensorStorage _sensorStorage;
 
 static keyboard::KeyboardHandler _keyboardHandler;
 static esp_pm_lock_handle_t _lock;
+static bool _doorClosed = true;
 
 
 
@@ -118,6 +121,7 @@ static void _dataHandler(std::string_view topic, std::string_view data)
 
 static void _batteryAction()
 {
+	//TODO: ADD RSSI reading in to status
 	int avg = _adc.readRaw(1000);
 	int percents = _battery.readCharge();
 	const std::string data = "{" + std::to_string(settings::getMqttId()) + ":" + std::to_string(avg) + ", " + std::to_string(percents) + "%}";
@@ -197,4 +201,35 @@ adc::Battery& project::getBatteryHw()
 wrappers::WrapperGpio& project::getPulseGpio()
 {
 	return _lockPin;	
+}
+
+void project::doorIsOpened()
+{
+	if(!_doorClosed){
+		return;
+	}
+
+	FB_DEBUG_LOG_I_TAG("Door is opened!");
+
+	_doorClosed = false;
+	//enable GPIO if not enabled yet
+	//read from NVS
+	_ledRPin.setValue(100);
+	_ledGPin.setValue(100);
+	_ledBPin.setValue(100);
+}
+
+void project::doorIsClosed()
+{
+	if(_doorClosed){
+		return;
+	}
+
+	FB_DEBUG_LOG_I_TAG("Door is closed!");
+
+	_doorClosed = true;
+	//disable GPIO
+	_ledRPin.setValue(0);
+	_ledGPin.setValue(0);
+	_ledBPin.setValue(0);
 }

@@ -17,5 +17,8 @@ namespace fb
 		adc::Battery& getBatteryHw();
 		wrappers::WrapperGpio& getPulseGpio();
 		periph::MqttClient& getMqttClient();
+
+		void doorIsOpened();
+		void doorIsClosed();
 	}
 }
