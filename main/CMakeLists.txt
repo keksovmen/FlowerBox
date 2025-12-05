@@ -95,6 +95,7 @@ idf_component_register(
 		"fb_mqtt_client.cpp"
 		"fb_adc.cpp"
 		"fb_battery.cpp"
+		"fb_sleep.cpp"
 		"h_keyboard.cpp"
 		"main.cpp"
 		"box/fb_box.cpp"
