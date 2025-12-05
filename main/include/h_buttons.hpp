@@ -120,6 +120,9 @@ namespace h
 		case ButtonVK::VK_0:
 			return ButtonKeys::RESET;
 		
+		case ButtonVK::VK_1:
+			return ButtonKeys::MODE;
+			
 		default:
 			return ButtonKeys::RESET;
 		}
