@@ -140,7 +140,7 @@ int settings::getMqttId()
 int settings::getBatteryMax()
 {
     
-    return settings::getIntOrDefault(_PARTITION, _KEY_BATTERYMAX, 3150);
+    return settings::getIntOrDefault(_PARTITION, _KEY_BATTERYMAX, 2843);
     
 }
 

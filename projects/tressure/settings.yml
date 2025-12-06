@@ -17,7 +17,7 @@ settings:
     key: l_mqtt_id
   - name: BatteryMax
     type: int
-    default: 3150
+    default: 2843
     key: b_max
   - name: BatteryMin
     type: int

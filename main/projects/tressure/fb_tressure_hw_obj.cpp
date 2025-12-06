@@ -110,6 +110,12 @@ static void _handleRGBTopic(std::string_view data)
 	settings::setLedRed(r);
 	settings::setLedGreen(g);
 	settings::setLedBlue(b);
+
+	if(!_doorClosed){
+		_ledRPin.setValue(r);
+		_ledGPin.setValue(g);
+		_ledBPin.setValue(b);
+	}
 }
 
 static void _dataHandler(std::string_view topic, std::string_view data)
@@ -131,20 +137,22 @@ static void _dataHandler(std::string_view topic, std::string_view data)
 static void _batteryAction()
 {
 	wifi_ap_record_t ap_info;
-	esp_wifi_sta_get_ap_info(&ap_info);
+	const int err = esp_wifi_sta_get_ap_info(&ap_info);
 	FB_DEBUG_LOG_I_TAG("RSSI: %d", ap_info.rssi);
 
 	int avg = _adc.readRaw(1000);
 	int percents = _battery.readCharge();
-	int volts = _battery.readVolts();
+	float volts = _battery.readVolts();
 
 	char buff[256];
-	sprintf(buff, "{\"ID\":%d, \"RSSI\":%d, \"time\":%lld, \"battery\":{\"raw\":%d, \"percents\":%d, \"volts\":%d}}",
+	sprintf(buff, "{\"ID\":%d, \"RSSI\":%d, \"time\":%lld, \"battery\":{\"raw\":%d, \"percents\":%d, \"volts\":%.3f}}",
 		settings::getMqttId(), ap_info.rssi, static_cast<clock::Timestamp>(clock::getCurrentTime()), avg, percents, volts);
 
-	_mqtt.publish(_MQTT_PATH_STATUS, buff);
+	FB_DEBUG_LOG_I_TAG("Battery: %d raw, %d %%, volts %.3f", avg, percents, volts);
 
-	FB_DEBUG_LOG_I_TAG("Battery: %d raw, %d %%, volts %d", avg, percents, volts);
+	if(err == ESP_OK){
+		_mqtt.publish(_MQTT_PATH_STATUS, buff);
+	}
 }
 
 static void _init_from_settings()
@@ -249,4 +257,9 @@ void project::doorIsClosed()
 	_ledRPin.setValue(0);
 	_ledGPin.setValue(0);
 	_ledBPin.setValue(0);
+}
+
+void project::forceStatusPost()
+{
+	_batteryAction();
 }

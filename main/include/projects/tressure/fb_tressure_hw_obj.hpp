@@ -20,5 +20,6 @@ namespace fb
 
 		void doorIsOpened();
 		void doorIsClosed();
+		void forceStatusPost();
 	}
 }

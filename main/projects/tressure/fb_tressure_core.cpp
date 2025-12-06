@@ -37,21 +37,22 @@ static void _handleEvent(const event::Event& event)
 	if(event.groupId == event::EventGroup::WIFI && event.eventId == wifi::WifiEventId::CONNECTED){
 		// ESP_ERROR_CHECK(esp_wifi_set_protocol(WIFI_IF_STA, WIFI_PROTOCOL_11N));
 		sleep::enable();
+		project::forceStatusPost();
 	}else if(event.groupId == event::EventGroup::KEYBOARD){
 		h::ButtonAction* action = static_cast<h::ButtonAction*>(event.data);
 		if(action->isJustPressed(h::ButtonKeys::MODE)){
 			//tell HW that we are closed
-			project::doorIsClosed();
+			project::doorIsOpened();
 		}else if(action->isStillPressed(h::ButtonKeys::MODE)){
 			//tell HW that we are open
-			project::doorIsOpened();
+			project::doorIsClosed();
 		}
 	}else if(event.groupId == event::EventGroup::SENSOR && event.eventId == sensor::SensorEvent::ALL_SENSORS_INIT){
 			bool door = gpio_get_level(static_cast<gpio_num_t>(pins::PIN_LOCK_SENSOR));
 			if(door){
-				doorIsClosed();
-			}else{
 				doorIsOpened();
+			}else{
+				doorIsClosed();
 			}
 	}
 }
