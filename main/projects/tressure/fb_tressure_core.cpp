@@ -26,7 +26,8 @@ static BaseCore _core{&_handleEvent, "TressureBox"};
 
 static CoreInfo _info = {
 	.core = _core,
-	.requiresTime = true,
+	.requiresTime = false,
+	.requiresServices = true,
 };
 
 
@@ -54,6 +55,7 @@ static void _handleEvent(const event::Event& event)
 			}else{
 				doorIsClosed();
 			}
+			h::Keyboard::instance()->setPullPeriod(200);
 	}
 }
 

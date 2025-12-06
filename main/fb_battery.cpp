@@ -25,7 +25,7 @@ int Battery::readCharge()
 
 float Battery::readVolts()
 {
-	return 3.4f + (0.8f * readCharge() / 100);
+	return 3.5f + (0.7f * readCharge() / 100.0f);
 }
 
 void Battery::setMaxRaw(int raw)

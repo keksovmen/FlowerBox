@@ -17,11 +17,11 @@ settings:
     key: l_mqtt_id
   - name: BatteryMax
     type: int
-    default: 2843
+    default: 2809
     key: b_max
   - name: BatteryMin
     type: int
-    default: 2315
+    default: 2382
     key: b_min
   - name: Ip
     type: std::string

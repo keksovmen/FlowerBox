@@ -150,6 +150,11 @@ static void _batteryAction()
 
 	FB_DEBUG_LOG_I_TAG("Battery: %d raw, %d %%, volts %.3f", avg, percents, volts);
 
+	// extern int64_t _desired_sleep_us;
+	// extern int64_t _actual_sleep_us;
+	// extern int64_t _sleep_tries;
+	// FB_DEBUG_LOG_E_TAG("Sleep cycles: %lld, desired: %lld, actual: %lld, delta %lld", _sleep_tries, _desired_sleep_us, _actual_sleep_us, static_cast<clock::Timestamp>(clock::getCurrentTime()) * 1000000 - _actual_sleep_us);
+
 	if(err == ESP_OK){
 		_mqtt.publish(_MQTT_PATH_STATUS, buff);
 	}
@@ -187,7 +192,7 @@ void project::initHwObjs()
 
 	global::getEventManager()->attachListener(&_keyboardHandler);
 	global::getEventManager()->attachListener(&_mqtt);
-	global::getTimeScheduler()->addActionDelayed(&_batteryAction, 30000, 1000, true);
+	global::getTimeScheduler()->addActionDelayed(&_batteryAction, 60000, 1000, true);
 	// global::getTimeScheduler()->addActionDelayed([](){
 	// 	wifi_ap_record_t ap_info;
 	// 	esp_err_t err = esp_wifi_sta_get_ap_info(&ap_info);
