@@ -27,7 +27,8 @@ static BaseCore _core{&_handleEvent, "TressureBox"};
 static CoreInfo _info = {
 	.core = _core,
 	.requiresTime = false,
-	.requiresServices = true,
+	.requireSensorService = true,
+	.requireSwitchService = false,
 };
 
 
@@ -44,18 +45,17 @@ static void _handleEvent(const event::Event& event)
 		if(action->isJustPressed(h::ButtonKeys::MODE)){
 			//tell HW that we are closed
 			project::doorIsOpened();
-		}else if(action->isStillPressed(h::ButtonKeys::MODE)){
+		}else if(action->button == h::ButtonKeys::MODE && (action->movement == h::ButtonMovement::PRESSED || action->movement == h::ButtonMovement::STILL_PRESSED)){
 			//tell HW that we are open
 			project::doorIsClosed();
 		}
 	}else if(event.groupId == event::EventGroup::SENSOR && event.eventId == sensor::SensorEvent::ALL_SENSORS_INIT){
-			bool door = gpio_get_level(static_cast<gpio_num_t>(pins::PIN_LOCK_SENSOR));
-			if(door){
-				doorIsOpened();
-			}else{
-				doorIsClosed();
-			}
-			h::Keyboard::instance()->setPullPeriod(200);
+		bool door = gpio_get_level(static_cast<gpio_num_t>(pins::PIN_LOCK_SENSOR));
+		if(door){
+			doorIsOpened();
+		}else{
+			doorIsClosed();
+		}
 	}
 }
 

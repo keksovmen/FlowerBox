@@ -1,6 +1,6 @@
 #include "h_keyboard.hpp"
 
-
+#include <algorithm>
 
 #include "esp_log.h"
 
@@ -68,37 +68,61 @@ void Keyboard::keyboardStop()
 	_isTaskRunning = false;
 }
 
+void Keyboard::tick()
+{
+	for(KeyboardButton& b : _buttons){
+		const bool isPressed = !gpio_get_level(b.pin);
+
+		_handleButton(b, isPressed);
+	}
+}
+
+void Keyboard::tick(gpio_num_t pin, bool state)
+{
+	auto iter = std::find_if(_buttons.begin(), _buttons.end(), [pin](const auto& b){return pin == b.pin;});
+	if(iter == _buttons.end()){
+		return;
+	}
+
+	auto& b = *iter;
+	const bool isPressed = !state;
+
+	_handleButton(b, isPressed);
+}
+
+void Keyboard::_handleButton(KeyboardButton& button, bool isPressed)
+{
+	if(isPressed){
+		if(button.press()){
+			//прошлое состояние pressed
+			//проверяем прошел ли период генерации события
+			if(button.currentDurationMs() >= _repeatPeriodMs){
+				_consumer({mapButtonVKtoButtonKey(button.vk), button.holdDurationMs(), ButtonMovement::STILL_PRESSED});
+				button.resetCurrentDuration();
+			}
+		}else{
+			//прошлое состояние released
+			_consumer({mapButtonVKtoButtonKey(button.vk), button.holdDurationMs(), ButtonMovement::PRESSED});
+		}
+	}else{
+		if(button.release()){
+			//прошлое состояние pressed
+			_consumer({mapButtonVKtoButtonKey(button.vk), button.holdDurationMs(), ButtonMovement::RELEASED});
+		}else{
+			//прошлое состояние released
+			//do nothing
+		}
+	}
+}
+
+
 void Keyboard::_task(void* arg)
 {
 	Keyboard* self = static_cast<Keyboard*>(arg);
 	assert(self);
 
 	while(self->_isTaskRunning){
-		for(KeyboardButton& b : self->_buttons){
-			const bool isPressed = !gpio_get_level(b.pin);
-
-			if(isPressed){
-				if(b.press()){
-					//прошлое состояние pressed
-					//проверяем прошл ли период генерации события
-					if(b.currentDurationMs() >= self->_repeatPeriodMs){
-						self->_consumer({mapButtonVKtoButtonKey(b.vk), b.holdDurationMs(), ButtonMovement::STILL_PRESSED});
-						b.resetCurrentDuration();
-					}
-				}else{
-					//прошлое состояние released
-					self->_consumer({mapButtonVKtoButtonKey(b.vk), b.holdDurationMs(), ButtonMovement::PRESSED});
-				}
-			}else{
-				if(b.release()){
-					//прошлое состояние pressed
-					self->_consumer({mapButtonVKtoButtonKey(b.vk), b.holdDurationMs(), ButtonMovement::RELEASED});
-				}else{
-					//прошлое состояние released
-					//do nothing
-				}
-			}
-		}
+		self->tick();
 
 		vTaskDelay(pdMS_TO_TICKS(self->_pullPeriodMs));
 	}

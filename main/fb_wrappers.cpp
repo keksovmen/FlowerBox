@@ -81,6 +81,8 @@ void WrapperPwm::init()
 		.flags = 0,
 	};
 	ESP_ERROR_CHECK(ledc_channel_config(&channelCfg));
+
+	// gpio_sleep_sel_dis(_gpio);
 }
 
 void WrapperPwm::setValue(bool value)

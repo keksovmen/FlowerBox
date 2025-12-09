@@ -147,7 +147,7 @@ int settings::getBatteryMax()
 int settings::getBatteryMin()
 {
     
-    return settings::getIntOrDefault(_PARTITION, _KEY_BATTERYMIN, 2382);
+    return settings::getIntOrDefault(_PARTITION, _KEY_BATTERYMIN, 2250);
     
 }
 

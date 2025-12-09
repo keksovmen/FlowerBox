@@ -29,7 +29,7 @@ const char* StateHwInit::getName() const
 
 void StateHwInit::handleEvent(const event::Event& event)
 {
-	if(project::getInfo().requiresServices){
+	if(project::getInfo().requireSensorService){
 		if(event.groupId == event::EventGroup::SENSOR){
 			if(event.eventId == sensor::SensorEvent::ALL_SENSORS_INIT){
 				if(settings::isWifiProvided()){
@@ -53,8 +53,10 @@ void StateHwInit::handleEvent(const event::Event& event)
 void StateHwInit::enter()
 {
 	fs::init();
-	if(project::getInfo().requiresServices){
+	if(project::getInfo().requireSensorService){
 		global::getSensorService()->start();
+	}
+	if(project::getInfo().requireSwitchService){
 		global::getSwitchService()->start();
 	}
 	assert(wifi::init());

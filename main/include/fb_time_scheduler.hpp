@@ -31,6 +31,7 @@ namespace fb
 
 				bool addActionPrecise(Action action, int unixAt, int maxWaitMs);
 				bool addActionDelayed(Action action, int afterMs, int maxWaitMs, bool repeated = false);
+				bool addActionDelayedIrq(Action action, int afterMs, int maxWaitMs, bool repeated = false);
 
 			
 			private:

@@ -14,7 +14,7 @@ static BaseCore _core{{}, ""};
 static CoreInfo _info = {
 	.core = _core,
 	.requiresTime = false,
-	.requiresServices = false,
+	.requireSensorService = false,
 };
 
 

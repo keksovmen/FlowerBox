@@ -56,7 +56,8 @@ namespace fb
 		{
 			Core& core;
 			bool requiresTime;
-			bool requiresServices = true;
+			bool requireSensorService = true;
+			bool requireSwitchService = true;
 		};
 
 

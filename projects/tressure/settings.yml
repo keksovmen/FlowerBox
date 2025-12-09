@@ -21,7 +21,7 @@ settings:
     key: b_max
   - name: BatteryMin
     type: int
-    default: 2382
+    default: 2250
     key: b_min
   - name: Ip
     type: std::string

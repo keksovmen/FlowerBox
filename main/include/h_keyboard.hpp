@@ -143,6 +143,13 @@ namespace h
 			 */
 
 			void keyboardStop();
+
+			/**
+			 * @brief проверяет все кнопки и обновляет состояние,
+			 * по сути вызывается внутри задачи, те можно самому вручную пуллить
+			 */
+			void tick();
+			void tick(gpio_num_t pin, bool state);
 		
 		private:
 			static Keyboard* _instance;
@@ -158,6 +165,10 @@ namespace h
 			std::vector<KeyboardButton> _buttons;
 
 			volatile bool _isTaskRunning = false;
+
+
+
+			void _handleButton(KeyboardButton& button, bool isPressed);
 
 
 

@@ -15,6 +15,7 @@
 
 
 #define _MQTT_PATH_STATUS "/status"
+#define _MQTT_PATH_DEBUG "/debug"
 #define _MQTT_PATH_LOCK "/controls/lock"
 #define _MQTT_PATH_RGB "/controls/rgb"
 
@@ -29,7 +30,7 @@ static const char* TAG = "HW";
 
 
 
-static sensor::KeyboardSensor<2> _keyboardSensor({
+static sensor::KeyboardSensorIrq<2> _keyboardSensor({
 	std::pair{pins::PIN_KEYBOARD, h::ButtonVK::VK_0},
 	std::pair{pins::PIN_LOCK_SENSOR, h::ButtonVK::VK_1}});
 
@@ -70,6 +71,7 @@ static void _pulse()
 
 	_lockPin.setValue(1);
 	//TODO: add duration to settings
+	//TODO: if for current power level need to start using longer delay after 3.5V
 	vTaskDelay(pdMS_TO_TICKS(150));
 	_lockPin.setValue(0);
 
@@ -153,11 +155,24 @@ static void _batteryAction()
 	// extern int64_t _desired_sleep_us;
 	// extern int64_t _actual_sleep_us;
 	// extern int64_t _sleep_tries;
-	// FB_DEBUG_LOG_E_TAG("Sleep cycles: %lld, desired: %lld, actual: %lld, delta %lld", _sleep_tries, _desired_sleep_us, _actual_sleep_us, static_cast<clock::Timestamp>(clock::getCurrentTime()) * 1000000 - _actual_sleep_us);
+	// extern int _cause_timer;
+	// extern int _cause_wifi;
+	// extern int _cause_gpio;
+	// extern int _cause_uart;
+	// extern int _cause_ext;
+	// extern int _cause_other;
 
 	if(err == ESP_OK){
 		_mqtt.publish(_MQTT_PATH_STATUS, buff);
 	}
+
+	// sprintf(buff, "CAUSES: timer %d, wifi %d, gpio %d, uart %d, ext %d, other %d", _cause_timer, _cause_wifi, _cause_gpio, _cause_uart, _cause_ext, _cause_other);
+	// FB_DEBUG_LOG_E_TAG("Sleep cycles: %lld, desired: %lld, actual: %lld, delta %lld", _sleep_tries, _desired_sleep_us, _actual_sleep_us, static_cast<clock::Timestamp>(clock::getCurrentTime()) * 1000000 - _actual_sleep_us);
+	// FB_DEBUG_LOG_E_TAG("%s", buff);
+
+	// if(err == ESP_OK){
+	// 	_mqtt.publish(_MQTT_PATH_DEBUG, buff);
+	// }
 }
 
 static void _init_from_settings()
@@ -175,6 +190,11 @@ void project::initHwObjs()
 	_ledRPin.init();
 	_ledGPin.init();
 	_ledBPin.init();
+
+	// gpio_sleep_set_direction(static_cast<gpio_num_t>(pins::PIN_LOCK), GPIO_MODE_OUTPUT);
+	// gpio_sleep_set_pull_mode(static_cast<gpio_num_t>(pins::PIN_LOCK), GPIO_FLOATING);
+	// gpio_sleep_sel_dis(static_cast<gpio_num_t>(pins::PIN_LOCK));
+
 
 	//read from settings
 	_mqtt.init("mqtt://" + settings::getIp() + ":" + std::to_string(settings::getPort()));
@@ -201,6 +221,8 @@ void project::initHwObjs()
 	// }, 500, 1000, true);
 
 	_sensorService.addSensor(&_keyboardSensor);
+	_keyboardSensor.init();
+	_keyboardSensor.update();
 }
 
 sensor::SensorService& project::getHwSensorService()

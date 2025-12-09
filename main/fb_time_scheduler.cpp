@@ -50,6 +50,23 @@ bool TimeScheduler::addActionDelayed(Action action, int afterMs, int maxWaitMs, 
 	return true;
 }
 
+bool TimeScheduler::addActionDelayedIrq(Action action, int afterMs, int maxWaitMs, bool repeated)
+{
+	auto lock = LockWrapperIrq(_mutex, pdMS_TO_TICKS(maxWaitMs));
+	if(!lock){
+		return false;
+	}
+
+	auto fireAt = pdTICKS_TO_MS(xTaskGetTickCount()) + afterMs;
+
+	_queue.emplace(fireAt, ActionWrapper{action, afterMs, repeated});
+
+	xTimerChangePeriod(_timerHndl, pdMS_TO_TICKS(10), 0);
+	xTimerStart(_timerHndl, 0);
+	
+	return true;
+}
+
 bool TimeScheduler::_isReadyToFire()
 {
 	if(_queue.empty()){

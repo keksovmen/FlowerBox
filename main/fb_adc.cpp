@@ -1,5 +1,7 @@
 #include "fb_adc.hpp"
 
+#include "driver/gpio.h"
+
 
 
 using namespace fb;
@@ -29,6 +31,15 @@ void AdcPin::init(adc_unit_t unit, adc_channel_t channel, adc_atten_t atten)
 		.bitwidth = ADC_BITWIDTH_DEFAULT,      // 12 bits by default
 	};
 	adc_oneshot_config_channel(_handler, ADC_CHANNEL_1, &config);
+
+	gpio_config_t io_conf = {
+		.pin_bit_mask = 1ULL << static_cast<int>(channel),
+		.mode = GPIO_MODE_INPUT,
+		.pull_up_en = GPIO_PULLUP_DISABLE,
+		.pull_down_en = GPIO_PULLDOWN_DISABLE,
+		.intr_type = GPIO_INTR_DISABLE,
+	};
+	gpio_config(&io_conf);
 }
 
 int AdcPin::readRaw(int samples)
