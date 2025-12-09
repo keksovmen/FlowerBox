@@ -20,11 +20,15 @@ namespace fb
 
 				void setMaxRaw(int raw);
 				void setMinRaw(int raw);
+				void setMaxVoltage(float voltage);
+				void setMinVoltage(float voltage);
 
 			private:
 				AdcPin& _adc;
 				int _maxRaw = 0;
 				int _minRaw = 0;
+				float _maxVoltage = 0.0f;
+				float _minVoltage = 0.0f;
 		};
 	}
 }

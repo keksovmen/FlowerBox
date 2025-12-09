@@ -179,6 +179,8 @@ static void _init_from_settings()
 {
 	_battery.setMinRaw(settings::getBatteryMin());
 	_battery.setMaxRaw(settings::getBatteryMax());
+	_battery.setMinVoltage(3.35f);
+	_battery.setMaxVoltage(4.2f);
 }
 
 
