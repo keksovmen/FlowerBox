@@ -97,6 +97,8 @@ void fb::sleep::disableLightSleep()
 
 void fb::sleep::enterDeepSleep(int wakePin, bool isPullUp)
 {
+	disableLightSleep();
+	
 	// Configure the button GPIO as input with proper pull
 	gpio_config_t io_conf = {
 		.pin_bit_mask = 1ULL << wakePin,

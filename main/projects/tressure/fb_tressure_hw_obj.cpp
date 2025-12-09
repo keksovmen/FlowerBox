@@ -128,7 +128,6 @@ static void _handleSleepTopic(std::string_view data)
 	FB_DEBUG_LOG_W_TAG("Going to deep sleep!");
 
 	global::getTimeScheduler()->addActionDelayed([](){
-		sleep::disableLightSleep();
 		sleep::enterDeepSleep(pins::PIN_SLEEP, true);
 	}, 1000, portMAX_DELAY);
 }
@@ -179,6 +178,14 @@ static void _batteryAction()
 
 	if(err == ESP_OK){
 		_mqtt.publish(_MQTT_PATH_STATUS, buff);
+	}
+
+
+	if(percents == 0){
+		FB_DEBUG_LOG_W_TAG("Too low battery level, going to deep sleep!");
+		global::getTimeScheduler()->addActionDelayed([](){
+			sleep::enterDeepSleep(pins::PIN_SLEEP, true);
+		}, 1000, portMAX_DELAY);
 	}
 
 	// sprintf(buff, "CAUSES: timer %d, wifi %d, gpio %d, uart %d, ext %d, other %d", _cause_timer, _cause_wifi, _cause_gpio, _cause_uart, _cause_ext, _cause_other);
