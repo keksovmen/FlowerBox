@@ -14,10 +14,10 @@
 
 
 
-#define _MQTT_PATH_STATUS "/status"
-#define _MQTT_PATH_DEBUG "/debug"
-#define _MQTT_PATH_LOCK "/controls/lock"
-#define _MQTT_PATH_RGB "/controls/rgb"
+#define _MQTT_PATH_STATUS ("/box/" + std::to_string(settings::getMqttId()) + "/status")
+// #define _MQTT_PATH_DEBUG "/debug"
+#define _MQTT_PATH_LOCK ("/box/" + std::to_string(settings::getMqttId()) + "/lock")
+#define _MQTT_PATH_RGB ("/box/" + std::to_string(settings::getMqttId()) + "/rgb")
 
 
 
@@ -80,15 +80,15 @@ static void _pulse()
 
 static void _handleLockTopic(std::string_view data)
 {
-	cJSON* obj = cJSON_ParseWithLength(data.begin(), data.length());
-	const int id = _getIntFromJsonOrDefault(obj, "ID", -1);
+	// cJSON* obj = cJSON_ParseWithLength(data.begin(), data.length());
+	// const int id = _getIntFromJsonOrDefault(obj, "ID", -1);
 
-	cJSON_Delete(obj);
+	// cJSON_Delete(obj);
 
-	if(id != settings::getMqttId()){
-		FB_DEBUG_LOG_I_TAG("Not my MQTT id: %d != %d", id, settings::getMqttId());
-		return;
-	}
+	// if(id != settings::getMqttId()){
+	// 	FB_DEBUG_LOG_I_TAG("Not my MQTT id: %d != %d", id, settings::getMqttId());
+	// 	return;
+	// }
 
 	//generate pulse
 	_pulse();
@@ -97,17 +97,17 @@ static void _handleLockTopic(std::string_view data)
 static void _handleRGBTopic(std::string_view data)
 {
 	cJSON* obj = cJSON_ParseWithLength(data.begin(), data.length());
-	const int id = _getIntFromJsonOrDefault(obj, "ID", -1);
+	// const int id = _getIntFromJsonOrDefault(obj, "ID", -1);
 	const int r = _getIntFromJsonOrDefault(obj, "R", 0);
 	const int g = _getIntFromJsonOrDefault(obj, "G", 0);
 	const int b = _getIntFromJsonOrDefault(obj, "B", 0);
 
 	cJSON_Delete(obj);
 
-	if(id != settings::getMqttId()){
-		FB_DEBUG_LOG_I_TAG("Not my MQTT id: %d != %d", id, settings::getMqttId());
-		return;
-	}
+	// if(id != settings::getMqttId()){
+	// 	FB_DEBUG_LOG_I_TAG("Not my MQTT id: %d != %d", id, settings::getMqttId());
+	// 	return;
+	// }
 
 	settings::setLedRed(r);
 	settings::setLedGreen(g);
