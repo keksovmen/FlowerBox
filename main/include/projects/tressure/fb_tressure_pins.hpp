@@ -13,5 +13,6 @@ namespace fb
 		static constexpr int PIN_LED_R = 0;
 		static constexpr int PIN_LED_G = 3;
 		static constexpr int PIN_LED_B = 4;
+		static constexpr int PIN_SLEEP = 5;
 	}
 }

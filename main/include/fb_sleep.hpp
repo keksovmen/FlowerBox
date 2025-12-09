@@ -16,7 +16,8 @@ namespace fb
 
 
 
-		void enable();
-		void disable();
+		void enableLightSleep();
+		void disableLightSleep();
+		void enterDeepSleep(int wakePin, bool isPullUp);
 	}
 }

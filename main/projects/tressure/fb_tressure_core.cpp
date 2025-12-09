@@ -38,7 +38,7 @@ static void _handleEvent(const event::Event& event)
 	//do stuff
 	if(event.groupId == event::EventGroup::WIFI && event.eventId == wifi::WifiEventId::CONNECTED){
 		// ESP_ERROR_CHECK(esp_wifi_set_protocol(WIFI_IF_STA, WIFI_PROTOCOL_11N));
-		sleep::enable();
+		sleep::enableLightSleep();
 		global::getTimeScheduler()->addActionDelayed([](){project::forceStatusPost();}, 1000, 1000);
 	}else if(event.groupId == event::EventGroup::KEYBOARD){
 		h::ButtonAction* action = static_cast<h::ButtonAction*>(event.data);

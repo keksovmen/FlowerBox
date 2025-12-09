@@ -1,5 +1,6 @@
 #include "fb_sleep.hpp"
 
+#include "driver/gpio.h"
 #include "esp_pm.h"
 #include "esp_sleep.h"
 #include "esp_wifi.h"
@@ -65,7 +66,7 @@ using namespace sleep;
 // 	return ESP_OK;
 // }
 
-void fb::sleep::enable()
+void fb::sleep::enableLightSleep()
 {
 	ESP_ERROR_CHECK(esp_wifi_set_ps(WIFI_PS_MAX_MODEM));
 	esp_pm_config_t pm_config = {
@@ -84,7 +85,7 @@ void fb::sleep::enable()
 	// esp_pm_light_sleep_register_cbs(&cbs);
 }
 
-void fb::sleep::disable()
+void fb::sleep::disableLightSleep()
 {
 	esp_pm_config_t pm_config = {
 		.max_freq_mhz = 160,
@@ -92,4 +93,26 @@ void fb::sleep::disable()
 		.light_sleep_enable = false
 	};
 	ESP_ERROR_CHECK(esp_pm_configure(&pm_config));
+}
+
+void fb::sleep::enterDeepSleep(int wakePin, bool isPullUp)
+{
+	// Configure the button GPIO as input with proper pull
+	gpio_config_t io_conf = {
+		.pin_bit_mask = 1ULL << wakePin,
+		.mode = GPIO_MODE_INPUT,
+		.pull_up_en = isPullUp ? GPIO_PULLUP_ENABLE : GPIO_PULLUP_DISABLE,    // or PULLDOWN depending on wiring
+		.pull_down_en = isPullUp ? GPIO_PULLDOWN_DISABLE : GPIO_PULLDOWN_ENABLE,
+		.intr_type = GPIO_INTR_DISABLE,
+	};
+	gpio_config(&io_conf);
+
+	// Enable deep-sleep wake on this GPIO, e.g. wake on LOW (button to GND)
+	esp_deep_sleep_enable_gpio_wakeup(
+		1ULL << wakePin,
+		isPullUp ? ESP_GPIO_WAKEUP_GPIO_LOW : ESP_GPIO_WAKEUP_GPIO_HIGH
+	);
+
+	//point of no return
+	esp_deep_sleep_start();
 }

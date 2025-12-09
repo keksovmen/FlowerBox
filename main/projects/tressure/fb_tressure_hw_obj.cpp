@@ -4,6 +4,7 @@
 #include "fb_globals.hpp"
 #include "fb_keyboard_handler.hpp"
 #include "fb_sensor_keyboard.hpp"
+#include "fb_sleep.hpp"
 #include "fb_tressure_pins.hpp"
 #include "fb_tressure_settings.hpp"
 
@@ -18,6 +19,7 @@
 // #define _MQTT_PATH_DEBUG "/debug"
 #define _MQTT_PATH_LOCK ("/box/" + std::to_string(settings::getMqttId()) + "/lock")
 #define _MQTT_PATH_RGB ("/box/" + std::to_string(settings::getMqttId()) + "/rgb")
+#define _MQTT_PATH_SLEEP ("/box/" + std::to_string(settings::getMqttId()) + "/sleep")
 
 
 
@@ -121,6 +123,16 @@ static void _handleRGBTopic(std::string_view data)
 	}
 }
 
+static void _handleSleepTopic(std::string_view data)
+{
+	FB_DEBUG_LOG_W_TAG("Going to deep sleep!");
+
+	global::getTimeScheduler()->addActionDelayed([](){
+		sleep::disableLightSleep();
+		sleep::enterDeepSleep(pins::PIN_SLEEP, true);
+	}, 1000, portMAX_DELAY);
+}
+
 static void _dataHandler(std::string_view topic, std::string_view data)
 {
 	//parse json data and see if you must fire
@@ -130,6 +142,8 @@ static void _dataHandler(std::string_view topic, std::string_view data)
 		_handleLockTopic(data);
 	}else if(topic == _MQTT_PATH_RGB){
 		_handleRGBTopic(data);
+	}else if(topic == _MQTT_PATH_SLEEP){
+		_handleSleepTopic(data);
 	}else{
 		FB_DEBUG_LOG_W_TAG("Unexpected MQTT topic!");
 	}
@@ -205,6 +219,7 @@ void project::initHwObjs()
 	_mqtt.registerSubscribeHandler([](const auto& handler){
 		std::invoke(handler, _MQTT_PATH_LOCK, 2);
 		std::invoke(handler, _MQTT_PATH_RGB, 2);
+		std::invoke(handler, _MQTT_PATH_SLEEP, 2);
 	});
 
 	esp_pm_lock_create(ESP_PM_NO_LIGHT_SLEEP, 0, "pin_action", &_lock);
