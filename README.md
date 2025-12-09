@@ -8,3 +8,4 @@
 - Диплом (DMX) папка project2
 - Реле папка relay_project
 - Управление китайскими игрушками sticks_project
+- Коробка на аккумуляторе с дверью на замке и MQTT управлении, [ссылка на документацию](projects/tressure/README.md)
