@@ -119,7 +119,7 @@ static void _dmx_send_task(void* arg)
 	for(;;)
 	{
 		//better each time write data to dmx buffer due to RX interrupts pushing garbage in to the buffer
-		// _rgbSwitch.setColor(_rgbSwitch.getColor());
+		_rgbSwitch.writeDmx();
 		dmx_send(_DMX_UART_PORT);
 	}
 

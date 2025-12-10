@@ -55,6 +55,8 @@ namespace fb
 				void setDmxAddress(int address);
 				int getDmxAddress() const;
 
+				void writeDmx();
+
 			private:
 				const dmx_port_t _dmx;
 				const int _gpioRX, _gpioTX, _gpioRTS;
