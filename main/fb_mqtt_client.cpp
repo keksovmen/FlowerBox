@@ -58,6 +58,13 @@ void MqttClient::init(std::string_view uri)
 	FB_DEBUG_LOG_W_OBJ("MQTT client created: %s", _handle == nullptr ? "False" : "True");
 }
 
+void MqttClient::init(std::string_view ip, int port)
+{
+	char buff[256] = {0};
+	int len = sprintf(buff, "mqtt://%s:%d", ip.cbegin(), port);
+	init(std::string_view(buff, len));
+}
+
 void MqttClient::publish(std::string_view topic, std::string_view data)
 {
 	if(!_handle){

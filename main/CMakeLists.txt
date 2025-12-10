@@ -1,8 +1,8 @@
 # set(_PROJECT MINE)
-# set(_PROJECT DIPLOM)
+set(_PROJECT DIPLOM)
 # set(_PROJECT RELAY)
 # set(_PROJECT STICKS)
-set(_PROJECT TRESSURE)
+# set(_PROJECT TRESSURE)
 
 message(STATUS "Selected project: " ${_PROJECT})
 
@@ -23,6 +23,7 @@ elseif(${_PROJECT} STREQUAL "DIPLOM")
 		"projects/dmx_light/fb_project_hw_obj.cpp"
 		"projects/dmx_light/fb_project_maper_obj.cpp"
 		"projects/dmx_light/fb_project_core.cpp"
+		"projects/dmx_light/fb_dmx_light_settings.cpp"
 		"switches/fb_rgb_switch.cpp"
 		"switches/fb_mp3_switch.cpp"
 		"sensors/fb_sensor_mp3.cpp"

@@ -28,6 +28,7 @@ namespace fb
 				virtual void handleEvent(const event::Event& event) override;
 
 				void init(std::string_view uri);
+				void init(std::string_view ip, int port);
 
 				//add subscribe action with callback handler for data
 				//add publish action

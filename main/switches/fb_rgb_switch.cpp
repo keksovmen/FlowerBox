@@ -138,6 +138,16 @@ void RgbSwitchDmx::setColor(int color)
 	}
 }
 
+void RgbSwitchDmx::setColor(uint8_t r, uint8_t g, uint8_t b)
+{
+	int color = (r << 16) + (g << 8) + b;
+	_color = color;
+
+	if(isOn()){
+		_applyColor(getColor());
+	}
+}
+
 int RgbSwitchDmx::getColor() const
 {
 	return _color;
@@ -166,18 +176,24 @@ int RgbSwitchDmx::getDmxAddress() const
 
 void RgbSwitchDmx::_applyColor(int color)
 {
-	const uint8_t white = (color >> 24) & 0xFF;
+	// const uint8_t white = (color >> 24) & 0xFF;
 	const uint8_t red = (color >> 16) & 0xFF;
 	const uint8_t green = (color >> 8) & 0xFF;
 	const uint8_t blue = color & 0xFF;
 
-	// FB_DEBUG_LOG_I_OBJ("Apply color: R = %u, G = %u, B = %u, W = %u", red, green, blue, white);
+	_applyColor(red, green, blue);
+}
 
-	uint8_t packet[3] = {red, green, blue};
+void RgbSwitchDmx::_applyColor(uint8_t r, uint8_t g, uint8_t b)
+{
+	FB_DEBUG_LOG_I_OBJ("Apply color: R = %u, G = %u, B = %u", r, g, b);
+
+	uint8_t packet[3] = {r, g, b};
 
 	dmx_write_slot(_dmx, 0, 0);
 	dmx_write_offset(_dmx, _address, packet, sizeof(packet));
 }
+
 
 bool RgbSwitchDmx::_condition(SwitchIface* me)
 {

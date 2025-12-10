@@ -2,10 +2,13 @@
 
 #include <cstring>
 
+// #include "fb_http_puller_32.hpp"
 #include "fb_dmx_light_pins.hpp"
+#include "fb_dmx_light_settings.hpp"
 #include "fb_globals.hpp"
-#include "fb_http_puller_32.hpp"
+#include "fb_json_util.hpp"
 #include "fb_keyboard_handler.hpp"
+#include "fb_mqtt_client.hpp"
 
 #include "esp_dmx.h"
 #include "cJSON.h"
@@ -19,7 +22,8 @@
 #define _DMX_TASK_STACK 4 * 1024
 #define _DMX_TASK_PRIORITY 20
 
-#define _DEFAULT_HTTP_PULLER_URL "https://gameofmind.ru/_projects/hardware_management/get.php"
+// #define _DEFAULT_HTTP_PULLER_URL "https://gameofmind.ru/_projects/hardware_management/get.php"
+#define _MQTT_RGB_PATH ("/dmx/" + std::to_string(settings::getMqttId()) + "/rgb")
 
 
 using namespace fb;
@@ -28,7 +32,7 @@ using namespace project;
 
 
 //function declarations
-static void _httpRequestHandler(std::optional<std::string_view>);
+// static void _httpRequestHandler(std::optional<std::string_view>);
 
 
 
@@ -49,7 +53,8 @@ static sensor::SensorStorage _sensorStorage;
 
 //прочее туть
 static keyboard::KeyboardHandler _keyboardHandler;
-static HttpPuller _httpPuller(&_httpRequestHandler);
+// static HttpPuller _httpPuller(&_httpRequestHandler);
+static periph::MqttClient _mqtt;
 
 
 
@@ -57,49 +62,49 @@ static const char* TAG = "hw";
 
 
 
-static void _httpRequestHandler(std::optional<std::string_view> data)
-{
-	//failure case
-	if(!data){
-		return;
-	}
+// static void _httpRequestHandler(std::optional<std::string_view> data)
+// {
+// 	//failure case
+// 	if(!data){
+// 		return;
+// 	}
 
-	// Парсинг JSON
-	cJSON* json = cJSON_Parse(data->cbegin());
-	if(!json){
-		FB_DEBUG_LOG_E_TAG("Failed to parse JSON");
-		return;
-	}
+// 	// Парсинг JSON
+// 	cJSON* json = cJSON_Parse(data->cbegin());
+// 	if(!json){
+// 		FB_DEBUG_LOG_E_TAG("Failed to parse JSON");
+// 		return;
+// 	}
 
-	//parse json
-	cJSON* idJson = cJSON_GetObjectItemCaseSensitive(json, "id");
-	cJSON* valueJson = cJSON_GetObjectItemCaseSensitive(json, "value");
+// 	//parse json
+// 	cJSON* idJson = cJSON_GetObjectItemCaseSensitive(json, "id");
+// 	cJSON* valueJson = cJSON_GetObjectItemCaseSensitive(json, "value");
 
-	if (!cJSON_IsNumber(idJson) || !cJSON_IsString(valueJson)) {
-		//failure do nothing
-		FB_DEBUG_LOG_E_TAG("Id is not an int and value is not a string");
+// 	if (!cJSON_IsNumber(idJson) || !cJSON_IsString(valueJson)) {
+// 		//failure do nothing
+// 		FB_DEBUG_LOG_E_TAG("Id is not an int and value is not a string");
 
-		// Освобождение памяти
-		cJSON_Delete(json);
-		return;
-	}
+// 		// Освобождение памяти
+// 		cJSON_Delete(json);
+// 		return;
+// 	}
 
-	const int id = idJson->valueint;
-	const char* valuePtr = valueJson->valuestring;
-	FB_DEBUG_LOG_I_TAG("ID=%d, value=%s", id, valuePtr);
+// 	const int id = idJson->valueint;
+// 	const char* valuePtr = valueJson->valuestring;
+// 	FB_DEBUG_LOG_I_TAG("ID=%d, value=%s", id, valuePtr);
 
-	const std::string value = valuePtr;
+// 	const std::string value = valuePtr;
 
-	// Освобождение памяти
-	cJSON_Delete(json);
+// 	// Освобождение памяти
+// 	cJSON_Delete(json);
 
 
-	//изменение свойства
-	auto* prop = global::getFlowerBox()->getProperty(id);
-	if(prop){
-		prop->setFromJson(value);
-	}
-}
+// 	//изменение свойства
+// 	auto* prop = global::getFlowerBox()->getProperty(id);
+// 	if(prop){
+// 		prop->setFromJson(value);
+// 	}
+// }
 
 
 
@@ -114,11 +119,36 @@ static void _dmx_send_task(void* arg)
 	for(;;)
 	{
 		//better each time write data to dmx buffer due to RX interrupts pushing garbage in to the buffer
-		_rgbSwitch.setColor(_rgbSwitch.getColor());
+		// _rgbSwitch.setColor(_rgbSwitch.getColor());
 		dmx_send(_DMX_UART_PORT);
 	}
 
 	vTaskDelete(NULL);
+}
+
+
+
+static void _mqtt_data_handler(std::string_view topic, std::string_view data)
+{
+	FB_DEBUG_LOG_I_TAG("Data handler: %.*s -> %.*s", topic.length(), topic.cbegin(), data.length(), data.cbegin());
+
+	if(topic == _MQTT_RGB_PATH){
+		auto vals = json_util::parseRgbFromJson(data);
+		_rgbSwitch.setColor(vals.r, vals.g, vals.b);
+	}else{
+		FB_DEBUG_LOG_W_TAG("Unexpected MQTT topic!");
+	}
+}
+
+
+
+static void _init_from_settings()
+{
+	_mqtt.init(settings::getIp(), settings::getPort());
+	_mqtt.registerSubscribeHandler([](auto consumer){
+		std::invoke(consumer, _MQTT_RGB_PATH, 2);
+	});
+	_mqtt.addDataHandler(&_mqtt_data_handler);
 }
 
 void project::initHwObjs()
@@ -131,8 +161,11 @@ void project::initHwObjs()
 	_rgbSwitch.setForseFlag(switches::SwitchForseState::ON);
 	_rgbSwitch.init();
 
+	_init_from_settings();
+
 	//register key handler for dropping WIFI settings
 	global::getEventManager()->attachListener(&_keyboardHandler);
+	global::getEventManager()->attachListener(&_mqtt);
 
 	xTaskCreate(&_dmx_send_task, "DMX_READER", _DMX_TASK_STACK, NULL, _DMX_TASK_PRIORITY, NULL);
 

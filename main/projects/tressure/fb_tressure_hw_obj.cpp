@@ -2,6 +2,7 @@
 
 #include "fb_clock.hpp"
 #include "fb_globals.hpp"
+#include "fb_json_util.hpp"
 #include "fb_keyboard_handler.hpp"
 #include "fb_sensor_keyboard.hpp"
 #include "fb_sleep.hpp"
@@ -55,18 +56,6 @@ static bool _doorClosed = true;
 
 
 
-static int _getIntFromJsonOrDefault(cJSON* json, std::string_view key, int def)
-{
-	auto* obj = cJSON_GetObjectItem(json, key.cbegin());
-	if(obj != nullptr){
-		return static_cast<int>(cJSON_GetNumberValue(obj));
-	}
-
-	return def;
-}
-
-
-
 static void _pulse()
 {
 	esp_pm_lock_acquire(_lock);
@@ -99,18 +88,10 @@ static void _handleLockTopic(std::string_view data)
 
 static void _handleRGBTopic(std::string_view data)
 {
-	cJSON* obj = cJSON_ParseWithLength(data.begin(), data.length());
-	// const int id = _getIntFromJsonOrDefault(obj, "ID", -1);
-	const int r = _getIntFromJsonOrDefault(obj, "R", 0);
-	const int g = _getIntFromJsonOrDefault(obj, "G", 0);
-	const int b = _getIntFromJsonOrDefault(obj, "B", 0);
-
-	cJSON_Delete(obj);
-
-	// if(id != settings::getMqttId()){
-	// 	FB_DEBUG_LOG_I_TAG("Not my MQTT id: %d != %d", id, settings::getMqttId());
-	// 	return;
-	// }
+	auto vals = json_util::parseRgbFromJson(data);
+	const int r = vals.r;
+	const int g = vals.g;
+	const int b = vals.b;
 
 	settings::setLedRed(r);
 	settings::setLedGreen(g);
@@ -221,7 +202,7 @@ void project::initHwObjs()
 
 
 	//read from settings
-	_mqtt.init("mqtt://" + settings::getIp() + ":" + std::to_string(settings::getPort()));
+	_mqtt.init(settings::getIp(), settings::getPort());
 	_mqtt.addDataHandler(&_dataHandler);
 	_mqtt.registerSubscribeHandler([](const auto& handler){
 		std::invoke(handler, _MQTT_PATH_LOCK, 2);

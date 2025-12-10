@@ -49,6 +49,7 @@ namespace fb
 
 				void init();
 				void setColor(int color);
+				void setColor(uint8_t r, uint8_t g, uint8_t b);
 				int getColor() const;
 
 				void setDmxAddress(int address);
@@ -64,6 +65,7 @@ namespace fb
 
 
 				void _applyColor(int color);
+				void _applyColor(uint8_t r, uint8_t g, uint8_t b);
 
 				static bool _condition(SwitchIface* me);
 				static void _action(SwitchIface* me, bool value);
