@@ -69,7 +69,7 @@ static int _rgbw_to_value_gradient(int rgbw) {
 
 static void _initRgbSwitch()
 {
-	util::createAndRegisterForceProperty(getHwRgbSwitch(), _boxRgbSwitch);
+	fb::project::util::createAndRegisterForceProperty(getHwRgbSwitch(), _boxRgbSwitch);
 	auto* colorProperty = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_RGB_VALUE,
 		[](int val){
 			getHwRgbSwitch().setColor(val);

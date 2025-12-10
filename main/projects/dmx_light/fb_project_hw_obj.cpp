@@ -106,22 +106,16 @@ static void _httpRequestHandler(std::optional<std::string_view> data)
 static void _dmx_send_task(void* arg)
 {
 	FB_DEBUG_LOG_I_TAG("Started DMX send task");
+	vTaskDelay(pdMS_TO_TICKS(1000));
+	// Write full zero packet first to clear receiver noise
+	uint8_t zero_packet[DMX_PACKET_SIZE_MAX] = {0};
+	dmx_write(_DMX_UART_PORT, zero_packet, sizeof(zero_packet));
 
 	for(;;)
 	{
+		//better each time write data to dmx buffer due to RX interrupts pushing garbage in to the buffer
+		_rgbSwitch.setColor(_rgbSwitch.getColor());
 		dmx_send(_DMX_UART_PORT);
-		// uint8_t data[DMX_PACKET_SIZE];
-		// dmx_packet_t packet;
-
-		// int size = dmx_receive(_MP3_UART_PORT, &packet, DMX_TIMEOUT_TICK);
-		// if(size > 0){
-		// 	dmx_read(_MP3_UART_PORT, data, size);
-		// 	FB_DEBUG_LOG_I_TAG("Read from DMX: err = %d, rdm = %d, sc = %d, size = %d", static_cast<int>(packet.err), packet.is_rdm, packet.sc, packet.size);
-		// 	FB_DEBUG_LOG_I_TAG("Read from DMX: R=%u, G=%u, B=%u", data[1], data[2], data[3]);
-		// }else{
-		// 	FB_DEBUG_LOG_W_TAG("NOTHING TO RECEIVE");
-		// 	vTaskDelay(pdMS_TO_TICKS(1000));
-		// }
 	}
 
 	vTaskDelete(NULL);
@@ -134,50 +128,19 @@ void project::initHwObjs()
 
 	_swithService.addSwitch(&getHwRgbSwitch());
 
+	_rgbSwitch.setForseFlag(switches::SwitchForseState::ON);
 	_rgbSwitch.init();
 
 	//register key handler for dropping WIFI settings
 	global::getEventManager()->attachListener(&_keyboardHandler);
 
-	// _rgbSwitch.setForseFlag(switches::SwitchForseState::ON);
-	// _rgbSwitch.check();
-
-	// for(;;){
-	// 	for(int slot = 0; slot < 8; slot++){
-	// 		FB_DEBUG_LOG_I_TAG("Writing slot %d", slot);
-
-	// 		for(int val = 0; val < 255; val++){
-	// 			dmx_write_slot(_DMX_UART_PORT, 0, 0);
-	// 			dmx_write_slot(_DMX_UART_PORT, 1 + slot, val);
-	// 			dmx_send(_DMX_UART_PORT);
-	// 		}
-	// 	}
-	// }
-
-
-	// // First, use the default DMX configuration...
-	// dmx_config_t config = DMX_CONFIG_DEFAULT;
-	
-	// // ...declare the driver's DMX personalities...
-	// const int personality_count = 1;
-	// dmx_personality_t personalities[] = {
-	// 	{1, "Default Personality"}
-	// };
-	
-	// // ...install the DMX driver...
-	// // dmx_driver_install(_DMX_UART_PORT, &config, personalities, personality_count);
-	// dmx_driver_install(_MP3_UART_PORT, &config, personalities, personality_count);
-	
-	// // dmx_set_pin(_DMX_UART_PORT, PIN_DMX_TX, PIN_DMX_RX, PIN_DMX_RTS);
-	// dmx_set_pin(_MP3_UART_PORT, PIN_MP3_TX, PIN_MP3_RX, _MP3_PIN_RTS);
-
 	xTaskCreate(&_dmx_send_task, "DMX_READER", _DMX_TASK_STACK, NULL, _DMX_TASK_PRIORITY, NULL);
 
 	//read it from NVS
-	_httpPuller.setUrl(_DEFAULT_HTTP_PULLER_URL);
-	_httpPuller.start();
+	// _httpPuller.setUrl(_DEFAULT_HTTP_PULLER_URL);
+	// _httpPuller.start();
 
-	global::getEventManager()->attachListener(&_httpPuller);
+	// global::getEventManager()->attachListener(&_httpPuller);
 }
 
 sensor::Mp3Sensor& project::getHwMp3Sensor()

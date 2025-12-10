@@ -29,6 +29,7 @@ RgbSwitch::RgbSwitch(ledc_timer_t timer, ledc_channel_t startChannel, int gpioR,
 		.timer_sel = timer,
 		.duty = 0,
 		.hpoint = 0,
+		.sleep_mode{},
 		.flags = 0,
 	};
 	ESP_ERROR_CHECK(ledc_channel_config(&channelCfg));
@@ -124,6 +125,8 @@ void RgbSwitchDmx::init()
 	dmx_set_baud_rate(_dmx, 250000);
 	dmx_set_break_len(_dmx, 88);
 	dmx_set_mab_len(_dmx, 8);
+
+	_applyColor(0);
 }
 
 void RgbSwitchDmx::setColor(int color)
@@ -168,7 +171,7 @@ void RgbSwitchDmx::_applyColor(int color)
 	const uint8_t green = (color >> 8) & 0xFF;
 	const uint8_t blue = color & 0xFF;
 
-	FB_DEBUG_LOG_I_OBJ("Apply color: R = %u, G = %u, B = %u, W = %u", red, green, blue, white);
+	// FB_DEBUG_LOG_I_OBJ("Apply color: R = %u, G = %u, B = %u, W = %u", red, green, blue, white);
 
 	uint8_t packet[3] = {red, green, blue};
 
