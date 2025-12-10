@@ -17,7 +17,8 @@ Uart::Uart(uart_port_t port, int rx, int tx, int baudrate)
 		.stop_bits = UART_STOP_BITS_1,
 		.flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
 		.rx_flow_ctrl_thresh = 0,
-		.source_clk = UART_SCLK_DEFAULT
+		.source_clk = UART_SCLK_DEFAULT,
+		.flags{}
 	};
 	ESP_ERROR_CHECK(uart_driver_install(_port, 256, 256, 0, NULL, 0));
 	ESP_ERROR_CHECK(uart_param_config(_port, &cfg));

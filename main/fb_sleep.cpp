@@ -97,6 +97,8 @@ void fb::sleep::disableLightSleep()
 
 void fb::sleep::enterDeepSleep(int wakePin, bool isPullUp)
 {
+	//TODO: fix deep sleep for esp32
+#ifdef SOC_GPIO_SUPPORT_DEEPSLEEP_WAKEUP
 	disableLightSleep();
 	
 	// Configure the button GPIO as input with proper pull
@@ -117,4 +119,5 @@ void fb::sleep::enterDeepSleep(int wakePin, bool isPullUp)
 
 	//point of no return
 	esp_deep_sleep_start();
+#endif
 }

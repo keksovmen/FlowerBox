@@ -21,7 +21,11 @@ void AdcPin::init(adc_unit_t unit, adc_channel_t channel, adc_atten_t atten)
 {
 	adc_oneshot_unit_init_cfg_t init_config = {
 		.unit_id = ADC_UNIT_1,
+	#ifdef SOC_ADC_RTC_CTRL_SUPPORTED
+		.clk_src = ADC_RTC_CLK_SRC_DEFAULT,
+	#else
 		.clk_src = ADC_DIGI_CLK_SRC_DEFAULT,
+	#endif
 		.ulp_mode = ADC_ULP_MODE_DISABLE,
 	};
 	adc_oneshot_new_unit(&init_config, &_handler);

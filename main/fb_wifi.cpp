@@ -228,12 +228,12 @@ bool wifi::init()
 {
 	FB_DEBUG_ENTER_I_TAG();
 
-	#ifndef _ESP8266
-		static std::once_flag flag;
-		std::call_once(flag, &_init);
-	#else
+	// #ifndef _ESP8266
+	// 	static std::once_flag flag;
+	// 	std::call_once(flag, &_init);
+	// #else
 		_init();
-	#endif
+	// #endif
 
 	return true;
 }
