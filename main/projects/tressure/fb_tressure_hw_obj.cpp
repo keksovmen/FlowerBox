@@ -143,7 +143,7 @@ static void _batteryAction()
 
 	char buff[256];
 	sprintf(buff, "{\"ID\":%d, \"RSSI\":%d, \"time\":%lld, \"battery\":{\"raw\":%d, \"percents\":%d, \"volts\":%.3f}}",
-		settings::getMqttId(), ap_info.rssi, static_cast<clock::Timestamp>(clock::getCurrentTime()), avg, percents, volts);
+		settings::getMqttId(), ap_info.rssi, clock::currentTimeStamp(), avg, percents, volts);
 
 	FB_DEBUG_LOG_I_TAG("Battery: %d raw, %d %%, volts %.3f", avg, percents, volts);
 
