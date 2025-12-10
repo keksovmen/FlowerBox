@@ -42,7 +42,9 @@ namespace fb
 
 				virtual void handleEvent(const event::Event& event) override
 				{
-					std::invoke(_eventHandler, event);
+					if(_eventHandler){
+						std::invoke(_eventHandler, event);
+					}
 				}
 
 			private:
