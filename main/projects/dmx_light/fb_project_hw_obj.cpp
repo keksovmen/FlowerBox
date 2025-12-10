@@ -8,7 +8,6 @@
 #include "fb_globals.hpp"
 #include "fb_json_util.hpp"
 #include "fb_keyboard_handler.hpp"
-#include "fb_mqtt_client.hpp"
 
 #include "esp_dmx.h"
 #include "cJSON.h"
@@ -111,7 +110,7 @@ static const char* TAG = "hw";
 static void _dmx_send_task(void* arg)
 {
 	FB_DEBUG_LOG_I_TAG("Started DMX send task");
-	vTaskDelay(pdMS_TO_TICKS(1000));
+	vTaskDelay(pdMS_TO_TICKS(2000));
 	// Write full zero packet first to clear receiver noise
 	uint8_t zero_packet[DMX_PACKET_SIZE_MAX] = {0};
 	dmx_write(_DMX_UART_PORT, zero_packet, sizeof(zero_packet));
@@ -204,4 +203,9 @@ switches::SwitchService& project::getHwSwitchService()
 sensor::SensorStorage& project::getHwSensorStorage()
 {
 	return _sensorStorage;
+}
+
+periph::MqttClient& project::getHwMqttClient()
+{
+	return _mqtt;
 }

@@ -6,6 +6,7 @@
 #include "fb_rgb_switch.hpp"
 #include "fb_sensor_keyboard.hpp"
 #include "fb_sensor_mp3.hpp"
+#include "fb_mqtt_client.hpp"
 
 
 
@@ -17,5 +18,7 @@ namespace fb
 		sensor::KeyboardSensor<1>& getHwKeyboardSensor();
 
 		switches::RgbSwitchDmx& getHwRgbSwitch();
+
+		periph::MqttClient& getHwMqttClient();
 	}
 }
