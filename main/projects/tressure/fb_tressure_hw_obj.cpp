@@ -63,7 +63,7 @@ static void _pulse()
 	_lockPin.setValue(1);
 	//TODO: add duration to settings
 	//TODO: if for current power level need to start using longer delay after 3.5V
-	const int delayMs = (_battery.readVolts() < 3.5f) ? 400 : 150;
+	const int delayMs = (_battery.readVolts() < 3.7f) ? 250 : 150;
 	vTaskDelay(pdMS_TO_TICKS(delayMs));
 	_lockPin.setValue(0);
 
@@ -162,7 +162,7 @@ static void _batteryAction()
 	}
 
 
-	if(percents == 0){
+	if(percents <= 1){
 		FB_DEBUG_LOG_W_TAG("Too low battery level, going to deep sleep!");
 		global::getTimeScheduler()->addActionDelayed([](){
 			sleep::enterDeepSleep(pins::PIN_SLEEP, true);
@@ -182,7 +182,7 @@ static void _init_from_settings()
 {
 	_battery.setMinRaw(settings::getBatteryMin());
 	_battery.setMaxRaw(settings::getBatteryMax());
-	_battery.setMinVoltage(3.35f);
+	_battery.setMinVoltage(3.6f);
 	_battery.setMaxVoltage(4.2f);
 }
 
@@ -229,6 +229,10 @@ void project::initHwObjs()
 	_sensorService.addSensor(&_keyboardSensor);
 	_keyboardSensor.init();
 	_keyboardSensor.update();
+
+	if(_battery.readCharge() <= 1){
+		sleep::enterDeepSleep(pins::PIN_SLEEP, true);
+	}
 }
 
 sensor::SensorService& project::getHwSensorService()
