@@ -222,7 +222,7 @@ static esp_err_t _web_socket_cb(httpd_req_t* r)
 
 		_client_socket = _INVALID_SOCKET;
 
-		return ESP_OK;
+		return ESP_FAIL;
 	}
 
 	return ESP_OK;
