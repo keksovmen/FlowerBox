@@ -63,8 +63,7 @@ static void _pulse()
 	_lockPin.setValue(1);
 	//TODO: add duration to settings
 	//TODO: if for current power level need to start using longer delay after 3.5V
-	const int delayMs = (_battery.readVolts() < 3.7f) ? 250 : 150;
-	vTaskDelay(pdMS_TO_TICKS(delayMs));
+	vTaskDelay(pdMS_TO_TICKS(250));
 	_lockPin.setValue(0);
 
 	esp_pm_lock_release(_lock);
