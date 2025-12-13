@@ -164,10 +164,10 @@ static bool _checkWifiConfig(const WifiConfig& cfg)
 		return false;
 	}
 
-	if(cfg.staSsid.length() < 8){
-		FB_DEBUG_LOG_E_TAG("Invalid STA ssid length must be >= 8, %s", cfg.staSsid.c_str());
-		return false;
-	}
+	// if(cfg.staSsid.length() < 8){
+	// 	FB_DEBUG_LOG_E_TAG("Invalid STA ssid length must be >= 8, %s", cfg.staSsid.c_str());
+	// 	return false;
+	// }
 
 	if(cfg.apPass.length() > 0 && cfg.apPass.length() < 8){
 		FB_DEBUG_LOG_E_TAG("Invalid AP pass length must be >= 8 or 0");
