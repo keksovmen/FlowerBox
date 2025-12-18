@@ -1,6 +1,6 @@
 # set(_PROJECT MINE)
-set(_PROJECT DIPLOM)
-# set(_PROJECT RELAY)
+# set(_PROJECT DIPLOM)
+set(_PROJECT RELAY)
 # set(_PROJECT STICKS)
 # set(_PROJECT TRESSURE)
 
@@ -41,7 +41,7 @@ elseif(${_PROJECT} STREQUAL "RELAY")
 		"projects/relay/fb_project_hw_obj.cpp"
 		"projects/relay/fb_project_maper_obj.cpp"
 		"projects/relay/fb_project_core.cpp"
-		"projects/relay/fb_project_settings.cpp"
+		"projects/relay/fb_relay_settings.cpp"
 		"switches/fb_gpio_switch.cpp"
 		"fb_http_puller.cpp"
 		"fb_http_puller32.cpp"

@@ -25,7 +25,7 @@ static box::Switch _hhtpPullerSwitch(box::Tid::SWITCH_HTTP_PULLER,
 
 static void _initGpioArray()
 {
-	util::createAndRegisterForceProperty(getHwGpioSwitch(), _gpioSwitch);
+	fb::project::util::createAndRegisterForceProperty(getHwGpioSwitch(), _gpioSwitch);
 
 	auto* turnOnProperty = new box::PropertyInt("TurnOn", "Turns specific GPIO on",
 		box::Tid::PROPERTY_GENERAL,
