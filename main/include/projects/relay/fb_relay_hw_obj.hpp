@@ -8,6 +8,7 @@
 #include "fb_sensor_service.hpp"
 #include "fb_sensor_storage.hpp"
 #include "fb_switch_service.hpp"
+#include "fb_relay_pins.hpp"
 
 
 
@@ -16,7 +17,7 @@ namespace fb
 	namespace project
 	{
 		sensor::KeyboardSensor<1>& getHwKeyboardSensor();
-		switches::ArrayGpioSwitch<6>& getHwGpioSwitch();
+		switches::ArrayGpioSwitch<pins::RELAY_PINS_COUNT>& getHwGpioSwitch();
 		
 		AbstractHttpPuller& getHwHttpPuller();
 	}

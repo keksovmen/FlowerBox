@@ -32,7 +32,7 @@ static void _initGpioArray()
 		[](int val){
 			getHwGpioSwitch().turnOn(val);
 			return true;
-		}, 0, 0, 6
+		}, 0, 0, pins::RELAY_PINS_COUNT
 	);
 
 	getBox().addProperty(std::unique_ptr<box::PropertyIface>(turnOnProperty));
@@ -44,7 +44,7 @@ static void _initGpioArray()
 		[](int val){
 			getHwGpioSwitch().turnOff(val);
 			return true;
-		}, 0, 0, 6
+		}, 0, 0, pins::RELAY_PINS_COUNT
 	);
 
 	getBox().addProperty(std::unique_ptr<box::PropertyIface>(turnOffProperty));

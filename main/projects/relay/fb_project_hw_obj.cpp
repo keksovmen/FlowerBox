@@ -7,20 +7,10 @@
 #include "fb_gpio_switch.hpp"
 #include "fb_http_puller_32.hpp"
 #include "fb_keyboard_handler.hpp"
-#include "fb_relay_pins.hpp"
 #include "fb_relay_settings.hpp"
+// #include "fb_mqtt_client.hpp"
 
 #include "cJSON.h"
-
-
-
-#define _MP3_UART_PORT UART_NUM_1
-
-#define _DMX_UART_PORT UART_NUM_2
-
-#define _DMX_TASK_STACK 4 * 1024
-#define _DMX_TASK_PRIORITY 20
-
 
 
 
@@ -39,12 +29,17 @@ static sensor::KeyboardSensor<1> _keyboardSensor({std::pair{pins::PIN_KEYBOARD_R
 
 // //переключатели туть
 static switches::ArrayGpioSwitch<pins::RELAY_PINS_COUNT> _gpioSwitch(
-	{switches::GpioSwitch{pins::PIN_RELAY_1},
-	switches::GpioSwitch{pins::PIN_RELAY_2},
-	switches::GpioSwitch{pins::PIN_RELAY_3},
-	switches::GpioSwitch{pins::PIN_RELAY_4},
-	switches::GpioSwitch{pins::PIN_RELAY_5},
-	switches::GpioSwitch{pins::PIN_RELAY_6}});
+	{switches::GpioSwitch{pins::PIN_RELAY_1, true},
+	switches::GpioSwitch{pins::PIN_RELAY_2, true},
+	switches::GpioSwitch{pins::PIN_RELAY_3, true},
+	switches::GpioSwitch{pins::PIN_RELAY_4, true},
+	switches::GpioSwitch{pins::PIN_RELAY_5, true},
+	switches::GpioSwitch{pins::PIN_RELAY_6, true},
+	switches::GpioSwitch{pins::PIN_RELAY_7, true},
+	switches::GpioSwitch{pins::PIN_RELAY_8, true},
+	switches::GpioSwitch{pins::PIN_RELAY_9, true},
+	switches::GpioSwitch{pins::PIN_RELAY_10, true}}
+	);
 
 // //сервисы туть
 static sensor::SensorService _sensorService;
@@ -56,6 +51,7 @@ static sensor::SensorStorage _sensorStorage;
 //прочее туть
 static keyboard::KeyboardHandler _keyboardHandler;
 static HttpPuller _httpPuller(&_httpRequestHandler);
+// static periph::MqttClient _mqtt;
 
 
 
@@ -77,7 +73,7 @@ static void _httpRequestHandler(std::optional<std::string_view> data)
 		return;
 	}
 
-	std::array<bool, pins::RELAY_PINS_COUNT> result;
+	std::array<bool, pins::RELAY_PINS_COUNT> result{};
 
 	for(auto i = 0; i < result.size(); i++){
 		//parse json
@@ -88,10 +84,7 @@ static void _httpRequestHandler(std::optional<std::string_view> data)
 			//failure do nothing
 			FB_DEBUG_LOG_E_TAG("Pin %d, Value is not an int", i);
 
-			// Освобождение памяти
-			cJSON_Delete(json);
-
-			return;
+			continue;
 		}
 
 		const int state = valueJson->valueint;
@@ -131,6 +124,15 @@ void project::initHwObjs()
 	_httpPuller.setTimeoutMs(settings::getHttpDelay());
 	_httpPuller.start();
 	global::getEventManager()->attachListener(&_httpPuller);
+
+	// _mqtt.init("192.168.0.111", 8081);
+	// _mqtt.registerSubscribeHandler([](auto handler){
+	// 	handler("/relay/0/light", 2);
+	// });
+	// _mqtt.addDataHandler([](std::string_view topic, std::string_view data){
+	// 	_httpRequestHandler(data);
+	// });
+	// global::getEventManager()->attachListener(&_mqtt);
 }
 
 sensor::KeyboardSensor<1>& project::getHwKeyboardSensor()
@@ -153,7 +155,7 @@ sensor::SensorStorage& project::getHwSensorStorage()
 	return _sensorStorage;
 }
 
-switches::ArrayGpioSwitch<6>& project::getHwGpioSwitch()
+switches::ArrayGpioSwitch<pins::RELAY_PINS_COUNT>& project::getHwGpioSwitch()
 {
 	return _gpioSwitch;
 }

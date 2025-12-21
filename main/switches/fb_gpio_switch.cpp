@@ -14,7 +14,7 @@ void GpioSwitch::turnOn()
 {
 	_init();
 
-	esp_err_t ret = gpio_set_level(static_cast<gpio_num_t>(_gpio), 1);
+	esp_err_t ret = gpio_set_level(static_cast<gpio_num_t>(_gpio), _isOd ? 0 : 1);
 	if (ret == ESP_OK) {
 		_state = true;
 		FB_DEBUG_LOG_I_OBJ("GPIO %d turned ON", _gpio);
@@ -27,7 +27,7 @@ void GpioSwitch::turnOff()
 {
 	_init();
 
-	esp_err_t ret = gpio_set_level(static_cast<gpio_num_t>(_gpio), 0);
+	esp_err_t ret = gpio_set_level(static_cast<gpio_num_t>(_gpio), _isOd ? 1 : 0);
 	if (ret == ESP_OK) {
 		_state = false;
 		FB_DEBUG_LOG_I_OBJ("GPIO %d turned OFF", _gpio);
@@ -59,7 +59,7 @@ void GpioSwitch::_init()
 	// GPIO configuration structure
 	gpio_config_t io_conf = {
 		.pin_bit_mask = (1ULL << _gpio),
-		.mode = GPIO_MODE_OUTPUT,
+		.mode = _isOd ? GPIO_MODE_OUTPUT_OD : GPIO_MODE_OUTPUT,
 		.pull_up_en = GPIO_PULLUP_DISABLE,
 		.pull_down_en = GPIO_PULLDOWN_DISABLE,
 		.intr_type = GPIO_INTR_DISABLE,

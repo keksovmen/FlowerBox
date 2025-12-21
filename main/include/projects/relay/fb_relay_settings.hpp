@@ -2,22 +2,28 @@
 
 
 
-#include <string_view>
+#include <string>
+
+#include "fb_clock.hpp"
 
 
 
-namespace fb
-{
-	namespace settings
-	{
-		//setters
+namespace fb {
+	namespace settings {
 
-		void setHttpDelay(int delayMs);
-		void setHttpUrl(std::string_view url);
+		/* ------- setters ------- */
+		
+		void setHttpUrl(std::string value);
+		
+		void setHttpDelay(int value);
+		
 
-
-		//getters
-		int getHttpDelay();
+		/*  ------- getters ------- */
+		
 		std::string getHttpUrl();
-	}
-}
+		
+		int getHttpDelay();
+		
+
+	} // namespace settings
+} // namespace fb

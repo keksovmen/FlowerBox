@@ -14,9 +14,10 @@ namespace fb
 		class GpioSwitch : public SwitchIface
 		{
 			public:
-				GpioSwitch(int gpio) : 
+				GpioSwitch(int gpio, bool isOd) : 
 					SwitchIface(SwitchIface::MockCondition, &_action), 
-					_gpio(gpio)
+					_gpio(gpio),
+					_isOd(isOd)
 				{
 
 				}
@@ -41,6 +42,7 @@ namespace fb
 
 			private:
 				const int _gpio;
+				const bool _isOd;
 				bool _state = false;
 				bool _initFlag = false;
 
