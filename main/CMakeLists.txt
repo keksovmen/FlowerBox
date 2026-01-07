@@ -1,8 +1,12 @@
 # set(_PROJECT MINE)
 # set(_PROJECT DIPLOM)
-set(_PROJECT RELAY)
+# set(_PROJECT RELAY)
 # set(_PROJECT STICKS)
 # set(_PROJECT TRESSURE)
+# set(_PROJECT IR)
+set(_PROJECT KEY_BACKLIGHT)
+
+
 
 message(STATUS "Selected project: " ${_PROJECT})
 
@@ -72,6 +76,22 @@ elseif(${_PROJECT} STREQUAL "TRESSURE")
 	set(_ADD_INCLUDES
 		"include/projects/tressure"
 		)
+elseif(${_PROJECT} STREQUAL "IR")
+	file(GLOB _ADD_SRC
+		"projects/ir/*.cpp"
+		)
+
+	set(_ADD_INCLUDES
+		"include/projects/ir"
+		)
+elseif(${_PROJECT} STREQUAL "KEY_BACKLIGHT")
+	file(GLOB _ADD_SRC
+		"projects/keypad_backlight/*.cpp"
+		)
+
+	set(_ADD_INCLUDES
+		"include/projects/keypad_backlight"
+		)
 endif()
 
 message(STATUS "ADD SRC: " ${_ADD_SRC})
@@ -93,6 +113,7 @@ idf_component_register(
 		"fb_time_scheduler.cpp"
 		"fb_keyboard_handler.cpp"
 		"fb_wrappers.cpp"
+		"fb_wrapper_db135.cpp"
 		"fb_mqtt_client.cpp"
 		"fb_adc.cpp"
 		"fb_battery.cpp"
