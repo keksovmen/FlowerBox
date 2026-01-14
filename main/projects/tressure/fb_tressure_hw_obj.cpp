@@ -40,6 +40,7 @@ static sensor::KeyboardSensorIrq<2> _keyboardSensor({
 static adc::AdcPin _adc;
 static adc::Battery _battery(_adc);
 static wrappers::WrapperGpio _lockPin(static_cast<gpio_num_t>(pins::PIN_LOCK), false);
+static wrappers::WrapperGpio _powerPin(static_cast<gpio_num_t>(pins::PIN_SLEEP), true);
 static wrappers::WrapperPwm _ledRPin(LEDC_TIMER_0, LEDC_CHANNEL_0, static_cast<gpio_num_t>(pins::PIN_LED_R), false);
 static wrappers::WrapperPwm _ledGPin(LEDC_TIMER_0, LEDC_CHANNEL_1, static_cast<gpio_num_t>(pins::PIN_LED_G), false);
 static wrappers::WrapperPwm _ledBPin(LEDC_TIMER_0, LEDC_CHANNEL_2, static_cast<gpio_num_t>(pins::PIN_LED_B), false);
@@ -62,7 +63,7 @@ static void _pulse()
 
 	_lockPin.setValue(1);
 	//TODO: add duration to settings
-	//TODO: if for current power level need to start using longer delay after 3.5V
+	//TODO: longer delay after 3.5V
 	vTaskDelay(pdMS_TO_TICKS(250));
 	_lockPin.setValue(0);
 
@@ -71,16 +72,6 @@ static void _pulse()
 
 static void _handleLockTopic(std::string_view data)
 {
-	// cJSON* obj = cJSON_ParseWithLength(data.begin(), data.length());
-	// const int id = _getIntFromJsonOrDefault(obj, "ID", -1);
-
-	// cJSON_Delete(obj);
-
-	// if(id != settings::getMqttId()){
-	// 	FB_DEBUG_LOG_I_TAG("Not my MQTT id: %d != %d", id, settings::getMqttId());
-	// 	return;
-	// }
-
 	//generate pulse
 	_pulse();
 }
@@ -108,7 +99,7 @@ static void _handleSleepTopic(std::string_view data)
 	FB_DEBUG_LOG_W_TAG("Going to deep sleep!");
 
 	global::getTimeScheduler()->addActionDelayed([](){
-		sleep::enterDeepSleep(pins::PIN_SLEEP, true);
+		_powerPin.setValue(false);
 	}, 1000, portMAX_DELAY);
 }
 
@@ -162,9 +153,10 @@ static void _batteryAction()
 
 
 	if(percents <= 1){
-		FB_DEBUG_LOG_W_TAG("Too low battery level, going to deep sleep!");
+		FB_DEBUG_LOG_W_TAG("Too low battery level, going to shutdown!");
 		global::getTimeScheduler()->addActionDelayed([](){
-			sleep::enterDeepSleep(pins::PIN_SLEEP, true);
+			// sleep::enterDeepSleep(pins::PIN_SLEEP, true);
+			_powerPin.setValue(false);
 		}, 1000, portMAX_DELAY);
 	}
 
@@ -191,13 +183,12 @@ void project::initHwObjs()
 {
 	_adc.init(ADC_UNIT_1, static_cast<adc_channel_t>(pins::PIN_BATTERY), ADC_ATTEN_DB_12);
 	_lockPin.init();
+	_powerPin.init();
 	_ledRPin.init();
 	_ledGPin.init();
 	_ledBPin.init();
 
-	// gpio_sleep_set_direction(static_cast<gpio_num_t>(pins::PIN_LOCK), GPIO_MODE_OUTPUT);
-	// gpio_sleep_set_pull_mode(static_cast<gpio_num_t>(pins::PIN_LOCK), GPIO_FLOATING);
-	// gpio_sleep_sel_dis(static_cast<gpio_num_t>(pins::PIN_LOCK));
+	gpio_sleep_sel_dis(static_cast<gpio_num_t>(pins::PIN_SLEEP));
 
 
 	//read from settings
@@ -229,9 +220,15 @@ void project::initHwObjs()
 	_keyboardSensor.init();
 	_keyboardSensor.update();
 
+	// don't start up on low battery
 	if(_battery.readCharge() <= 1){
-		sleep::enterDeepSleep(pins::PIN_SLEEP, true);
+		FB_DEBUG_LOG_W_TAG("to low power, going to shutdown!");
+		_powerPin.setValue(false);
+		vTaskDelay(portMAX_DELAY);
 	}
+
+	//indicate that we are ready to work
+	_pulse();
 }
 
 sensor::SensorService& project::getHwSensorService()
