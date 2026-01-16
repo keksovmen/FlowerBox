@@ -16,17 +16,17 @@ WrapperDb135::WrapperDb135(int scl, int sda, int cs)
 
 void WrapperDb135::init()
 {
-	spi_bus_config_t buscfg = {
-        .mosi_io_num = _gpioSda,
-        .miso_io_num = -1,
-        .sclk_io_num = _gpioScl,
-        .quadwp_io_num = -1,
-        .quadhd_io_num = -1,
-        .max_transfer_sz = 4,   // small, we only send 2 bytes
-    };
+	//TODO: test no init structure what will be affected by random
+	spi_bus_config_t busCfg;
+	busCfg.mosi_io_num = _gpioSda;
+	busCfg.miso_io_num = -1;
+	busCfg.sclk_io_num = _gpioScl;
+	busCfg.quadwp_io_num = -1;
+	busCfg.quadhd_io_num = -1;
+	busCfg.max_transfer_sz = 4;   // small, we only send 2 bytes
 
     // Initialize SPI bus
-    ESP_ERROR_CHECK(spi_bus_initialize(SPI2_HOST, &buscfg, SPI_DMA_DISABLED));
+    ESP_ERROR_CHECK(spi_bus_initialize(SPI2_HOST, &busCfg, SPI_DMA_DISABLED));
 
     spi_device_interface_config_t devcfg = {
         .command_bits     = 0,
@@ -88,14 +88,14 @@ void WrapperDb135::_sendState()
 
 	uint8_t data[2] = {static_cast<uint8_t>(_state >> 8), static_cast<uint8_t>(_state & 0xFF)};
 
-    spi_transaction_t t = {
-        .flags     = 0,
-        .cmd       = 0,
-        .length    = 16,        // 16 bits total
-        .rxlength  = 0,
-        .tx_buffer = data,
-        .rx_buffer = NULL,
-    };
+	//TODO: test no init structure what will be affected by random
+    spi_transaction_t t;
+	t.flags     = 0;
+	t.cmd       = 0;
+	t.length    = 16;        // 16 bits total
+	t.rxlength  = 0;
+	t.tx_buffer = data;
+	t.rx_buffer = NULL;
 
     // One transaction: bytes go out back-to-back, no gap on the bus
     ESP_ERROR_CHECK(spi_device_polling_transmit(_dev, &t));
