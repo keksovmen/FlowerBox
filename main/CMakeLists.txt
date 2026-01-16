@@ -4,7 +4,8 @@
 # set(_PROJECT STICKS)
 # set(_PROJECT TRESSURE)
 # set(_PROJECT IR)
-set(_PROJECT KEY_BACKLIGHT)
+# set(_PROJECT KEY_BACKLIGHT)
+set(_PROJECT CIPHER_BOX)
 
 
 
@@ -92,6 +93,14 @@ elseif(${_PROJECT} STREQUAL "KEY_BACKLIGHT")
 	set(_ADD_INCLUDES
 		"include/projects/keypad_backlight"
 		)
+elseif(${_PROJECT} STREQUAL "CIPHER_BOX")
+	file(GLOB _ADD_SRC
+		"projects/cipher_box/*.cpp"
+		)
+
+	set(_ADD_INCLUDES
+		"include/projects/cipher_box"
+		)
 endif()
 
 message(STATUS "ADD SRC: " ${_ADD_SRC})
@@ -118,6 +127,9 @@ idf_component_register(
 		"fb_adc.cpp"
 		"fb_battery.cpp"
 		"fb_sleep.cpp"
+		"fb_expander_matrix.cpp"
+		"fb_http_request.cpp"
+		"fb_i2c.cpp"
 		"h_keyboard.cpp"
 		"main.cpp"
 		"box/fb_box.cpp"

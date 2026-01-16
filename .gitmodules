@@ -1,3 +1,6 @@
 [submodule "components/esp_dmx"]
 	path = components/esp_dmx
 	url = https://github.com/keksovmen/esp_dmx.git
+[submodule "components/gpio-expander"]
+	path = components/gpio-expander
+	url = https://github.com/keksovmen/CH32V003-GPIO-ADC-PWM-EXPANDER.git
