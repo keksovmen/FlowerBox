@@ -13,20 +13,16 @@ namespace fb {
 
 		/* ------- setters ------- */
 		
-		void setMqttId(int value);
+		void setUrl(std::string value);
 		
-		void setIp(std::string value);
-		
-		void setPort(int value);
+		void setDeltaError(int value);
 		
 
 		/*  ------- getters ------- */
 		
-		int getMqttId();
+		std::string getUrl();
 		
-		std::string getIp();
-		
-		int getPort();
+		int getDeltaError();
 		
 
 	} // namespace settings

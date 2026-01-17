@@ -15,6 +15,23 @@ using namespace project;
 void project::initMaperObjs()
 {
 	util::createAndRegisterDefaultBoxProperties();
+
+	{% for s in settings %}
+	{% if s.type == 'int' %}
+	auto* {{s.name}}Prop = new box::PropertyInt("{{s.name}}", "Change {{s.name}}",
+	{% else %}
+	auto* {{s.name}}Prop = new box::PropertyString("{{s.name}}", "Change {{s.name}}",
+    {% endif %}
+		box::Tid::PROPERTY_GENERAL,
+		[]({{s.type}} val){
+			settings::set{{s.name}}(val);
+			return true;
+		}, settings::get{{s.name}}(){% if s.type == 'int' %}, {{s.min}}, {{s.max}} {% endif %}
+	);
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>({{s.name}}Prop));
+	getBox().addPropertyDependency({{s.name}}Prop->getId());
+	{% endfor %}
 }
 
 int project::mapBoxSensorIdToAddres(int id)

@@ -3,15 +3,13 @@ project: cipher_box
 name: CipherBox
 version: 0.0.1
 settings:
-  - name: MqttId
-    type: int
-    default: 0
-    key: l_mqtt_id
-  - name: Ip
+  - name: Url
     type: std::string
-    default: 192.168.0.111
-    key: mq_ip
-  - name: Port
+    default: "http://192.168.0.111:8080"
+    key: http_url
+  - name: DeltaError
     type: int
-    default: 8081
-    key: mq_port
+    default: 15
+    key: adc_error
+    min: 0
+    max: 100

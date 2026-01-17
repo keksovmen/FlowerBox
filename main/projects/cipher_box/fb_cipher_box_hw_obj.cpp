@@ -46,9 +46,10 @@ static void _monitorTask(void* arg)
 	for(;;){
 		auto state = _matrix.readPins();
 		bool changedFlag = false;
+		const int error = settings::getDeltaError();	// just to reduce log output from internal NVS handling
 		for (size_t i = 0; i < state.size(); i++)
 		{
-			if(abs((int) prevState[i] - (int) state[i]) > 15){
+			if(abs((int)prevState[i] - (int)state[i]) > error){
 				FB_DEBUG_LOG_I_TAG("%d = %u -> %u", i, prevState[i], state[i]);
 				changedFlag = true;
 			}
@@ -57,7 +58,7 @@ static void _monitorTask(void* arg)
 		if(changedFlag){
 			changedFlag = false;
 			prevState = std::move(state);
-			//TODO: make POST request
+
 			char buffer[64] = "[";
 			char* ptr = &buffer[1];
 			for(auto v : prevState){
@@ -68,10 +69,11 @@ static void _monitorTask(void* arg)
 			ptr[1] = '\0';
 
 			FB_DEBUG_LOG_I_TAG("%s", buffer);
-			_http.post("http://192.168.0.111:8080/loh", ptr);
+			_http.post(settings::getUrl(), ptr);
+		}else{
+			vTaskDelay(pdMS_TO_TICKS(100));
 		}
 		
-		vTaskDelay(pdMS_TO_TICKS(1000));
 	}
 
 	vTaskDelete(NULL);
@@ -104,13 +106,12 @@ void project::initHwObjs()
 	masterCfg.write_cb = [](int32_t address, uint8_t* data, int32_t length){return _i2c.write(0, {data, (unsigned int) length}, 1000);};
 	ex_master_init(&_expander, &masterCfg);
 
-	//TODO: update CH32 for last version and change false to true
-	ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_6, false);
-	ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_7, false);
-	ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_8, false);
-	ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_9, false);
-	ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_0, false);
-	ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_10, false);
+	ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_6, true);
+	ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_7, true);
+	ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_8, true);
+	ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_9, true);
+	ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_0, true);
+	ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_10, true);
 	ex_master_set_pin_adc_mode(&_expander, EX_MASTER_ADC_PIN_0, true);
 	ex_master_set_pin_adc_mode(&_expander, EX_MASTER_ADC_PIN_1, true);
 

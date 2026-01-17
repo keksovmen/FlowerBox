@@ -10,11 +10,9 @@
 #define _PARTITION "prj_set"
 
 
-#define _KEY_MQTTID "l_mqtt_id"
+#define _KEY_URL "http_url"
 
-#define _KEY_IP "mq_ip"
-
-#define _KEY_PORT "mq_port"
+#define _KEY_DELTAERROR "adc_error"
 
 
 
@@ -27,24 +25,17 @@ using namespace settings;
 
 /* ---------- setters ---------- */
 
-void settings::setMqttId(int value)
+void settings::setUrl(std::string value)
 {
     
-    settings::setInt(_PARTITION, _KEY_MQTTID, value);
-    
-}
-
-void settings::setIp(std::string value)
-{
-    
-    settings::setStr(_PARTITION, _KEY_IP, value);
+    settings::setStr(_PARTITION, _KEY_URL, value);
 	
 }
 
-void settings::setPort(int value)
+void settings::setDeltaError(int value)
 {
     
-    settings::setInt(_PARTITION, _KEY_PORT, value);
+    settings::setInt(_PARTITION, _KEY_DELTAERROR, value);
     
 }
 
@@ -53,23 +44,16 @@ void settings::setPort(int value)
 
 /* ---------- getters ---------- */
 
-int settings::getMqttId()
+std::string settings::getUrl()
 {
     
-    return settings::getIntOrDefault(_PARTITION, _KEY_MQTTID, 0);
+    return settings::getStrOrDefault(_PARTITION, _KEY_URL, "http://192.168.0.111:8080");
     
 }
 
-std::string settings::getIp()
+int settings::getDeltaError()
 {
     
-    return settings::getStrOrDefault(_PARTITION, _KEY_IP, "192.168.0.111");
-    
-}
-
-int settings::getPort()
-{
-    
-    return settings::getIntOrDefault(_PARTITION, _KEY_PORT, 8081);
+    return settings::getIntOrDefault(_PARTITION, _KEY_DELTAERROR, 15);
     
 }
