@@ -21,7 +21,7 @@ static BaseCore _core{&_handleEvent, "KeypadBacklight"};
 static CoreInfo _info = {
 	.core = _core,
 	.requiresTime = false,
-	.requireSensorService = false,
+	.requireSensorService = true,
 	.requireSwitchService = false,
 };
 

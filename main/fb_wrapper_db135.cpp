@@ -17,7 +17,7 @@ WrapperDb135::WrapperDb135(int scl, int sda, int cs)
 void WrapperDb135::init()
 {
 	//TODO: test no init structure what will be affected by random
-	spi_bus_config_t busCfg;
+	spi_bus_config_t busCfg{};
 	busCfg.mosi_io_num = _gpioSda;
 	busCfg.miso_io_num = -1;
 	busCfg.sclk_io_num = _gpioScl;
@@ -89,7 +89,7 @@ void WrapperDb135::_sendState()
 	uint8_t data[2] = {static_cast<uint8_t>(_state >> 8), static_cast<uint8_t>(_state & 0xFF)};
 
 	//TODO: test no init structure what will be affected by random
-    spi_transaction_t t;
+    spi_transaction_t t{};
 	t.flags     = 0;
 	t.cmd       = 0;
 	t.length    = 16;        // 16 bits total
