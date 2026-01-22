@@ -3,9 +3,9 @@
 # set(_PROJECT RELAY)
 # set(_PROJECT STICKS)
 # set(_PROJECT TRESSURE)
-# set(_PROJECT IR)
+set(_PROJECT IR)
 # set(_PROJECT KEY_BACKLIGHT)
-set(_PROJECT CIPHER_BOX)
+# set(_PROJECT CIPHER_BOX)
 
 
 
@@ -130,6 +130,7 @@ idf_component_register(
 		"fb_expander_matrix.cpp"
 		"fb_http_request.cpp"
 		"fb_i2c.cpp"
+		"fb_ir_reader.cpp"
 		"h_keyboard.cpp"
 		"main.cpp"
 		"box/fb_box.cpp"
