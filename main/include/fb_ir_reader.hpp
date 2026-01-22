@@ -20,7 +20,11 @@ namespace fb
 		class IrReader : public debug::Named
 		{
 			public:
-				using DataCb = std::function<void(int pin, uint32_t val)>;
+				/**
+				 * @brief 
+				 * @param val 0 bit is first accepted bit = the oldest, the higher bits are the newest
+				 */
+				using DataCb = std::function<void(int pin, uint32_t val, int length)>;
 
 
 
@@ -42,35 +46,26 @@ namespace fb
 
 
 
-						// Entry(int pin) : pin(pin)
-						// {
-
-						// }
-
 						int64_t operator[](int i) const
 						{
-							return _readBuffer[i];
+							return _stampsUs1[i];
 						}
 
-
-						bool push(int64_t stamp)
+						void push(int64_t stamp)
 						{
-							_writeBuffer[_length] = stamp;
+							_stampsUs1[_length % SIZE] = stamp;
 							_length++;
-
-							if(_length >= SIZE){
-								_length = 0;
-								_messageFlag = true;
-								swapBuffers();
-								return true;
-							}
-
-							return false;
 						}
 
 						void reset()
 						{
 							_length = 0;
+							memset(_stampsUs1, 0, sizeof(_stampsUs1));
+						}
+
+						void setMessageFlag()
+						{
+							_messageFlag = true;
 						}
 
 						void clearMessageFlag()
@@ -84,7 +79,7 @@ namespace fb
 								return def;
 							}
 
-							return _writeBuffer[_length - 1];
+							return _stampsUs1[_length - 1];
 						}
 
 						bool hasMessage() const
@@ -92,24 +87,20 @@ namespace fb
 							return _messageFlag;
 						}
 
+						int currentLength() const
+						{
+							return _length;
+						}
+
 					private:
 						int _length = 0;	//current bit
 						int64_t _stampsUs1[SIZE];
-						int64_t _stampsUs2[SIZE];
-						int64_t* _writeBuffer = _stampsUs1;
-						int64_t* _readBuffer = _stampsUs2;
 						bool _messageFlag = false;
-
-						void swapBuffers()
-						{
-							_writeBuffer = _writeBuffer == _stampsUs1 ? _stampsUs2 : _stampsUs1;
-							_readBuffer = _readBuffer == _stampsUs1 ? _stampsUs2 : _stampsUs1;
-						}
 				};
 
 			private:
 				DataCb _dataCb;
-				std::array<Entry<25>, 10> _pins;
+				std::array<Entry<64>, 10> _pins;
 				int _length = 0;
 				TaskHandle_t _taskHndl = nullptr;
 

@@ -28,12 +28,11 @@ void IrReader::addPin(int pin)
 		.mode = GPIO_MODE_INPUT,
 		.pull_up_en = GPIO_PULLUP_DISABLE,
 		.pull_down_en = GPIO_PULLDOWN_DISABLE,
-		.intr_type = GPIO_INTR_NEGEDGE,
+		.intr_type = GPIO_INTR_POSEDGE,
 	};
 	gpio_config(&cfg);
 	gpio_intr_enable(static_cast<gpio_num_t>(pin));
 
-	// ::new((void*)&_pins[_length])Entry<25>{pin};
 	_pins[_length++].pin = pin;
 }
 
@@ -65,9 +64,11 @@ void IRAM_ATTR IrReader::_irq(void* arg)
 		if((static_cast<uint64_t>(currentStamp - e.lastStamp(currentStamp))) > 10000u){
 			e.reset();
 		}
+	
+		e.push(currentStamp);
 
-		if(e.push(currentStamp)){
-			// send to queue we have a message
+		if(e.currentLength() > 14){
+			e.setMessageFlag();
 			BaseType_t shouldYield;
 			vTaskNotifyGiveFromISR(me->_taskHndl, &shouldYield);
 		}
@@ -81,7 +82,11 @@ void IRAM_ATTR IrReader::_task(void *pvParameters)
 	const char* TAG = me->getName();
 
     while (true) {
-		ulTaskNotifyTake(pdFALSE, portMAX_DELAY);
+		ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+
+		//must wait for some time to be sure it is final length
+		//time is only thing we can use to determine end of the command
+		vTaskDelay(pdMS_TO_TICKS(10));
 
 		for(int i = 0 ; i < me->_length; i++){
 			auto& e = me->_pins[i];
@@ -92,25 +97,38 @@ void IRAM_ATTR IrReader::_task(void *pvParameters)
 
 			e.clearMessageFlag();
 
-			char buff[128];
+			char buff[256];
 			char* ptr = buff;
 			uint32_t data = 0;
-			for(size_t i = 0; i < e.N - 1; i++){
+			size_t length = 0;
+
+			for(size_t i = 0; i < e.currentLength() - 1; i++){
 				const int delta = e[i + 1] - e[i];
-				int result = -1;
-				if(delta > 2900){
-					result = 2;
-				}else if(delta > 1700){
-					result = 1;
-					data = (data << 1) + 1;
-				}else{
-					data = (data << 1);
-					result = 0;
+				if(delta > 1500 && delta < 2000){
+					data += 1 << i;
+					ptr += sprintf(ptr, "%d ", 1);
+					length++;
+
+				}else if(delta > 900 && delta < 1400){
+					ptr += sprintf(ptr, "%d ", 0);
+					length++;
 				}
-				ptr += sprintf(ptr, "%d ", result);
+
+				// case for HEAL and KILL commands
+				if(length == 24){
+					FB_DEBUG_LOG_I_TAG("Received on GPIO_%d: \r\n%s", e.pin, buff);
+					std::invoke(me->_dataCb, e.pin, data, length);
+
+					ptr = buff;
+					length = 0;			
+				}
 			}
-			FB_DEBUG_LOG_I_TAG("Triggered: %d, \r\n%s", e.pin, buff);
-			std::invoke(me->_dataCb, e.pin, data);
+
+			//case for single shoot command
+			if(length == 14 && e.currentLength() == 15){
+				FB_DEBUG_LOG_I_TAG("Received on GPIO_%d: \r\n%s", e.pin, buff);
+				std::invoke(me->_dataCb, e.pin, data, length);
+			}
 		}
     }
 

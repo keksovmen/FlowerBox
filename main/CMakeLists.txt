@@ -131,6 +131,7 @@ idf_component_register(
 		"fb_http_request.cpp"
 		"fb_i2c.cpp"
 		"fb_ir_reader.cpp"
+		"fb_ir_transmitter.cpp"
 		"h_keyboard.cpp"
 		"main.cpp"
 		"box/fb_box.cpp"
