@@ -17,12 +17,16 @@ namespace fb {
 		
 		void setDeltaError(int value);
 		
+		void setBounceTimeMs(int value);
+		
 
 		/*  ------- getters ------- */
 		
 		std::string getUrl();
 		
 		int getDeltaError();
+		
+		int getBounceTimeMs();
 		
 
 	} // namespace settings

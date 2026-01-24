@@ -11,10 +11,20 @@
 
 #include "ex_protocol.h"
 
+#include "esp_timer.h"
+
 
 
 using namespace fb;
 using namespace project;
+
+
+
+struct _Entry
+{
+	int64_t timestampUs = 0;
+	bool sended = false;
+};
 
 
 
@@ -42,6 +52,7 @@ static void _monitorTask(void* arg)
 {
 	_http.init();
 	auto prevState = _matrix.readPins();
+	std::vector<_Entry> timeStates(prevState.size());
 	//make post request
 	for(;;){
 		auto state = _matrix.readPins();
@@ -50,14 +61,27 @@ static void _monitorTask(void* arg)
 		for (size_t i = 0; i < state.size(); i++)
 		{
 			if(abs((int)prevState[i] - (int)state[i]) > error){
-				FB_DEBUG_LOG_I_TAG("%d = %u -> %u", i, prevState[i], state[i]);
-				changedFlag = true;
+				timeStates[i].timestampUs = esp_timer_get_time();
+				timeStates[i].sended = false;
+
+			}else{
+				//debounce logic wait some time for stability of the signal, due to all possible jack connections
+				if(((esp_timer_get_time() - timeStates[i].timestampUs) > (settings::getBounceTimeMs() * 1000))
+					&& !timeStates[i].sended)
+				{
+					FB_DEBUG_LOG_I_TAG("%d = %u -> %u", i, prevState[i], state[i]);
+					//here we are sure we need to send stable state
+					changedFlag = true;
+					timeStates[i].sended = true;
+				}
 			}
 		}
 
+		prevState = std::move(state);
+
 		if(changedFlag){
 			changedFlag = false;
-			prevState = std::move(state);
+			// prevState = std::move(state);
 
 			char buffer[64] = "[";
 			char* ptr = &buffer[1];
@@ -69,7 +93,7 @@ static void _monitorTask(void* arg)
 			ptr[1] = '\0';
 
 			FB_DEBUG_LOG_I_TAG("%s", buffer);
-			_http.post(settings::getUrl(), ptr);
+			_http.post(settings::getUrl(), buffer);
 		}else{
 			vTaskDelay(pdMS_TO_TICKS(100));
 		}

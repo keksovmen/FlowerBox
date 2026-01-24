@@ -32,6 +32,7 @@ void HttpRequest::init()
 	config.buffer_size_tx = 512;
 	config.event_handler = [](esp_http_client_event_t *evt){return ESP_OK;};
 	config.user_data = this;
+	config.method = HTTP_METHOD_POST;
 
 	// Инициализация HTTP-клиента
 	_httpClient = esp_http_client_init(&config);
@@ -43,6 +44,7 @@ void HttpRequest::post(std::string url, std::string data)
 	esp_http_client_set_method(_httpClient, HTTP_METHOD_POST);
 	esp_http_client_set_url(_httpClient, url.c_str());
 	esp_http_client_set_post_field(_httpClient, data.c_str(), data.length());
+	esp_http_client_set_header(_httpClient, "Content-Type", "application/octet-stream");
 
     esp_err_t err = esp_http_client_perform(_httpClient);
     if (err == ESP_OK) {

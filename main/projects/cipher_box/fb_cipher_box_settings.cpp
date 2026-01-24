@@ -14,6 +14,8 @@
 
 #define _KEY_DELTAERROR "adc_error"
 
+#define _KEY_BOUNCETIMEMS "adc_bounce"
+
 
 
 
@@ -39,6 +41,13 @@ void settings::setDeltaError(int value)
     
 }
 
+void settings::setBounceTimeMs(int value)
+{
+    
+    settings::setInt(_PARTITION, _KEY_BOUNCETIMEMS, value);
+    
+}
+
 
 
 
@@ -55,5 +64,12 @@ int settings::getDeltaError()
 {
     
     return settings::getIntOrDefault(_PARTITION, _KEY_DELTAERROR, 15);
+    
+}
+
+int settings::getBounceTimeMs()
+{
+    
+    return settings::getIntOrDefault(_PARTITION, _KEY_BOUNCETIMEMS, 500);
     
 }
