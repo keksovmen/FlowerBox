@@ -50,7 +50,7 @@ void IrTransmitter::sendHeal(int gpio)
 
 	FB_DEBUG_LOG_I_OBJ("Sending HEAL on GPIO_%d", gpio);
 	//we are little endian, don't need to do anything
-	uint32_t data = FB_IR_COMMANDS_HEAL;
+	uint32_t data = Ir::reverseInt(FB_IR_COMMANDS_HEAL, 24);
 	const uint8_t* cmd = ((uint8_t*) &data);
 	_sendBytes(gpio, cmd, 3);
 
@@ -65,12 +65,12 @@ void IrTransmitter::sendKill(int gpio)
 
 	FB_DEBUG_LOG_I_OBJ("Sending KILL on GPIO_%d", gpio);
 
-	uint32_t data = FB_IR_COMMANDS_KILL;
+	uint32_t data = Ir::reverseInt(FB_IR_COMMANDS_KILL, 24);
 	const uint8_t* cmd = ((uint8_t*) &data);
 	_sendBytes(gpio, cmd, 3);
 }
 
-void IrTransmitter::sendAttack(int gpio, AttackCmd attack)
+void IrTransmitter::sendAttack(int gpio, Ir::AttackCmd attack)
 {
 	if(!_hasGpio(gpio)){
 		FB_DEBUG_LOG_E_OBJ("Does not have GPIO_%d as output!", gpio);
@@ -81,32 +81,15 @@ void IrTransmitter::sendAttack(int gpio, AttackCmd attack)
 
 	portENTER_CRITICAL(&_lock);
 
+	uint16_t cmd = Ir::reverseInt(attack.raw, 14);
 	_sendStart(gpio);
 	for(int i = 0; i < 14; i++){
-		if((attack.raw >> i) & 0x01){
+		if((cmd >> i) & 0x01){
 			_sendOne(gpio);
 		}else{
 			_sendZero(gpio);
 		}
 	}
-
-	// _sendStart(gpio);
-	// _sendByte(gpio, attack.packet.id & 0xFE);
-	// for(int i = 0; i < 2; i++){
-	// 	if((attack.packet.team >> i) & 0x01){
-	// 		_sendOne(gpio);
-	// 	}else{
-	// 		_sendZero(gpio);
-	// 	}
-	// }
-
-	// for(int i = 0; i < 4; i++){
-	// 	if((attack.packet.damage >> i) & 0x01){
-	// 		_sendOne(gpio);
-	// 	}else{
-	// 		_sendZero(gpio);
-	// 	}
-	// }
 
 	portEXIT_CRITICAL(&_lock);
 }
@@ -141,56 +124,16 @@ void IRAM_ATTR IrTransmitter::_sendCarrier(int gpio, int times)
 
 void IRAM_ATTR IrTransmitter::_sendStart(int gpio)
 {
-	// bool state = true;
-	// const uint8_t delays[] = {6, 12};
-	// for(int i = 0; i < 131 * 2; i++)
-	// {
-	// 	gpio_set_level(static_cast<gpio_num_t>(gpio), state);
-	// 	_delayUs(delays[state ? 0 : 1] - 1);
-	// 	state = !state;
-	// }
-
-	// gpio_set_level(static_cast<gpio_num_t>(gpio), 1);
-	// _delayUs(6);
-	// gpio_set_level(static_cast<gpio_num_t>(gpio), 0);
-	// _delayUs(639);
 	_sendCarrier(gpio, 262);
 }
 
 void IRAM_ATTR IrTransmitter::_sendZero(int gpio)
 {
-	// bool state = true;
-	// const uint8_t delays[] = {6, 12};
-	// for(int i = 0; i < 64; i++)
-	// {
-	// 	gpio_set_level(static_cast<gpio_num_t>(gpio), state);
-	// 	_delayUs(delays[state ? 0 : 1] - 1);
-	// 	state = !state;
-	// }
-
-	// gpio_set_level(static_cast<gpio_num_t>(gpio), 1);
-	// _delayUs(6);
-	// gpio_set_level(static_cast<gpio_num_t>(gpio), 0);
-	// _delayUs(648);
 	_sendCarrier(gpio, 64);
-
 }
 
 void IRAM_ATTR IrTransmitter::_sendOne(int gpio)
 {
-	// bool state = true;
-	// const uint8_t delays[] = {6, 12};
-	// for(int i = 0; i < 131; i++)
-	// {
-	// 	gpio_set_level(static_cast<gpio_num_t>(gpio), state);
-	// 	_delayUs(delays[state ? 0 : 1] - 1);
-	// 	state = !state;
-	// }
-
-	// gpio_set_level(static_cast<gpio_num_t>(gpio), 1);
-	// _delayUs(6);
-	// gpio_set_level(static_cast<gpio_num_t>(gpio), 0);
-	// _delayUs(648);
 	_sendCarrier(gpio, 131);
 }
 

@@ -107,14 +107,17 @@ void TimeScheduler::_startTimer()
 	}
 
 	auto lock = LockWrapper(_mutex, portMAX_DELAY);
-	int64_t delta = static_cast<int64_t>(_queue.top().first) - static_cast<int64_t>(pdTICKS_TO_MS(xTaskGetTickCount()));
+	int32_t delta = static_cast<int32_t>(_queue.top().first) - static_cast<int32_t>(pdTICKS_TO_MS(xTaskGetTickCount()));
 
-	FB_DEBUG_LOG_I_OBJ("Starting timer for %lld ms", delta);
+	FB_DEBUG_LOG_I_OBJ("Starting timer for %d ms", delta);
 
 	auto ret = xTimerStop(_timerHndl, pdMS_TO_TICKS(1000));
 	assert(ret == pdPASS);
+	
+	auto newPeriod = delta <= 0 ? 1 : pdMS_TO_TICKS(delta);
+	newPeriod = newPeriod == 0 ? 1 : newPeriod;
 
-	ret = xTimerChangePeriod(_timerHndl, delta <= 0 ? 1 : pdMS_TO_TICKS(delta), pdMS_TO_TICKS(1000));
+	ret = xTimerChangePeriod(_timerHndl, newPeriod, pdMS_TO_TICKS(1000));
 	assert(ret == pdPASS);
 
 	ret = xTimerStart(_timerHndl, pdMS_TO_TICKS(1000));

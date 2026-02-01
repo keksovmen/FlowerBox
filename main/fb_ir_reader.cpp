@@ -1,5 +1,7 @@
 #include "fb_ir_reader.hpp"
 
+#include "fb_ir_commands.hpp"
+
 #include "esp_timer.h"
 #include "driver/gpio.h"
 #include "soc/gpio_struct.h"
@@ -30,6 +32,8 @@ static void _reverseString(char* start, char* end)
 		end--;
 	}
 }
+
+
 
 const char* IrReader::getName() const
 {
@@ -136,6 +140,7 @@ void IRAM_ATTR IrReader::_task(void *pvParameters)
 			}
 
 			_reverseString(buff, ptr);
+			data = Ir::reverseInt(data, length);
 			FB_DEBUG_LOG_I_TAG("Received on GPIO_%d: \r\n%s", e.pin, buff);
 
 			if(length == FB_IR_COMMANDS_GLOBAL_LENGTH_BITS && e.currentLength() == (FB_IR_COMMANDS_GLOBAL_LENGTH_BITS + 1)){

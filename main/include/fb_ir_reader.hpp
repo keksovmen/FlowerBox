@@ -6,7 +6,6 @@
 #include <functional>
 
 #include "fb_debug.hpp"
-#include "fb_ir_commands.hpp"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
