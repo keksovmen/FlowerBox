@@ -6,6 +6,7 @@
 #include <functional>
 
 #include "fb_debug.hpp"
+#include "fb_ir_commands.hpp"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -24,7 +25,7 @@ namespace fb
 				 * @brief 
 				 * @param val 0 bit is first accepted bit = the oldest, the higher bits are the newest
 				 */
-				using DataCb = std::function<void(int pin, uint32_t val, int length)>;
+				using DataCb = std::function<void(int pin, int index, uint32_t val, int length)>;
 
 
 

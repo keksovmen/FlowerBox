@@ -11,6 +11,26 @@ using namespace periph;
 
 
 
+/**
+ * @brief 
+ * 
+ * @param start at begining
+ * @param end at null symbol
+ */
+static void _reverseString(char* start, char* end)
+{
+	end--;
+
+	while(end > start){
+		char tmp = *start;
+		*start = *end;
+		*end = tmp;
+
+		start++;
+		end--;
+	}
+}
+
 const char* IrReader::getName() const
 {
 	return "IrReader";
@@ -88,8 +108,8 @@ void IRAM_ATTR IrReader::_task(void *pvParameters)
 		//time is only thing we can use to determine end of the command
 		vTaskDelay(pdMS_TO_TICKS(10));
 
-		for(int i = 0 ; i < me->_length; i++){
-			auto& e = me->_pins[i];
+		for(int pinIndex = 0 ; pinIndex < me->_length; pinIndex++){
+			auto& e = me->_pins[pinIndex];
 
 			if(!e.hasMessage()){
 				continue;
@@ -113,21 +133,18 @@ void IRAM_ATTR IrReader::_task(void *pvParameters)
 					ptr += sprintf(ptr, "%d ", 0);
 					length++;
 				}
-
-				// case for HEAL and KILL commands
-				if(length == 24){
-					FB_DEBUG_LOG_I_TAG("Received on GPIO_%d: \r\n%s", e.pin, buff);
-					std::invoke(me->_dataCb, e.pin, data, length);
-
-					ptr = buff;
-					length = 0;			
-				}
 			}
 
-			//case for single shoot command
-			if(length == 14 && e.currentLength() == 15){
-				FB_DEBUG_LOG_I_TAG("Received on GPIO_%d: \r\n%s", e.pin, buff);
-				std::invoke(me->_dataCb, e.pin, data, length);
+			_reverseString(buff, ptr);
+			FB_DEBUG_LOG_I_TAG("Received on GPIO_%d: \r\n%s", e.pin, buff);
+
+			if(length == FB_IR_COMMANDS_GLOBAL_LENGTH_BITS && e.currentLength() == (FB_IR_COMMANDS_GLOBAL_LENGTH_BITS + 1)){
+				// case for HEAL and KILL commands
+				std::invoke(me->_dataCb, e.pin, pinIndex, data, FB_IR_COMMANDS_GLOBAL_LENGTH_BITS);
+
+			}else if(length == FB_IR_COMMANDS_ATTACK_LENGTH_BITS && e.currentLength() == (FB_IR_COMMANDS_ATTACK_LENGTH_BITS + 1)){
+				//case for single shoot command
+				std::invoke(me->_dataCb, e.pin, pinIndex, data, FB_IR_COMMANDS_ATTACK_LENGTH_BITS);
 			}
 		}
     }

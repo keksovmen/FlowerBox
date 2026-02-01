@@ -50,7 +50,7 @@ void IrTransmitter::sendHeal(int gpio)
 
 	FB_DEBUG_LOG_I_OBJ("Sending HEAL on GPIO_%d", gpio);
 	//we are little endian, don't need to do anything
-	uint32_t data = 0x17A0C1;
+	uint32_t data = FB_IR_COMMANDS_HEAL;
 	const uint8_t* cmd = ((uint8_t*) &data);
 	_sendBytes(gpio, cmd, 3);
 
@@ -65,9 +65,50 @@ void IrTransmitter::sendKill(int gpio)
 
 	FB_DEBUG_LOG_I_OBJ("Sending KILL on GPIO_%d", gpio);
 
-	uint32_t data = 0x1700C1;
+	uint32_t data = FB_IR_COMMANDS_KILL;
 	const uint8_t* cmd = ((uint8_t*) &data);
 	_sendBytes(gpio, cmd, 3);
+}
+
+void IrTransmitter::sendAttack(int gpio, AttackCmd attack)
+{
+	if(!_hasGpio(gpio)){
+		FB_DEBUG_LOG_E_OBJ("Does not have GPIO_%d as output!", gpio);
+		return;
+	}
+
+	FB_DEBUG_LOG_I_OBJ("Sending Attack on GPIO_%d, %d", gpio, attack.packet.id);
+
+	portENTER_CRITICAL(&_lock);
+
+	_sendStart(gpio);
+	for(int i = 0; i < 14; i++){
+		if((attack.raw >> i) & 0x01){
+			_sendOne(gpio);
+		}else{
+			_sendZero(gpio);
+		}
+	}
+
+	// _sendStart(gpio);
+	// _sendByte(gpio, attack.packet.id & 0xFE);
+	// for(int i = 0; i < 2; i++){
+	// 	if((attack.packet.team >> i) & 0x01){
+	// 		_sendOne(gpio);
+	// 	}else{
+	// 		_sendZero(gpio);
+	// 	}
+	// }
+
+	// for(int i = 0; i < 4; i++){
+	// 	if((attack.packet.damage >> i) & 0x01){
+	// 		_sendOne(gpio);
+	// 	}else{
+	// 		_sendZero(gpio);
+	// 	}
+	// }
+
+	portEXIT_CRITICAL(&_lock);
 }
 
 void IRAM_ATTR IrTransmitter::_delayUs(int64_t us)
