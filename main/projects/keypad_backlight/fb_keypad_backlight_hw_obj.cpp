@@ -34,6 +34,61 @@ static sensor::KeyboardSensor<1> _keyboardSensor({std::pair{pins::PIN_KEYBOARD_R
 static wrappers::WrapperDb135 _db135(pins::PIN_SCL, pins::PIN_MOSI, pins::PIN_SC);
 static periph::MqttClient _mqtt;
 
+static std::array<int, 16> _outputState;
+static std::array<std::pair<bool, int>, 16> _dutyState;
+
+
+
+static void _dimmerTask(void* data)
+{
+	FB_DEBUG_LOG_I_TAG("Dimmer task is started");
+
+	const int RESOLUTION = 12;
+	const int BLINK_MULTIPLIER = 4;
+
+	_dutyState.fill({false, RESOLUTION});
+
+	uint32_t cycle = 0;
+
+	for(;;){
+		int state = 0;
+		for(size_t i = 0; i < _outputState.size(); i++){
+			if(_outputState[i] == 0){
+				//OFF
+			}else if(_outputState[i] == 1){
+				//FULL ON
+				state += 1 << i;
+			}else{
+				//BLINK
+				auto& duty = _dutyState[i];
+				if(cycle % RESOLUTION < duty.second){
+					state += 1 << i;	
+				}
+
+				//TODO: accumulate for each pin independently, if it is needed btw
+				if((cycle % RESOLUTION * BLINK_MULTIPLIER) == 0){
+					if(duty.first){
+						duty.second++;
+						if(duty.second >= RESOLUTION){
+							duty.first = false;
+						}
+					}else{
+						duty.second--;
+						if(duty.second <= 0){
+							duty.first = true;
+						}
+					}
+				}
+			}
+		}
+
+		cycle++;
+		_db135.setValue(state);
+		vTaskDelay(pdMS_TO_TICKS(1));
+	}
+	vTaskDelete(NULL);
+}
+
 
 
 static void _init_from_settings()
@@ -45,12 +100,18 @@ static void _init_from_settings()
 
 static void _handlePortTopic(std::string_view data)
 {
-	auto* json = cJSON_ParseWithLength(data.cbegin(), data.length());
-	auto val = json_util::getIntFromJsonOrDefault(json, "val", 0);
-	cJSON_Delete(json);
+	int i = 0;
+	const bool result = json_util::parseNumberArray(data, "pins", [&i](int val){
+		_outputState[i] = val;
+		i++;
+		if(i >= _outputState.size()){
+			i = 0;
+		}
+	});
 
-	_db135.setValue(val);
-	FB_DEBUG_LOG_I_TAG("Set DB135 to %d", val);
+	if(!result){
+		FB_DEBUG_LOG_E_TAG("Failed to parse values!");
+	}
 }
 
 static void _dataHandler(std::string_view topic, std::string_view data)
@@ -84,6 +145,8 @@ void project::initHwObjs()
 	//register key handler for dropping WIFI settings
 	global::getEventManager()->attachListener(&_keyboardHandler);
 	global::getEventManager()->attachListener(&_mqtt);
+
+	xTaskCreate(&_dimmerTask, "Dimmer", 4 * 1024, nullptr, 17, NULL);
 }
 
 sensor::SensorService& project::getHwSensorService()
