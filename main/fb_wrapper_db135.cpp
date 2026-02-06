@@ -49,6 +49,8 @@ void WrapperDb135::init()
 
     // Add device to bus
     ESP_ERROR_CHECK(spi_bus_add_device(SPI2_HOST, &devcfg, &_dev));
+	
+	setValue(0);
 }
 
 void WrapperDb135::setValue(bool value)

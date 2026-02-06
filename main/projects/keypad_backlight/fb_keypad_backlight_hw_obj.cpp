@@ -44,7 +44,7 @@ static void _dimmerTask(void* data)
 	FB_DEBUG_LOG_I_TAG("Dimmer task is started");
 
 	const int RESOLUTION = 12;
-	const int BLINK_MULTIPLIER = 4;
+	// const int BLINK_MULTIPLIER = 4;
 
 	_dutyState.fill({false, RESOLUTION});
 
@@ -66,7 +66,7 @@ static void _dimmerTask(void* data)
 				}
 
 				//TODO: accumulate for each pin independently, if it is needed btw
-				if((cycle % RESOLUTION * BLINK_MULTIPLIER) == 0){
+				if((cycle % (RESOLUTION * settings::getPulseTime())) == 0){
 					if(duty.first){
 						duty.second++;
 						if(duty.second >= RESOLUTION){
@@ -167,4 +167,32 @@ sensor::SensorStorage& project::getHwSensorStorage()
 wrappers::WrapperDb135& project::getHwWrapperDb()
 {
 	return _db135;
+}
+
+void project::setDbState(uint16_t state)
+{
+	for(int i = 0; i < 16; i++){
+		_outputState[i] = (state >> i) & 1;
+	}
+}
+
+uint16_t project::getDbState()
+{
+	uint16_t result = 0;
+	for(int i = 0; i < 16; i++){
+		if(_outputState[i] != 0){
+			result |= 1 << i;
+		}
+	}
+
+	return result;
+}
+
+void project::setPulseMode(int pin)
+{
+	if(pin < 0 || pin > 15){
+		return;
+	}
+
+	_outputState[pin] = 2;
 }

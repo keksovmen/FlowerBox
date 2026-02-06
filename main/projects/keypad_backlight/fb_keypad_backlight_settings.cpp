@@ -16,6 +16,8 @@
 
 #define _KEY_PORT "mq_port"
 
+#define _KEY_PULSETIME "t_pulse"
+
 
 
 
@@ -48,6 +50,13 @@ void settings::setPort(int value)
     
 }
 
+void settings::setPulseTime(int value)
+{
+    
+    settings::setInt(_PARTITION, _KEY_PULSETIME, value);
+    
+}
+
 
 
 
@@ -71,5 +80,12 @@ int settings::getPort()
 {
     
     return settings::getIntOrDefault(_PARTITION, _KEY_PORT, 8081);
+    
+}
+
+int settings::getPulseTime()
+{
+    
+    return settings::getIntOrDefault(_PARTITION, _KEY_PULSETIME, 4);
     
 }

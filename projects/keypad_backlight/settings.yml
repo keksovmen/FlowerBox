@@ -15,3 +15,9 @@ settings:
     type: int
     default: 8081
     key: mq_port
+  - name: PulseTime
+    type: int
+    default: 4
+    key: t_pulse
+    min: 1
+    max: 10

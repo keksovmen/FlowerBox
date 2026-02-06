@@ -19,6 +19,8 @@ namespace fb {
 		
 		void setPort(int value);
 		
+		void setPulseTime(int value);
+		
 
 		/*  ------- getters ------- */
 		
@@ -27,6 +29,8 @@ namespace fb {
 		std::string getIp();
 		
 		int getPort();
+		
+		int getPulseTime();
 		
 
 	} // namespace settings
