@@ -19,8 +19,8 @@ namespace fb
 
 				virtual void init() override;
 
-				virtual void setValue(bool value) override;
-				virtual void setValue(int value) override;
+				virtual void IRAM_ATTR setValue(bool value) override;
+				virtual void IRAM_ATTR setValue(int value) override;
 
 				void setPin(int pin, bool isOn);
 				uint16_t getValue() const;
@@ -35,7 +35,7 @@ namespace fb
 
 
 
-				void _sendState();
+				void IRAM_ATTR _sendState();
 		};
 	}
 }

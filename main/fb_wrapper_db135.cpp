@@ -100,5 +100,5 @@ void WrapperDb135::_sendState()
 	t.rx_buffer = NULL;
 
     // One transaction: bytes go out back-to-back, no gap on the bus
-    ESP_ERROR_CHECK(spi_device_polling_transmit(_dev, &t));
+    ESP_ERROR_CHECK(spi_device_queue_trans(_dev, &t, portMAX_DELAY));
 }

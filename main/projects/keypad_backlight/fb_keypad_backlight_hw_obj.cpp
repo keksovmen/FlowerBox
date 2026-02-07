@@ -31,61 +31,71 @@ static sensor::SensorStorage _sensorStorage;
 static keyboard::KeyboardHandler _keyboardHandler;
 
 static sensor::KeyboardSensor<1> _keyboardSensor({std::pair{pins::PIN_KEYBOARD_RESET, h::ButtonVK::VK_0}});
-static wrappers::WrapperDb135 _db135(pins::PIN_SCL, pins::PIN_MOSI, pins::PIN_SC);
+static DRAM_ATTR wrappers::WrapperDb135 _db135(pins::PIN_SCL, pins::PIN_MOSI, pins::PIN_SC);
 static periph::MqttClient _mqtt;
 
-static std::array<int, 16> _outputState;
-static std::array<std::pair<bool, int>, 16> _dutyState;
+static DRAM_ATTR std::array<uint8_t, 16> _outputState;
 
 
 
-static void _dimmerTask(void* data)
+static void IRAM_ATTR _dimmerTask(void* data)
 {
 	FB_DEBUG_LOG_I_TAG("Dimmer task is started");
 
-	const int RESOLUTION = 12;
-	// const int BLINK_MULTIPLIER = 4;
+	const uint8_t RESOLUTION = 12;
+	const uint8_t DUTY_COUNTER = RESOLUTION * settings::getPulseTime();
 
-	_dutyState.fill({false, RESOLUTION});
+	uint8_t currentDuty = 0;
+	uint8_t cycle = 0;
 
-	uint32_t cycle = 0;
+	bool dutyDirection = true;
 
 	for(;;){
+		const bool dutyVal = (cycle % RESOLUTION) < currentDuty;
+
 		int state = 0;
-		for(size_t i = 0; i < _outputState.size(); i++){
+
+		for(uint8_t i = 0; i < _outputState.size(); i++){
 			if(_outputState[i] == 0){
 				//OFF
+				continue;
+
 			}else if(_outputState[i] == 1){
 				//FULL ON
-				state += 1 << i;
+				state |= 1 << i;
+
 			}else{
 				//BLINK
-				auto& duty = _dutyState[i];
-				if(cycle % RESOLUTION < duty.second){
-					state += 1 << i;	
-				}
-
-				//TODO: accumulate for each pin independently, if it is needed btw
-				if((cycle % (RESOLUTION * settings::getPulseTime())) == 0){
-					if(duty.first){
-						duty.second++;
-						if(duty.second >= RESOLUTION){
-							duty.first = false;
-						}
-					}else{
-						duty.second--;
-						if(duty.second <= 0){
-							duty.first = true;
-						}
-					}
-				}
+				state |= dutyVal << i;
 			}
 		}
 
-		cycle++;
+		//time to change duty
+		if(cycle == DUTY_COUNTER){
+			if(dutyDirection){
+				currentDuty++;
+				if(currentDuty == RESOLUTION){
+					dutyDirection = false;
+				}
+			}else{
+				currentDuty--;
+				if(currentDuty == 0){
+					dutyDirection = true;
+				}
+			}
+
+			cycle = 0;
+
+		}else{
+			cycle++;
+		}
+
+
 		_db135.setValue(state);
+
 		vTaskDelay(pdMS_TO_TICKS(1));
 	}
+
 	vTaskDelete(NULL);
 }
 
