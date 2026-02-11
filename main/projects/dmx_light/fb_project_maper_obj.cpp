@@ -16,8 +16,12 @@ using namespace project;
 
 
 
+static int _dmxAddress = 0;
+
+
+
 static box::Switch _boxRgbSwitch(box::Tid::SWITCH_RGB,
-	[](){return getHwRgbSwitch().isOn();});
+	[](){return true;});
 
 
 
@@ -70,33 +74,33 @@ static int _rgbw_to_value_gradient(int rgbw) {
 
 static void _initRgbSwitch()
 {
-	fb::project::util::createAndRegisterForceProperty(getHwRgbSwitch(), _boxRgbSwitch);
+	// fb::project::util::createAndRegisterForceProperty(getHwRgbSwitch(), _boxRgbSwitch);
 	auto* colorProperty = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_RGB_VALUE,
 		[](int val){
-			getHwRgbSwitch().setColor(val);
+			getHwDmxHal().write(_dmxAddress, val);
 			return true;
-		}, getHwRgbSwitch().getColor()
+		}, 0
 	);
 
 	getBox().addProperty(std::unique_ptr<box::PropertyIface>(colorProperty));
 	_boxRgbSwitch.addPropertyDependency(colorProperty->getId());
 
-	auto* gradientProperty = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_RGB_GRADIENT_MAFIA,
-		[](int val){
-			getHwRgbSwitch().setColor(_value_to_rgbw_gradient(val));
-			return true;
-		}, _rgbw_to_value_gradient(getHwRgbSwitch().getColor())
-	);
+	// auto* gradientProperty = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_RGB_GRADIENT_MAFIA,
+	// 	[](int val){
+	// 		getHwRgbSwitch().setColor(_value_to_rgbw_gradient(val));
+	// 		return true;
+	// 	}, _rgbw_to_value_gradient(getHwRgbSwitch().getColor())
+	// );
 
-	getBox().addProperty(std::unique_ptr<box::PropertyIface>(gradientProperty));
-	_boxRgbSwitch.addPropertyDependency(gradientProperty->getId());
+	// getBox().addProperty(std::unique_ptr<box::PropertyIface>(gradientProperty));
+	// _boxRgbSwitch.addPropertyDependency(gradientProperty->getId());
 
 
 	auto* dmxAddressProperty = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_DMX_ADDRESS,
 		[](int val){
-			getHwRgbSwitch().setDmxAddress(val);
+			_dmxAddress = val;
 			return true;
-		}, getHwRgbSwitch().getDmxAddress()
+		}, _dmxAddress
 	);
 
 	getBox().addProperty(std::unique_ptr<box::PropertyIface>(dmxAddressProperty));

@@ -52,6 +52,7 @@ void MqttClient::init(std::string_view uri)
 	mqtt_cfg.broker.address.uri = uri.begin();
 	mqtt_cfg.network.reconnect_timeout_ms = 7000;
 	mqtt_cfg.network.timeout_ms = 10000;
+	mqtt_cfg.buffer.size = 3 * 1024;
 
     _handle = esp_mqtt_client_init(&mqtt_cfg);
     esp_mqtt_client_register_event(_handle, MQTT_EVENT_ANY, &_handler, this);

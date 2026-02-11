@@ -36,6 +36,7 @@ elseif(${_PROJECT} STREQUAL "DIPLOM")
 		"fb_http_puller.cpp"
 		"fb_http_puller32.cpp"
 		"fb_uart.cpp"
+		"fb_dmx_hal.cpp"
 		)
 	set(_ADD_INCLUDES
 		"include/projects/dmx_light"
@@ -80,6 +81,8 @@ elseif(${_PROJECT} STREQUAL "TRESSURE")
 elseif(${_PROJECT} STREQUAL "IR")
 	file(GLOB _ADD_SRC
 		"projects/ir/*.cpp"
+		"fb_ir_reader.cpp"
+		"fb_ir_transmitter.cpp"
 		)
 
 	set(_ADD_INCLUDES
@@ -130,8 +133,6 @@ idf_component_register(
 		"fb_expander_matrix.cpp"
 		"fb_http_request.cpp"
 		"fb_i2c.cpp"
-		"fb_ir_reader.cpp"
-		"fb_ir_transmitter.cpp"
 		"h_keyboard.cpp"
 		"main.cpp"
 		"box/fb_box.cpp"
