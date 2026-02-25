@@ -1,9 +1,10 @@
 # set(_PROJECT MINE)
-# set(_PROJECT DIPLOM)
+set(_PROJECT DIPLOM)
+# set(_PROJECT DIPLOM_C3)
 # set(_PROJECT RELAY)
 # set(_PROJECT STICKS)
 # set(_PROJECT TRESSURE)
-set(_PROJECT IR)
+# set(_PROJECT IR)
 # set(_PROJECT KEY_BACKLIGHT)
 # set(_PROJECT CIPHER_BOX)
 
@@ -22,7 +23,7 @@ if(${_PROJECT} STREQUAL "MINE")
 		)
 	set(_ADD_INCLUDES
 		"include/projects/green_house")
-elseif(${_PROJECT} STREQUAL "DIPLOM")
+elseif(${_PROJECT} STREQUAL "DIPLOM" OR ${_PROJECT} STREQUAL "DIPLOM_C3")
 	set(_ADD_SRC 
 		"projects/dmx_light/fb_project_box_obj.cpp"
 		"projects/dmx_light/fb_project_hw_obj.cpp"
@@ -186,7 +187,10 @@ idf_component_register(
 		"include/templates"
 		"include/core"
 		)
-
+		
+if(${_PROJECT} STREQUAL "DIPLOM_C3")
+	target_compile_definitions(${COMPONENT_TARGET} PRIVATE _HW_VERSION=2)
+endif()
 # if(${_PROJECT} STREQUAL "MINE")
 # 	target_compile_options(${COMPONENT_LIB} PRIVATE -D_PROJECT=0)
 # else()

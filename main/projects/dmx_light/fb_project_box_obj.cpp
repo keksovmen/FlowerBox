@@ -23,7 +23,9 @@ static box::Sensor _boxMp3Sensor(box::Tid::SENSOR_MP3);
 
 void project::initBoxObjs()
 {
-	getBox().addSensor(&getBoxMp3Sensor());
+	#ifndef _HW_VERSION
+		getBox().addSensor(&getBoxMp3Sensor());
+	#endif
 }
 
 box::Box& project::getBox()

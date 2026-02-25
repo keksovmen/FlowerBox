@@ -75,11 +75,12 @@ static int _rgbw_to_value_gradient(int rgbw) {
 static void _initRgbSwitch()
 {
 	// fb::project::util::createAndRegisterForceProperty(getHwRgbSwitch(), _boxRgbSwitch);
-	auto* colorProperty = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_RGB_VALUE,
+	auto* colorProperty = new box::PropertyInt("Channel value", "Writes to before specified channel",
+		box::Tid::PROPERTY_GENERAL,
 		[](int val){
 			getHwDmxHal().write(_dmxAddress, val);
 			return true;
-		}, 0
+		}, 0, 0, 255
 	);
 
 	getBox().addProperty(std::unique_ptr<box::PropertyIface>(colorProperty));
@@ -107,49 +108,66 @@ static void _initRgbSwitch()
 	_boxRgbSwitch.addPropertyDependency(dmxAddressProperty->getId());
 }
 
-static void _initMp3Sensor()
-{
-	//must be write only
-	auto* playProperty = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_MP3_PLAY,
-		[](int val){
-			return getHwMp3Sensor().play(val);
-		}, 0
-	);
+#if _HW_VERSION == 2
+	static void _initRelay()
+	{
+		auto* gpioStateProperty = new box::PropertyInt("Relay", "Controls relay",
+			box::Tid::PROPERTY_GENERAL,
+			[](int val){
+				getHwRelay().setValue(val);
+				return true;
+			}, 0, 0, 1
+		);
 
-	getBox().addProperty(std::unique_ptr<box::PropertyIface>(playProperty));
-	getBoxMp3Sensor().addPropertyDependency(playProperty->getId());
+		getBox().addProperty(std::unique_ptr<box::PropertyIface>(gpioStateProperty));
+		getBox().addPropertyDependency(gpioStateProperty->getId());
 
+	}
+#else
+	static void _initMp3Sensor()
+	{
+		//must be write only
+		auto* playProperty = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_MP3_PLAY,
+			[](int val){
+				return getHwMp3Sensor().play(val);
+			}, 0
+		);
 
-	auto* stopProperty = new box::PropertyNone(
-		box::Tid::PROPERTY_SWITCH_MP3_STOP,
-		[](std::string val){
-			getHwMp3Sensor().stop();
-			return true;
-		});
-
-	getBox().addProperty(std::unique_ptr<box::PropertyIface>(stopProperty));
-	getBoxMp3Sensor().addPropertyDependency(stopProperty->getId());
-
-
-	auto* volumeProperty = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_MP3_VOLUME,
-		[](int val){
-			return getHwMp3Sensor().setVolume(val);
-		}, getHwMp3Sensor().getVolume()
-	);
-
-	getBox().addProperty(std::unique_ptr<box::PropertyIface>(volumeProperty));
-	getBoxMp3Sensor().addPropertyDependency(volumeProperty->getId());
+		getBox().addProperty(std::unique_ptr<box::PropertyIface>(playProperty));
+		getBoxMp3Sensor().addPropertyDependency(playProperty->getId());
 
 
-	auto* volumeLoop = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_MP3_LOOP,
-		[](int val){
-			return getHwMp3Sensor().setLoop(static_cast<bool>(val));
-		}, getHwMp3Sensor().isLooping()
-	);
+		auto* stopProperty = new box::PropertyNone(
+			box::Tid::PROPERTY_SWITCH_MP3_STOP,
+			[](std::string val){
+				getHwMp3Sensor().stop();
+				return true;
+			});
 
-	getBox().addProperty(std::unique_ptr<box::PropertyIface>(volumeLoop));
-	getBoxMp3Sensor().addPropertyDependency(volumeLoop->getId());
-}
+		getBox().addProperty(std::unique_ptr<box::PropertyIface>(stopProperty));
+		getBoxMp3Sensor().addPropertyDependency(stopProperty->getId());
+
+
+		auto* volumeProperty = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_MP3_VOLUME,
+			[](int val){
+				return getHwMp3Sensor().setVolume(val);
+			}, getHwMp3Sensor().getVolume()
+		);
+
+		getBox().addProperty(std::unique_ptr<box::PropertyIface>(volumeProperty));
+		getBoxMp3Sensor().addPropertyDependency(volumeProperty->getId());
+
+
+		auto* volumeLoop = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_MP3_LOOP,
+			[](int val){
+				return getHwMp3Sensor().setLoop(static_cast<bool>(val));
+			}, getHwMp3Sensor().isLooping()
+		);
+
+		getBox().addProperty(std::unique_ptr<box::PropertyIface>(volumeLoop));
+		getBoxMp3Sensor().addPropertyDependency(volumeLoop->getId());
+	}
+#endif
 
 static void _initMqtt()
 {
@@ -193,16 +211,24 @@ void project::initMaperObjs()
 
 
 	_initRgbSwitch();
-	_initMp3Sensor();
+
+	#if _HW_VERSION == 2
+		_initRelay();
+	#else
+		_initMp3Sensor();
+	#endif
+	
 	util::createAndRegisterDefaultBoxProperties();
 	_initMqtt();
 }
 
 int project::mapBoxSensorIdToAddres(int id)
 {
-	if(id == getBoxMp3Sensor().getId()){
-		return reinterpret_cast<int>(&getHwMp3Sensor());
-	}
+	#ifndef _HW_VERSION
+		if(id == getBoxMp3Sensor().getId()){
+			return reinterpret_cast<int>(&getHwMp3Sensor());
+		}
+	#endif
 
 	assert(0);
 }
