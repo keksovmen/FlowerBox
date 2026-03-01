@@ -16,6 +16,8 @@
 
 #define _KEY_BOUNCETIMEMS "adc_bounce"
 
+#define _KEY_CHIPSCOUNT "chips"
+
 
 
 
@@ -48,6 +50,13 @@ void settings::setBounceTimeMs(int value)
     
 }
 
+void settings::setChipsCount(int value)
+{
+    
+    settings::setInt(_PARTITION, _KEY_CHIPSCOUNT, value);
+    
+}
+
 
 
 
@@ -71,5 +80,12 @@ int settings::getBounceTimeMs()
 {
     
     return settings::getIntOrDefault(_PARTITION, _KEY_BOUNCETIMEMS, 500);
+    
+}
+
+int settings::getChipsCount()
+{
+    
+    return settings::getIntOrDefault(_PARTITION, _KEY_CHIPSCOUNT, 1);
     
 }

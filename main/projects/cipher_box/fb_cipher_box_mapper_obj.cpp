@@ -43,6 +43,32 @@ void project::initMaperObjs()
 	getBox().addProperty(std::unique_ptr<box::PropertyIface>(DeltaErrorProp));
 	getBox().addPropertyDependency(DeltaErrorProp->getId());
 	
+	
+	auto* BounceTimeMsProp = new box::PropertyInt("BounceTimeMs", "Change BounceTimeMs",
+	
+		box::Tid::PROPERTY_GENERAL,
+		[](int val){
+			settings::setBounceTimeMs(val);
+			return true;
+		}, settings::getBounceTimeMs(), 0, 10000 
+	);
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(BounceTimeMsProp));
+	getBox().addPropertyDependency(BounceTimeMsProp->getId());
+	
+	
+	auto* ChipsCountProp = new box::PropertyInt("ChipsCount", "Change ChipsCount",
+	
+		box::Tid::PROPERTY_GENERAL,
+		[](int val){
+			settings::setChipsCount(val);
+			return true;
+		}, settings::getChipsCount(), 1, 3 
+	);
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(ChipsCountProp));
+	getBox().addPropertyDependency(ChipsCountProp->getId());
+	
 }
 
 int project::mapBoxSensorIdToAddres(int id)

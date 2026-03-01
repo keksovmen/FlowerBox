@@ -1,5 +1,5 @@
 # set(_PROJECT MINE)
-set(_PROJECT DIPLOM)
+# set(_PROJECT DIPLOM)
 # set(_PROJECT DIPLOM_C3)
 # set(_PROJECT RELAY)
 # set(_PROJECT STICKS)
@@ -7,6 +7,8 @@ set(_PROJECT DIPLOM)
 # set(_PROJECT IR)
 # set(_PROJECT KEY_BACKLIGHT)
 # set(_PROJECT CIPHER_BOX)
+set(_PROJECT CIPHER_BOX_V2)
+# set(_PROJECT RFIDS)
 
 
 
@@ -97,13 +99,22 @@ elseif(${_PROJECT} STREQUAL "KEY_BACKLIGHT")
 	set(_ADD_INCLUDES
 		"include/projects/keypad_backlight"
 		)
-elseif(${_PROJECT} STREQUAL "CIPHER_BOX")
+elseif(${_PROJECT} STREQUAL "CIPHER_BOX" OR ${_PROJECT} STREQUAL "CIPHER_BOX_V2")
 	file(GLOB _ADD_SRC
 		"projects/cipher_box/*.cpp"
 		)
 
 	set(_ADD_INCLUDES
 		"include/projects/cipher_box"
+		)
+elseif(${_PROJECT} STREQUAL "RFIDS")
+	file(GLOB _ADD_SRC
+		"projects/rfids/*.cpp"
+		"fb_uart.cpp"
+		)
+
+	set(_ADD_INCLUDES
+		"include/projects/rfids"
 		)
 endif()
 
@@ -188,7 +199,7 @@ idf_component_register(
 		"include/core"
 		)
 		
-if(${_PROJECT} STREQUAL "DIPLOM_C3")
+if(${_PROJECT} STREQUAL "DIPLOM_C3" OR ${_PROJECT} STREQUAL "CIPHER_BOX_V2")
 	target_compile_definitions(${COMPONENT_TARGET} PRIVATE _HW_VERSION=2)
 endif()
 # if(${_PROJECT} STREQUAL "MINE")

@@ -43,7 +43,12 @@ static sensor::KeyboardSensor<1> _keyboardSensor({std::pair{pins::PIN_KEYBOARD_R
 
 static interfaces::I2c _i2c;
 static ex_master_t _expander;
-static periph::ExpanderMatrix _matrix(_expander);
+
+#if _HW_VERSION == 2
+	static periph::ExpanderMatrixByMultiplexer _matrix(_expander);
+#else
+	static periph::ExpanderMatrix _matrix(_expander);
+#endif
 static periph::HttpRequest _http;
 
 
@@ -54,10 +59,12 @@ static void _monitorTask(void* arg)
 	auto prevState = _matrix.readPins();
 	std::vector<_Entry> timeStates(prevState.size());
 	//make post request
+	const int error = settings::getDeltaError();	// just to reduce log output from internal NVS handling
+	const int bounceTimeMs = settings::getBounceTimeMs() * 1000;
+
 	for(;;){
 		auto state = _matrix.readPins();
 		bool changedFlag = false;
-		const int error = settings::getDeltaError();	// just to reduce log output from internal NVS handling
 		for (size_t i = 0; i < state.size(); i++)
 		{
 			if(abs((int)prevState[i] - (int)state[i]) > error){
@@ -66,7 +73,7 @@ static void _monitorTask(void* arg)
 
 			}else{
 				//debounce logic wait some time for stability of the signal, due to all possible jack connections
-				if(((esp_timer_get_time() - timeStates[i].timestampUs) > (settings::getBounceTimeMs() * 1000))
+				if(((esp_timer_get_time() - timeStates[i].timestampUs) > bounceTimeMs)
 					&& !timeStates[i].sended)
 				{
 					FB_DEBUG_LOG_I_TAG("%d = %u -> %u", i, prevState[i], state[i]);
@@ -83,7 +90,7 @@ static void _monitorTask(void* arg)
 			changedFlag = false;
 			// prevState = std::move(state);
 
-			char buffer[64] = "[";
+			char buffer[256] = "[";
 			char* ptr = &buffer[1];
 			for(auto v : prevState){
 				ptr = ptr + sprintf(ptr, "%d,", v);
@@ -126,31 +133,61 @@ void project::initHwObjs()
 	_i2c.addDevice(100000, EX_PROTOCOL_DEFAULT_I2C_ADDRESS >> 1);
 
 	ex_i2c_t masterCfg;
-	masterCfg.read_cb = [](int32_t address, uint8_t* data, int32_t length){return _i2c.read(0, {data, (unsigned int) length}, 1000);};
-	masterCfg.write_cb = [](int32_t address, uint8_t* data, int32_t length){return _i2c.write(0, {data, (unsigned int) length}, 1000);};
+	masterCfg.read_cb = [](int32_t address, uint8_t* data, int32_t length){
+		return _i2c.read(0, {data, (unsigned int) length}, 1000);};
+
+	masterCfg.write_cb = [](int32_t address, uint8_t* data, int32_t length){
+		return _i2c.write(0, {data, (unsigned int) length}, 1000);};
+
 	ex_master_init(&_expander, &masterCfg);
 
-	ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_6, true);
-	ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_7, true);
-	ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_8, true);
-	ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_9, true);
-	ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_0, true);
-	ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_10, true);
-	ex_master_set_pin_adc_mode(&_expander, EX_MASTER_ADC_PIN_0, true);
-	ex_master_set_pin_adc_mode(&_expander, EX_MASTER_ADC_PIN_1, true);
+	#if _HW_VERSION == 2
+		//HW_2
+		ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_2, true);
+		ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_15, true);
+		ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_14, true);
+		ex_master_set_pin_adc_mode(&_expander, EX_MASTER_ADC_PIN_6, true);
+		_matrix.addEntry({2, 15, 14, 6, true});
 
-	_matrix.addEntry({6, 0, true});
-	_matrix.addEntry({6, 1, true});
-	_matrix.addEntry({7, 0, true});
-	_matrix.addEntry({7, 1, true});
-	_matrix.addEntry({8, 0, true});
-	_matrix.addEntry({8, 1, true});
-	_matrix.addEntry({9, 0, true});
-	_matrix.addEntry({9, 1, true});
-	_matrix.addEntry({0, 0, true});
-	_matrix.addEntry({0, 1, true});
-	_matrix.addEntry({10, 0, true});
-	_matrix.addEntry({10, 1, true});
+		if(settings::getChipsCount() > 1){
+			ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_7, true);
+			ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_6, true);
+			ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_5, true);
+			ex_master_set_pin_adc_mode(&_expander, EX_MASTER_ADC_PIN_0, true);
+			_matrix.addEntry({7, 6, 5, 0, true});
+		}
+		
+		if(settings::getChipsCount() > 2){
+			ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_10, true);
+			ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_0, true);
+			ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_8, true);
+			ex_master_set_pin_adc_mode(&_expander, EX_MASTER_ADC_PIN_4, true);
+			_matrix.addEntry({10, 0, 8, 4, true});
+		}
+	#else
+		//HW_1
+		ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_6, true);
+		ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_7, true);
+		ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_8, true);
+		ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_9, true);
+		ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_0, true);
+		ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_10, true);
+		ex_master_set_pin_adc_mode(&_expander, EX_MASTER_ADC_PIN_0, true);
+		ex_master_set_pin_adc_mode(&_expander, EX_MASTER_ADC_PIN_1, true);
+
+		_matrix.addEntry({{6}, 0, true});
+		_matrix.addEntry({{6}, 1, true});
+		_matrix.addEntry({{7}, 0, true});
+		_matrix.addEntry({{7}, 1, true});
+		_matrix.addEntry({{8}, 0, true});
+		_matrix.addEntry({{8}, 1, true});
+		_matrix.addEntry({{9}, 0, true});
+		_matrix.addEntry({{9}, 1, true});
+		_matrix.addEntry({{0}, 0, true});
+		_matrix.addEntry({{0}, 1, true});
+		_matrix.addEntry({{10}, 0, true});
+		_matrix.addEntry({{10}, 1, true});
+	#endif
 
 	if(xTaskCreate(&_monitorTask, "mon", 4 * 1024, NULL, 8, NULL) != pdPASS){
 		FB_DEBUG_LOG_E_TAG("Failed to create the monitor task");

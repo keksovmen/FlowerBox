@@ -45,3 +45,96 @@ std::vector<uint16_t> ExpanderMatrix::readPins()
 
 	return result;
 }
+
+
+
+ExpanderMatrixByMultiplexer::ExpanderMatrixByMultiplexer(ex_master_t& expander)
+	: _expander(expander)
+{
+
+}
+
+const char* ExpanderMatrixByMultiplexer::getName() const
+{
+	return "ExpanderMatrixByMultiplexer";
+}
+
+void ExpanderMatrixByMultiplexer::addEntry(const Entry& entry)
+{
+	_entries.push_back(entry);
+}
+
+std::vector<uint16_t> ExpanderMatrixByMultiplexer::readPins()
+{
+	std::vector<uint16_t> result;
+	result.reserve(_entries.size() * 8);
+
+	for(auto& e : _entries)
+	{
+		uint16_t out = 0;
+		//0 = 000
+		ex_master_set_pin_val(&_expander, static_cast<ex_master_pin_t>(e.gpioPin_0), !e.activeHigh);
+		ex_master_set_pin_val(&_expander, static_cast<ex_master_pin_t>(e.gpioPin_1), !e.activeHigh);
+		ex_master_set_pin_val(&_expander, static_cast<ex_master_pin_t>(e.gpioPin_2), !e.activeHigh);
+		ex_master_adc_read(&_expander, static_cast<ex_master_adc_pin_t>(e.adcPin), &out);
+		result.emplace_back(out);
+		out = 0;
+		//1 = 001
+		ex_master_set_pin_val(&_expander, static_cast<ex_master_pin_t>(e.gpioPin_0), e.activeHigh);
+		ex_master_adc_read(&_expander, static_cast<ex_master_adc_pin_t>(e.adcPin), &out);
+		result.emplace_back(out);
+		out = 0;
+		//2 == 010
+		ex_master_set_pin_val(&_expander, static_cast<ex_master_pin_t>(e.gpioPin_0), !e.activeHigh);
+		ex_master_set_pin_val(&_expander, static_cast<ex_master_pin_t>(e.gpioPin_1), e.activeHigh);
+		ex_master_adc_read(&_expander, static_cast<ex_master_adc_pin_t>(e.adcPin), &out);
+		result.emplace_back(out);
+		out = 0;
+		//3 == 011
+		ex_master_set_pin_val(&_expander, static_cast<ex_master_pin_t>(e.gpioPin_0), e.activeHigh);
+		ex_master_adc_read(&_expander, static_cast<ex_master_adc_pin_t>(e.adcPin), &out);
+		result.emplace_back(out);
+		out = 0;
+		//4 == 100
+		ex_master_set_pin_val(&_expander, static_cast<ex_master_pin_t>(e.gpioPin_0), !e.activeHigh);
+		ex_master_set_pin_val(&_expander, static_cast<ex_master_pin_t>(e.gpioPin_1), !e.activeHigh);
+		ex_master_set_pin_val(&_expander, static_cast<ex_master_pin_t>(e.gpioPin_2), e.activeHigh);
+		ex_master_adc_read(&_expander, static_cast<ex_master_adc_pin_t>(e.adcPin), &out);
+		result.emplace_back(out);
+		out = 0;
+		//5 == 101
+		ex_master_set_pin_val(&_expander, static_cast<ex_master_pin_t>(e.gpioPin_0), e.activeHigh);
+		ex_master_adc_read(&_expander, static_cast<ex_master_adc_pin_t>(e.adcPin), &out);
+		result.emplace_back(out);
+		out = 0;
+		//6 == 110
+		ex_master_set_pin_val(&_expander, static_cast<ex_master_pin_t>(e.gpioPin_0), !e.activeHigh);
+		ex_master_set_pin_val(&_expander, static_cast<ex_master_pin_t>(e.gpioPin_1), e.activeHigh);
+		ex_master_adc_read(&_expander, static_cast<ex_master_adc_pin_t>(e.adcPin), &out);
+		result.emplace_back(out);
+		out = 0;
+		//7 == 111
+		ex_master_set_pin_val(&_expander, static_cast<ex_master_pin_t>(e.gpioPin_0), e.activeHigh);
+		ex_master_adc_read(&_expander, static_cast<ex_master_adc_pin_t>(e.adcPin), &out);
+		result.emplace_back(out);
+		//turn all off
+		ex_master_set_pin_val(&_expander, static_cast<ex_master_pin_t>(e.gpioPin_0), !e.activeHigh);
+		ex_master_set_pin_val(&_expander, static_cast<ex_master_pin_t>(e.gpioPin_1), !e.activeHigh);
+		ex_master_set_pin_val(&_expander, static_cast<ex_master_pin_t>(e.gpioPin_2), !e.activeHigh);
+		
+		// for(int gpio : e.gpioPins){
+		// 	if(gpio != NO_PIN){
+		// 		ex_master_set_pin_val(&_expander, static_cast<ex_master_pin_t>(gpio), e.activeHigh);
+		// 	}
+		// }
+
+
+		// for(int gpio : e.gpioPins){
+		// 	if(gpio != NO_PIN){
+		// 		ex_master_set_pin_val(&_expander, static_cast<ex_master_pin_t>(gpio), !e.activeHigh);
+		// 	}
+		// }
+	}
+
+	return result;
+}

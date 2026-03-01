@@ -19,6 +19,8 @@ namespace fb {
 		
 		void setBounceTimeMs(int value);
 		
+		void setChipsCount(int value);
+		
 
 		/*  ------- getters ------- */
 		
@@ -27,6 +29,8 @@ namespace fb {
 		int getDeltaError();
 		
 		int getBounceTimeMs();
+		
+		int getChipsCount();
 		
 
 	} // namespace settings
