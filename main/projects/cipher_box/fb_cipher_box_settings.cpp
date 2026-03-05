@@ -18,6 +18,8 @@
 
 #define _KEY_CHIPSCOUNT "chips"
 
+#define _KEY_READINGSCOUNT "readings"
+
 
 
 
@@ -57,6 +59,13 @@ void settings::setChipsCount(int value)
     
 }
 
+void settings::setReadingsCount(int value)
+{
+    
+    settings::setInt(_PARTITION, _KEY_READINGSCOUNT, value);
+    
+}
+
 
 
 
@@ -87,5 +96,12 @@ int settings::getChipsCount()
 {
     
     return settings::getIntOrDefault(_PARTITION, _KEY_CHIPSCOUNT, 1);
+    
+}
+
+int settings::getReadingsCount()
+{
+    
+    return settings::getIntOrDefault(_PARTITION, _KEY_READINGSCOUNT, 4);
     
 }

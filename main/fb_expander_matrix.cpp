@@ -1,5 +1,8 @@
 #include "fb_expander_matrix.hpp"
 
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+
 
 
 using namespace fb;
@@ -48,8 +51,8 @@ std::vector<uint16_t> ExpanderMatrix::readPins()
 
 
 
-ExpanderMatrixByMultiplexer::ExpanderMatrixByMultiplexer(ex_master_t& expander)
-	: _expander(expander)
+ExpanderMatrixByMultiplexer::ExpanderMatrixByMultiplexer(ex_master_t& expander, int averageCount)
+	: _averageCount(averageCount), _expander(expander)
 {
 
 }
@@ -76,46 +79,54 @@ std::vector<uint16_t> ExpanderMatrixByMultiplexer::readPins()
 		ex_master_set_pin_val(&_expander, static_cast<ex_master_pin_t>(e.gpioPin_0), !e.activeHigh);
 		ex_master_set_pin_val(&_expander, static_cast<ex_master_pin_t>(e.gpioPin_1), !e.activeHigh);
 		ex_master_set_pin_val(&_expander, static_cast<ex_master_pin_t>(e.gpioPin_2), !e.activeHigh);
-		ex_master_adc_read(&_expander, static_cast<ex_master_adc_pin_t>(e.adcPin), &out);
+		vTaskDelay(pdMS_TO_TICKS(10));
+		out = _readAverage(e.adcPin);
 		result.emplace_back(out);
 		out = 0;
 		//1 = 001
 		ex_master_set_pin_val(&_expander, static_cast<ex_master_pin_t>(e.gpioPin_0), e.activeHigh);
-		ex_master_adc_read(&_expander, static_cast<ex_master_adc_pin_t>(e.adcPin), &out);
+		vTaskDelay(pdMS_TO_TICKS(10));
+		out = _readAverage(e.adcPin);
 		result.emplace_back(out);
 		out = 0;
 		//2 == 010
 		ex_master_set_pin_val(&_expander, static_cast<ex_master_pin_t>(e.gpioPin_0), !e.activeHigh);
 		ex_master_set_pin_val(&_expander, static_cast<ex_master_pin_t>(e.gpioPin_1), e.activeHigh);
-		ex_master_adc_read(&_expander, static_cast<ex_master_adc_pin_t>(e.adcPin), &out);
+		vTaskDelay(pdMS_TO_TICKS(10));
+		out = _readAverage(e.adcPin);
 		result.emplace_back(out);
 		out = 0;
 		//3 == 011
 		ex_master_set_pin_val(&_expander, static_cast<ex_master_pin_t>(e.gpioPin_0), e.activeHigh);
-		ex_master_adc_read(&_expander, static_cast<ex_master_adc_pin_t>(e.adcPin), &out);
+		vTaskDelay(pdMS_TO_TICKS(10));
+		out = _readAverage(e.adcPin);
 		result.emplace_back(out);
 		out = 0;
 		//4 == 100
 		ex_master_set_pin_val(&_expander, static_cast<ex_master_pin_t>(e.gpioPin_0), !e.activeHigh);
 		ex_master_set_pin_val(&_expander, static_cast<ex_master_pin_t>(e.gpioPin_1), !e.activeHigh);
 		ex_master_set_pin_val(&_expander, static_cast<ex_master_pin_t>(e.gpioPin_2), e.activeHigh);
-		ex_master_adc_read(&_expander, static_cast<ex_master_adc_pin_t>(e.adcPin), &out);
+		vTaskDelay(pdMS_TO_TICKS(10));
+		out = _readAverage(e.adcPin);
 		result.emplace_back(out);
 		out = 0;
 		//5 == 101
 		ex_master_set_pin_val(&_expander, static_cast<ex_master_pin_t>(e.gpioPin_0), e.activeHigh);
-		ex_master_adc_read(&_expander, static_cast<ex_master_adc_pin_t>(e.adcPin), &out);
+		vTaskDelay(pdMS_TO_TICKS(10));
+		out = _readAverage(e.adcPin);
 		result.emplace_back(out);
 		out = 0;
 		//6 == 110
 		ex_master_set_pin_val(&_expander, static_cast<ex_master_pin_t>(e.gpioPin_0), !e.activeHigh);
 		ex_master_set_pin_val(&_expander, static_cast<ex_master_pin_t>(e.gpioPin_1), e.activeHigh);
-		ex_master_adc_read(&_expander, static_cast<ex_master_adc_pin_t>(e.adcPin), &out);
+		vTaskDelay(pdMS_TO_TICKS(10));
+		out = _readAverage(e.adcPin);
 		result.emplace_back(out);
 		out = 0;
 		//7 == 111
 		ex_master_set_pin_val(&_expander, static_cast<ex_master_pin_t>(e.gpioPin_0), e.activeHigh);
-		ex_master_adc_read(&_expander, static_cast<ex_master_adc_pin_t>(e.adcPin), &out);
+		vTaskDelay(pdMS_TO_TICKS(10));
+		out = _readAverage(e.adcPin);
 		result.emplace_back(out);
 		//turn all off
 		ex_master_set_pin_val(&_expander, static_cast<ex_master_pin_t>(e.gpioPin_0), !e.activeHigh);
@@ -137,4 +148,16 @@ std::vector<uint16_t> ExpanderMatrixByMultiplexer::readPins()
 	}
 
 	return result;
+}
+
+uint16_t ExpanderMatrixByMultiplexer::_readAverage(int pin)
+{
+	uint32_t result = 0;
+	for(int i = 0; i < _averageCount; i++){
+		uint16_t out = 0;
+		ex_master_adc_read(&_expander, static_cast<ex_master_adc_pin_t>(pin), &out);
+		result += out;
+	}
+
+	return result / _averageCount;
 }

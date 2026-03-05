@@ -45,11 +45,50 @@ static interfaces::I2c _i2c;
 static ex_master_t _expander;
 
 #if _HW_VERSION == 2
-	static periph::ExpanderMatrixByMultiplexer _matrix(_expander);
+	static periph::ExpanderMatrixByMultiplexer _matrix(_expander, settings::getReadingsCount());
 #else
 	static periph::ExpanderMatrix _matrix(_expander);
 #endif
 static periph::HttpRequest _http;
+
+static bool _i2cErrorFlag = false;
+
+
+
+static void _initExpander()
+{
+	#if _HW_VERSION == 2
+		//HW_2
+		ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_2, true);
+		ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_15, true);
+		ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_14, true);
+		ex_master_set_pin_adc_mode(&_expander, EX_MASTER_ADC_PIN_6, true);
+
+		if(settings::getChipsCount() > 1){
+			ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_7, true);
+			ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_6, true);
+			ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_5, true);
+			ex_master_set_pin_adc_mode(&_expander, EX_MASTER_ADC_PIN_0, true);
+		}
+		
+		if(settings::getChipsCount() > 2){
+			ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_10, true);
+			ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_0, true);
+			ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_8, true);
+			ex_master_set_pin_adc_mode(&_expander, EX_MASTER_ADC_PIN_4, true);
+		}
+	#else
+		//HW_1
+		ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_6, true);
+		ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_7, true);
+		ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_8, true);
+		ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_9, true);
+		ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_0, true);
+		ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_10, true);
+		ex_master_set_pin_adc_mode(&_expander, EX_MASTER_ADC_PIN_0, true);
+		ex_master_set_pin_adc_mode(&_expander, EX_MASTER_ADC_PIN_1, true);
+	#endif
+}
 
 
 
@@ -60,10 +99,18 @@ static void _monitorTask(void* arg)
 	std::vector<_Entry> timeStates(prevState.size());
 	//make post request
 	const int error = settings::getDeltaError();	// just to reduce log output from internal NVS handling
-	const int bounceTimeMs = settings::getBounceTimeMs() * 1000;
+	const int bounceTimeUs = settings::getBounceTimeMs() * 1000;
 
 	for(;;){
 		auto state = _matrix.readPins();
+		if(_i2cErrorFlag){
+			vTaskDelay(pdMS_TO_TICKS(100));
+			FB_DEBUG_LOG_W_TAG("Trying to revive CH32");
+			_initExpander();
+			_i2cErrorFlag = false;
+			continue;
+		}
+
 		bool changedFlag = false;
 		for (size_t i = 0; i < state.size(); i++)
 		{
@@ -73,7 +120,7 @@ static void _monitorTask(void* arg)
 
 			}else{
 				//debounce logic wait some time for stability of the signal, due to all possible jack connections
-				if(((esp_timer_get_time() - timeStates[i].timestampUs) > bounceTimeMs)
+				if(((esp_timer_get_time() - timeStates[i].timestampUs) > bounceTimeUs)
 					&& !timeStates[i].sended)
 				{
 					FB_DEBUG_LOG_I_TAG("%d = %u -> %u", i, prevState[i], state[i]);
@@ -112,6 +159,35 @@ static void _monitorTask(void* arg)
 
 
 
+static void _registerMatrix()
+{
+	#if _HW_VERSION == 2
+		_matrix.addEntry({2, 15, 14, 6, true});
+		if(settings::getChipsCount() > 1){
+			_matrix.addEntry({7, 6, 5, 0, true});
+		}
+		if(settings::getChipsCount() > 2){
+			_matrix.addEntry({10, 0, 8, 4, true});
+		}
+
+	#else
+		_matrix.addEntry({{6}, 0, true});
+		_matrix.addEntry({{6}, 1, true});
+		_matrix.addEntry({{7}, 0, true});
+		_matrix.addEntry({{7}, 1, true});
+		_matrix.addEntry({{8}, 0, true});
+		_matrix.addEntry({{8}, 1, true});
+		_matrix.addEntry({{9}, 0, true});
+		_matrix.addEntry({{9}, 1, true});
+		_matrix.addEntry({{0}, 0, true});
+		_matrix.addEntry({{0}, 1, true});
+		_matrix.addEntry({{10}, 0, true});
+		_matrix.addEntry({{10}, 1, true});
+	#endif
+}
+
+
+
 static void _init_from_settings()
 {
 
@@ -134,60 +210,25 @@ void project::initHwObjs()
 
 	ex_i2c_t masterCfg;
 	masterCfg.read_cb = [](int32_t address, uint8_t* data, int32_t length){
-		return _i2c.read(0, {data, (unsigned int) length}, 1000);};
+		const bool result = _i2c.read(0, {data, (unsigned int) length}, 1000);
+		if(!result){
+			_i2cErrorFlag = true;
+		}
+		return result;
+	};
 
 	masterCfg.write_cb = [](int32_t address, uint8_t* data, int32_t length){
-		return _i2c.write(0, {data, (unsigned int) length}, 1000);};
+		bool result = _i2c.write(0, {data, (unsigned int) length}, 1000);
+		if(!result){
+			_i2cErrorFlag = true;
+		}
+		return result;
+	};
 
 	ex_master_init(&_expander, &masterCfg);
 
-	#if _HW_VERSION == 2
-		//HW_2
-		ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_2, true);
-		ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_15, true);
-		ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_14, true);
-		ex_master_set_pin_adc_mode(&_expander, EX_MASTER_ADC_PIN_6, true);
-		_matrix.addEntry({2, 15, 14, 6, true});
-
-		if(settings::getChipsCount() > 1){
-			ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_7, true);
-			ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_6, true);
-			ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_5, true);
-			ex_master_set_pin_adc_mode(&_expander, EX_MASTER_ADC_PIN_0, true);
-			_matrix.addEntry({7, 6, 5, 0, true});
-		}
-		
-		if(settings::getChipsCount() > 2){
-			ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_10, true);
-			ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_0, true);
-			ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_8, true);
-			ex_master_set_pin_adc_mode(&_expander, EX_MASTER_ADC_PIN_4, true);
-			_matrix.addEntry({10, 0, 8, 4, true});
-		}
-	#else
-		//HW_1
-		ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_6, true);
-		ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_7, true);
-		ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_8, true);
-		ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_9, true);
-		ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_0, true);
-		ex_master_set_pin_dir(&_expander, EX_MASTER_PIN_10, true);
-		ex_master_set_pin_adc_mode(&_expander, EX_MASTER_ADC_PIN_0, true);
-		ex_master_set_pin_adc_mode(&_expander, EX_MASTER_ADC_PIN_1, true);
-
-		_matrix.addEntry({{6}, 0, true});
-		_matrix.addEntry({{6}, 1, true});
-		_matrix.addEntry({{7}, 0, true});
-		_matrix.addEntry({{7}, 1, true});
-		_matrix.addEntry({{8}, 0, true});
-		_matrix.addEntry({{8}, 1, true});
-		_matrix.addEntry({{9}, 0, true});
-		_matrix.addEntry({{9}, 1, true});
-		_matrix.addEntry({{0}, 0, true});
-		_matrix.addEntry({{0}, 1, true});
-		_matrix.addEntry({{10}, 0, true});
-		_matrix.addEntry({{10}, 1, true});
-	#endif
+	_initExpander();
+	_registerMatrix();
 
 	if(xTaskCreate(&_monitorTask, "mon", 4 * 1024, NULL, 8, NULL) != pdPASS){
 		FB_DEBUG_LOG_E_TAG("Failed to create the monitor task");

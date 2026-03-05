@@ -21,6 +21,8 @@ namespace fb {
 		
 		void setChipsCount(int value);
 		
+		void setReadingsCount(int value);
+		
 
 		/*  ------- getters ------- */
 		
@@ -31,6 +33,8 @@ namespace fb {
 		int getBounceTimeMs();
 		
 		int getChipsCount();
+		
+		int getReadingsCount();
 		
 
 	} // namespace settings

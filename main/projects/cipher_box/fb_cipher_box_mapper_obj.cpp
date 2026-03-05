@@ -69,6 +69,19 @@ void project::initMaperObjs()
 	getBox().addProperty(std::unique_ptr<box::PropertyIface>(ChipsCountProp));
 	getBox().addPropertyDependency(ChipsCountProp->getId());
 	
+	
+	auto* ReadingsCountProp = new box::PropertyInt("ReadingsCount", "Change ReadingsCount",
+	
+		box::Tid::PROPERTY_GENERAL,
+		[](int val){
+			settings::setReadingsCount(val);
+			return true;
+		}, settings::getReadingsCount(), 1, 16 
+	);
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(ReadingsCountProp));
+	getBox().addPropertyDependency(ReadingsCountProp->getId());
+	
 }
 
 int project::mapBoxSensorIdToAddres(int id)
