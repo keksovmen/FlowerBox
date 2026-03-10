@@ -19,7 +19,10 @@ namespace fb
 				~Uart();
 
 				bool read(std::span<uint8_t> out, int timeoutMs);
+				int readAtMax(std::span<uint8_t> out, int timeoutMs);
 				bool write(std::span<uint8_t> in);
+				void changeRx(int rx);
+				void reinit(int rx);
 			
 			private:
 				const uart_port_t _port;
