@@ -103,11 +103,13 @@ static void _taskReader(void* arg)
 				readers[idx]->changeRx(pins::RX_PINS[i + idx]);
 			}
 
+			int remainWaitMs = 0;
+			const auto startTick = xTaskGetTickCount();
 			for(int idx = 0; idx < (lastFlag ? 1 : readers.size()); idx++){
 				//size must be 2 times bigger than payload (14 bytes)
-				uint8_t buff[32] = {0};
+				uint8_t buff[28] = {0};
 				//160 ms is 100% guarantee to read a packet if there is no packet then there is nothing in range of rfid
-				int count = readers[idx]->readAtMax({buff, sizeof(buff)}, idx == 0 ? periodMs : 0);
+				int count = readers[idx]->readAtMax({buff, sizeof(buff)}, idx == 0 ? periodMs : remainWaitMs);
 				if(count <= 0){
 					if(_states[i + idx] != 0){
 						FB_DEBUG_LOG_I_TAG("LOST tag on: %d", i + idx);
@@ -116,6 +118,11 @@ static void _taskReader(void* arg)
 						_states[i + idx] = 0;
 					}
 					continue;
+				}
+
+				remainWaitMs = periodMs - pdTICKS_TO_MS((xTaskGetTickCount() - startTick));
+				if(remainWaitMs < 0){
+					remainWaitMs = 0;
 				}
 
 				FB_DEBUG_LOG_I_TAG("READ on %d: %d", i + idx, count);
