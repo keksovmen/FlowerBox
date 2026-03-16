@@ -123,18 +123,18 @@ static void _init_fan_switch()
 	project::util::createAndRegisterForceProperty(getHwFanSwitch(), _boxFanSwitch);
 	_boxFanSwitch.addSensorDependency(getBoxInsideTempSensor().getId());
 
-	auto* speedPwmProperty = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_SPEED,
-		[](int val){
-			getHwFanSwitch().setSpeed(val);
-			settings::setFanSpeed(val);
+	// auto* speedPwmProperty = new box::PropertyInt(box::Tid::PROPERTY_SWITCH_SPEED,
+	// 	[](int val){
+	// 		getHwFanSwitch().setSpeed(val);
+	// 		settings::setFanSpeed(val);
 
-			return true;
-		},
-		getHwFanSwitch().getSpeed()
-	);
+	// 		return true;
+	// 	},
+	// 	getHwFanSwitch().getSpeed()
+	// );
 
-	getBox().addProperty(std::unique_ptr<box::PropertyIface>(speedPwmProperty));
-	_boxFanSwitch.addPropertyDependency(speedPwmProperty->getId());
+	// getBox().addProperty(std::unique_ptr<box::PropertyIface>(speedPwmProperty));
+	// _boxFanSwitch.addPropertyDependency(speedPwmProperty->getId());
 
 
 	auto* lowTempProperty = new box::PropertyFloat(box::Tid::PROPERTY_SWITCH_LOW_TEMP,

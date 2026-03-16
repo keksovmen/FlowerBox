@@ -21,11 +21,11 @@ namespace fb
 		static constexpr int PIN_FAN = 5;
 		static constexpr int PIN_BLUE_LED = 5;
 
-		static constexpr int PIN_COOL_LED = 19;
-
 		//AHT20 IIC interface
 		static constexpr int PIN_IIC_SDA = 7;
 		static constexpr int PIN_IIC_SCL = 8;
+
+		static constexpr int PIN_KEYBOARD_RESET = 9;
 
 
 

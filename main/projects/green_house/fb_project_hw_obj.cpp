@@ -1,9 +1,10 @@
 #include "fb_green_house_hw_obj.hpp"
 
 #include "fb_globals.hpp"
-#include "fb_keyboard_handler.hpp"
 #include "fb_green_house_pins.hpp"
 #include "fb_green_house_settings.hpp"
+#include "fb_keyboard_handler.hpp"
+#include "fb_sensor_keyboard.hpp"
 
 
 
@@ -16,6 +17,7 @@ using namespace project;
 static sensor::TemperatureSensorArray<1> _sensorArrayDS18(pins::PIN_SENSOR_DS18);
 static sensor::TemperatureSensor* _sensorDS18Outside = _sensorArrayDS18.getSensor(0);
 static sensor::SensorAht20 _sensorAhtInside(I2C_NUM_0, pins::PIN_IIC_SDA, pins::PIN_IIC_SCL);
+static sensor::KeyboardSensor<1> _keyboardSensor({std::pair{pins::PIN_KEYBOARD_RESET, h::ButtonVK::VK_0}});
 
 //переключатели туть
 static switches::TimeSwitch _switchLight(clock::Time(0, 0, 0), clock::Time(0, 0, 0),
@@ -26,7 +28,7 @@ static switches::SensorSwitch _switchHeating(&_sensorAhtInside, 23, 27,
 	new wrappers::WrapperGpio((gpio_num_t) pins::PIN_HEATER, false));
 
 static switches::FanSwitch _switchFan(&_sensorAhtInside, _sensorDS18Outside, 27, 28, 70, 85,
-	new wrappers::WrapperPwm(LEDC_TIMER_0, LEDC_CHANNEL_0, (gpio_num_t) pins::PIN_FAN, true));
+	new wrappers::WrapperGpio((gpio_num_t) pins::PIN_FAN, true));
 
 //сервисы туть
 static sensor::SensorService _sensorService;
@@ -69,6 +71,7 @@ void project::initHwObjs()
 	_sensorService.addSensor(&getHwTempSensors());
 	_sensorService.addSensor(&getHwDS18Sensor());
 	_sensorService.addSensor(&getHwAhtSensor());
+	_sensorService.addSensor(&_keyboardSensor);
 
 	_swithService.addSwitch(&getHwLightSwitch());
 	_swithService.addSwitch(&getHwHeatSwitch());
