@@ -1,5 +1,5 @@
 # set(_PROJECT MINE)
-# set(_PROJECT DIPLOM)
+set(_PROJECT DIPLOM)
 # set(_PROJECT DIPLOM_C3)
 # set(_PROJECT RELAY)
 # set(_PROJECT STICKS)
@@ -8,7 +8,7 @@
 # set(_PROJECT KEY_BACKLIGHT)
 # set(_PROJECT CIPHER_BOX)
 # set(_PROJECT CIPHER_BOX_V2)
-set(_PROJECT RFIDS)
+# set(_PROJECT RFIDS)
 
 
 
@@ -40,6 +40,7 @@ elseif(${_PROJECT} STREQUAL "DIPLOM" OR ${_PROJECT} STREQUAL "DIPLOM_C3")
 		"fb_http_puller32.cpp"
 		"fb_uart.cpp"
 		"fb_dmx_hal.cpp"
+		"fb_channel_handler.cpp"
 		)
 	set(_ADD_INCLUDES
 		"include/projects/dmx_light"

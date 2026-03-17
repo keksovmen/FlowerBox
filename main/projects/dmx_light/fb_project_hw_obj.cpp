@@ -8,6 +8,7 @@
 #else
 	#include "fb_dmx_light_pins.hpp"
 #endif
+#include "fb_channel_handler.hpp"
 #include "fb_dmx_light_settings.hpp"
 #include "fb_globals.hpp"
 #include "fb_json_util.hpp"
@@ -30,11 +31,18 @@
 
 #define _MQTT_RGB_PATH ("/dmx/" + std::to_string(settings::getMqttId()) + "/rgb")
 #define _MQTT_RELAY_PATH ("/dmx/" + std::to_string(settings::getMqttId()) + "/relay")
+#define _MQTT_FUNC_PATH ("/dmx/" + std::to_string(settings::getMqttId()) + "/func")
+
+#define _DMX_TICK_RATE_HZ 50
 
 
 
 using namespace fb;
 using namespace project;
+
+
+
+static const char* TAG = "hw";
 
 
 
@@ -59,10 +67,7 @@ static sensor::SensorStorage _sensorStorage;
 //прочее туть
 static keyboard::KeyboardHandler _keyboardHandler;
 static periph::MqttClient _mqtt;
-
-
-
-static const char* TAG = "hw";
+static fb::util::ChannelHandler _channelHandler([](std::span<uint8_t> vals){_dmxHal.write(0, vals);});
 
 
 
@@ -75,8 +80,9 @@ static void _dmx_send_task(void* arg)
 	{
 		// Write full zero packet first to clear receiver noise
 		//better each time write data to dmx buffer due to RX interrupts pushing garbage in to the buffer
+		_channelHandler.tick();
 		_dmxHal.send();
-		vTaskDelay(pdMS_TO_TICKS(20));
+		vTaskDelay(pdMS_TO_TICKS(1000 / _DMX_TICK_RATE_HZ));
 	}
 
 	vTaskDelete(NULL);
@@ -84,27 +90,49 @@ static void _dmx_send_task(void* arg)
 
 
 
+static void _handleFunctionTopic(std::string_view topic, std::string_view data)
+{
+	json_util::parseObjArray(data, "data", [](cJSON* obj){
+		const int channel = json_util::getIntFromJsonOrDefault(obj, "i", 0);
+		const int val = json_util::getIntFromJsonOrDefault(obj, "v", -1);
+		const int valMin = json_util::getIntFromJsonOrDefault(obj, "a", 0);
+		const int valMax = json_util::getIntFromJsonOrDefault(obj, "b", 0);
+		const int periodMs = json_util::getIntFromJsonOrDefault(obj, "T", 0);
+		const bool cycle = json_util::getIntFromJsonOrDefault(obj, "cycle", 0);
+
+		if(val == -1){
+			_channelHandler.setChannelDynamic(
+				channel,valMin, valMax,
+				(periodMs / 1000.0f) * _DMX_TICK_RATE_HZ,
+				cycle);
+		}else{
+			_channelHandler.setChannelConst(channel, val);
+		}
+	});
+}
+
 static void _mqtt_data_handler(std::string_view topic, std::string_view data)
 {
 	FB_DEBUG_LOG_I_TAG("Data handler: %.*s -> %.*s", topic.length(), topic.cbegin(), data.length(), data.cbegin());
 
 	if(topic == _MQTT_RGB_PATH){
-		uint8_t buff[512] = {0};
 		uint16_t i = 0;
-		const bool result = json_util::parseNumberArray(data, "data", [&buff, &i](int val){
-			if(val >= 512){
+		const bool result = json_util::parseNumberArray(data, "data", [&i](int val){
+			if(i >= 512){
 				FB_DEBUG_LOG_E_TAG("Illegal index in array! %d", i);
 				return;
 			}
+			if(val < 0 || val > 255){
+				FB_DEBUG_LOG_E_TAG("Illegal value in array! %u = %d", i, val);
+				return;
+			}
 
-			buff[i] = val;
+			_channelHandler.setChannelConst(i, val);
 			i++;
 		});
 
 		if(!result){
 			FB_DEBUG_LOG_E_TAG("Failed to parse json!");
-		}else{
-			_dmxHal.write(0, std::span<uint8_t>(buff, i));
 		}
 	}else if(topic == _MQTT_RELAY_PATH){
 		#if _HW_VERSION == 2
@@ -116,6 +144,8 @@ static void _mqtt_data_handler(std::string_view topic, std::string_view data)
 		#else
 
 		#endif
+	}else if(topic == _MQTT_FUNC_PATH){
+		_handleFunctionTopic(topic, data);
 	}else{
 		FB_DEBUG_LOG_W_TAG("Unexpected MQTT topic!");
 	}
@@ -129,6 +159,7 @@ static void _init_from_settings()
 	_mqtt.registerSubscribeHandler([](auto consumer){
 		std::invoke(consumer, _MQTT_RGB_PATH, 2);
 		std::invoke(consumer, _MQTT_RELAY_PATH, 2);
+		std::invoke(consumer, _MQTT_FUNC_PATH, 2);
 	});
 	_mqtt.addDataHandler(&_mqtt_data_handler);
 }
