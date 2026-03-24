@@ -126,16 +126,20 @@ void SceneryHandler::addScenery(uint16_t channel, std::vector<BaseEntry> baseEnt
 	if(iter == _entries.end()){
 		//push back
 		_entries.push_back(ChannelEntry{channel, std::move(baseEntries), std::move(repeatEntries)});
-		FB_DEBUG_LOG_I_OBJ("Added scenery for %d", channel);
+		// FB_DEBUG_LOG_I_OBJ("Added scenery for %d", channel);
 	}else{
 		//replace
 		const int index = iter - _entries.begin();
 		_entries[index] = ChannelEntry{channel, std::move(baseEntries), std::move(repeatEntries)};
-		FB_DEBUG_LOG_I_OBJ("Replaced scenery for %d", channel);
+		// FB_DEBUG_LOG_I_OBJ("Replaced scenery for %d", channel);
 	}
-
 }
 
+void SceneryHandler::clearAll()
+{
+	LockWrapper wrapper(_mutex, portMAX_DELAY);
+	_entries.clear();
+}
 
 int SceneryHandler::_findRepeatPoint(ChannelEntry& entry, int index) const
 {
