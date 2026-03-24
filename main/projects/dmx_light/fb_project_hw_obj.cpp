@@ -34,6 +34,7 @@
 #define _MQTT_FUNC_PATH ("/dmx/" + std::to_string(settings::getMqttId()) + "/func")
 #define _MQTT_SCENERY_PATH ("/dmx/" + std::to_string(settings::getMqttId()) + "/scenery")
 #define _MQTT_ERROR_PATH ("/dmx/" + std::to_string(settings::getMqttId()) + "/err")
+#define _MQTT_CLEAR_PATH ("/dmx/" + std::to_string(settings::getMqttId()) + "/clear")
 
 #define _DMX_TICK_RATE_HZ 50
 
@@ -291,6 +292,14 @@ static void _handleSceneryTopic(std::string_view topic, std::string_view data)
 	}
 }
 
+static void _handleClearTopic(std::string_view topic, std::string_view data)
+{
+	_logicHandler.clearAll();
+
+	uint8_t buff[512] = {0};
+	_dmxHal.write(0, buff);
+}
+
 static void _mqtt_data_handler(std::string_view topic, std::string_view data)
 {
 	if(topic == _MQTT_RGB_PATH){
@@ -304,6 +313,9 @@ static void _mqtt_data_handler(std::string_view topic, std::string_view data)
 
 	}else if(topic == _MQTT_SCENERY_PATH){
 		_handleSceneryTopic(topic, data);
+
+	}else if(topic == _MQTT_CLEAR_PATH){
+		_handleClearTopic(topic, data);
 
 	}else{
 		FB_DEBUG_LOG_W_TAG("Unexpected MQTT topic!");
@@ -320,6 +332,7 @@ static void _init_from_settings()
 		std::invoke(consumer, _MQTT_RELAY_PATH, 2);
 		std::invoke(consumer, _MQTT_FUNC_PATH, 2);
 		std::invoke(consumer, _MQTT_SCENERY_PATH, 2);
+		std::invoke(consumer, _MQTT_CLEAR_PATH, 2);
 	});
 	_mqtt.addDataHandler(&_mqtt_data_handler);
 }
