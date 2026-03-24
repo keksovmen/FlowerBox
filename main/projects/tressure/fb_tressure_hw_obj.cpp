@@ -192,7 +192,7 @@ void project::initHwObjs()
 
 
 	//read from settings
-	_mqtt.init(settings::getIp(), settings::getPort());
+	_mqtt.init(settings::getIp(), settings::getPort(), 3 * 1024);
 	_mqtt.addDataHandler(&_dataHandler);
 	_mqtt.registerSubscribeHandler([](const auto& handler){
 		std::invoke(handler, _MQTT_PATH_LOCK, 2);

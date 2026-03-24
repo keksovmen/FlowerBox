@@ -47,9 +47,9 @@ static std::array<bool, pins::RECEIVER_COUNT> _entries;
 static std::array<wrappers::WrapperGpio, pins::RECEIVER_COUNT> _leds{{
 	{static_cast<gpio_num_t>(pins::PINS_LED[0]), false},
 	{static_cast<gpio_num_t>(pins::PINS_LED[1]), false},
-	{static_cast<gpio_num_t>(pins::PINS_LED[2]), false},
-	{static_cast<gpio_num_t>(pins::PINS_LED[3]), false},
-	{static_cast<gpio_num_t>(pins::PINS_LED[4]), false}
+	// {static_cast<gpio_num_t>(pins::PINS_LED[2]), false},
+	// {static_cast<gpio_num_t>(pins::PINS_LED[3]), false},
+	// {static_cast<gpio_num_t>(pins::PINS_LED[4]), false}
 }};
 
 static fb::util::TimeScheduler _mqttSender;
@@ -196,7 +196,7 @@ void project::initHwObjs()
 
 	_irSender.addGpio(pins::PIN_TRANSCEIVER);
 
-	_mqtt.init(settings::getIp(), settings::getPort());
+	_mqtt.init(settings::getIp(), settings::getPort(), 3 * 1024);
 	_mqtt.addDataHandler(&_mqttDataHandler);
 	_mqtt.registerSubscribeHandler([](auto r){
 		std::invoke(r, "/ir/action", 2);

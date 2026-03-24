@@ -146,7 +146,7 @@ void project::initHwObjs()
 
 	_db135.init();
 
-	_mqtt.init(settings::getIp(), settings::getPort());
+	_mqtt.init(settings::getIp(), settings::getPort(), 3 * 1024);
 	_mqtt.addDataHandler(&_dataHandler);
 	_mqtt.registerSubscribeHandler([](const auto& handler){
 		std::invoke(handler, _MQTT_PATH_PORT, 2);
