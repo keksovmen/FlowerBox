@@ -91,6 +91,8 @@ void SceneryHandler::tick()
 				//this point has no counter, so loop is infinite
 				//set index to to and continue
 				entry.state.index = entry.repeatEntries[repeatIndex].to;
+				//set current ticks to max ticks for this value, this way you set that entry instantly and switch to next entries 
+				entry.state.tickCount = entry.baseEntries[entry.state.index].timeTicks;
 				continue;
 			}
 
@@ -105,6 +107,8 @@ void SceneryHandler::tick()
 				entry.repeatEntries[repeatIndex].counter++;
 				//and set current index to given
 				entry.state.index = entry.repeatEntries[repeatIndex].to;
+				//set current ticks to max ticks for this value, this way you set that entry instantly and switch to next entries 
+				entry.state.tickCount = entry.baseEntries[entry.state.index].timeTicks;
 			}
 		}
 	}
