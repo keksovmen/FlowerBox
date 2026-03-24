@@ -1,9 +1,167 @@
 #include "fb_channel_handler.hpp"
 
+#include <algorithm>
+
 
 
 using namespace fb;
 using namespace util;
+
+
+
+BaseEntry::BaseEntry(uint8_t v, uint32_t timeMs)
+	: val(v), timeTicks(timeMs / SceneryHandler::TICK_VALUE_MS)
+{
+
+}
+
+
+
+ChannelEntry::ChannelEntry(uint16_t channel, std::vector<BaseEntry>&& bEntries, std::vector<RepeatEntry>&& rEntries)
+	: state{channel}, baseEntries(std::move(bEntries)), repeatEntries(std::move(rEntries))
+{
+
+}
+
+bool ChannelEntry::operator==(const ChannelEntry& e)
+{
+	return this->state.channelIndex == e.state.channelIndex;
+}
+
+
+
+SceneryHandler::SceneryHandler(Consumer consumer)
+	: _consumer(consumer)
+{
+
+}
+
+void SceneryHandler::init()
+{
+	_mutex = xSemaphoreCreateMutex();
+	assert(_mutex);
+}
+
+const char* SceneryHandler::getName() const
+{
+	return "SceneryHandler";
+}
+
+void SceneryHandler::tick()
+{
+	LockWrapper lock(_mutex, portMAX_DELAY);
+	
+	std::vector<int> removeList;
+
+	for(int i = 0; i < _entries.size(); i++)
+	{
+		ChannelEntry& entry = _entries[i];
+
+		//check if there is no further go
+		if(entry.state.index >= entry.baseEntries.size()){
+			//remove this entry from the list and continue
+			removeList.push_back(i);
+			continue;
+		}
+
+		//send current value here could use switch to use different interpolation instead of linear
+		_consumer(entry.state.channelIndex,
+			_calculatePosition(entry.baseEntries[(entry.state.index == 0) ? 0 : entry.state.index - 1].val,
+				entry.baseEntries[entry.state.index].val,
+				entry.baseEntries[entry.state.index].timeTicks,
+				entry.state.tickCount));
+		
+		//increment tick count and check if it is overflowed for next steps
+		entry.state.tickCount++;
+		if(entry.state.tickCount <= entry.baseEntries[entry.state.index].timeTicks){
+			continue;
+		}
+
+		//reset tick count for next entry
+		entry.state.tickCount = 0;
+
+		//check if this is repeat point and we should go back
+		const int repeatIndex = _findRepeatPoint(entry, entry.state.index);
+		if(repeatIndex == -1){
+			//there is no repeat for this node
+			entry.state.index++;
+		}else{
+			//we have repeat point
+			if(entry.repeatEntries[repeatIndex].repeatTimes == RepeatEntry::INFINITE){
+				//this point has no counter, so loop is infinite
+				//set index to to and continue
+				entry.state.index = entry.repeatEntries[repeatIndex].to;
+				continue;
+			}
+
+			//check if counter is reached the goal
+			if(entry.repeatEntries[repeatIndex].repeatTimes == (entry.repeatEntries[repeatIndex].counter + 1)){
+				//it reached the goal, so proceed to next node
+				entry.state.index++;
+				//set to zero in case if there is greater repeat loop that will repeat this loop
+				entry.repeatEntries[repeatIndex].counter = 0;
+			}else{
+				//not reached the goal so increment counter
+				entry.repeatEntries[repeatIndex].counter++;
+				//and set current index to given
+				entry.state.index = entry.repeatEntries[repeatIndex].to;
+			}
+		}
+	}
+
+	//remove, starting from back
+	std::reverse(removeList.begin(), removeList.end());
+	for(int index : removeList){
+		_entries.erase(_entries.begin() + index);
+		// FB_DEBUG_LOG_I_OBJ("Finished with %d", index);
+	}
+}
+
+void SceneryHandler::addScenery(uint16_t channel, std::vector<BaseEntry> baseEntries, std::vector<RepeatEntry> repeatEntries)
+{
+	LockWrapper wrapper(_mutex, portMAX_DELAY);
+
+	//first find if such channel is already exists if so replace
+	auto iter = std::find_if(_entries.begin(), _entries.end(), [channel](const ChannelEntry& e){return e.state.channelIndex == channel;});
+	if(iter == _entries.end()){
+		//push back
+		_entries.push_back(ChannelEntry{channel, std::move(baseEntries), std::move(repeatEntries)});
+		FB_DEBUG_LOG_I_OBJ("Added scenery for %d", channel);
+	}else{
+		//replace
+		const int index = iter - _entries.begin();
+		_entries[index] = ChannelEntry{channel, std::move(baseEntries), std::move(repeatEntries)};
+		FB_DEBUG_LOG_I_OBJ("Replaced scenery for %d", channel);
+	}
+
+}
+
+
+int SceneryHandler::_findRepeatPoint(ChannelEntry& entry, int index) const
+{
+	auto iter = std::find_if(entry.repeatEntries.begin(), entry.repeatEntries.end(), [index](const RepeatEntry& rep){return rep.from == index;});
+	if(iter == entry.repeatEntries.end()){
+		return -1;
+	}
+
+	//must return index of the found value
+	return iter - entry.repeatEntries.begin();
+}
+
+uint8_t SceneryHandler::_calculatePosition(int from, int to, uint32_t periodTicks, uint32_t currentTicks)
+{
+	// case for immediate values, often it is the first value in animation array
+	if(periodTicks == 0){
+		return from;
+	}
+
+	const int direction = to - from;
+
+	const int currentPosition = (currentTicks * 1000) / periodTicks;
+	//calculation must be signed and only at the last moment converted and truncated to the result type
+	const uint8_t result = from + ((direction * currentPosition) / 1000);
+	return result;
+}
 
 
 

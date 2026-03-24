@@ -17,6 +17,7 @@ static BaseCore _core{{}, ""};
 static CoreInfo _info = {
 	.core = _core,
 	.requiresTime = false,
+	.requireSwitchService = false,
 };
 
 

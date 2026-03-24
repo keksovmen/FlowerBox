@@ -46,24 +46,24 @@ void MqttClient::handleEvent(const event::Event& event)
 	}
 }
 
-void MqttClient::init(std::string_view uri)
+void MqttClient::init(std::string_view uri, int bufferSize)
 {
 	esp_mqtt_client_config_t mqtt_cfg{};
 	mqtt_cfg.broker.address.uri = uri.begin();
 	mqtt_cfg.network.reconnect_timeout_ms = 7000;
 	mqtt_cfg.network.timeout_ms = 10000;
-	mqtt_cfg.buffer.size = 3 * 1024;
+	mqtt_cfg.buffer.size = bufferSize;
 
     _handle = esp_mqtt_client_init(&mqtt_cfg);
     esp_mqtt_client_register_event(_handle, MQTT_EVENT_ANY, &_handler, this);
 	FB_DEBUG_LOG_W_OBJ("MQTT client created: %s", _handle == nullptr ? "False" : "True");
 }
 
-void MqttClient::init(std::string_view ip, int port)
+void MqttClient::init(std::string_view ip, int port, int bufferSize)
 {
 	char buff[256] = {0};
 	int len = sprintf(buff, "mqtt://%s:%d", ip.cbegin(), port);
-	init(std::string_view(buff, len));
+	init(std::string_view(buff, len), bufferSize);
 }
 
 void MqttClient::publish(std::string_view topic, std::string_view data)
@@ -163,7 +163,8 @@ void MqttClient::_handler(void *handler_args, esp_event_base_t base, int32_t eve
 			FB_DEBUG_LOG_I_TAG("MQTT_EVENT_PUBLISHED, msg_id=%d", event->msg_id);
 			break;
 		case MQTT_EVENT_DATA:
-			FB_DEBUG_LOG_I_TAG("MQTT_EVENT_DATA: %.*s = %.*s", event->topic_len, event->topic, event->data_len, event->data);
+			FB_DEBUG_LOG_I_TAG("MQTT_EVENT_DATA: %.*s", event->topic_len, event->topic);
+			// FB_DEBUG_LOG_I_TAG("MQTT_EVENT_DATA: %.*s = %.*s", event->topic_len, event->topic, event->data_len, event->data);
 			if(me->_dataHandler){
 				std::invoke(me->_dataHandler,
 					std::string_view{event->topic, static_cast<std::string_view::size_type>(event->topic_len)},
