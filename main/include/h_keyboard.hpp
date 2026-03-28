@@ -15,20 +15,29 @@
 
 namespace h
 {
-	/**
-	 * @brief объект кнопки на клавиатуре
-	 * 
-	 * Отслеживает текущее состояние и его переключение
-	 */
-
-	class KeyboardButton
+	class KeyboardButtonI
 	{
 		public:
-			const gpio_num_t pin;
 			const ButtonVK vk;
 
 
-			KeyboardButton(gpio_num_t pin, ButtonVK vk) : pin(pin), vk(vk){}
+			KeyboardButtonI(ButtonVK vk) : vk(vk){}
+
+			virtual ~KeyboardButtonI() = default;
+
+			/**
+			 * @brief must initialize itself in proper gpio mode
+			 */
+			virtual void setup() = 0;
+
+			/**
+			 * @brief must read current state
+			 * 
+			 * @return true button is pressed
+			 * @return false button is released
+			 */
+			virtual bool readState() = 0;
+
 
 			/**
 			 * @brief вернет предыдущее состояние
@@ -58,11 +67,46 @@ namespace h
 			 */
 
 			void resetCurrentDuration();
-
+		
 		private:
 			bool _isPressed = false;
 			TickType_t _whenPressed;
 			TickType_t _currentStart;
+	};
+
+	/**
+	 * @brief объект кнопки на клавиатуре
+	 * 
+	 * Отслеживает текущее состояние и его переключение
+	 */
+
+	class KeyboardButton : public KeyboardButtonI
+	{
+		public:
+			const gpio_num_t pin;
+
+
+
+			KeyboardButton(gpio_num_t pin, ButtonVK vk) : KeyboardButtonI(vk), pin(pin){}
+			
+			virtual void setup() override;
+			virtual bool readState() override;
+	};
+
+
+
+	class KeyboardMatrixButton : public KeyboardButtonI
+	{
+		public:
+			const gpio_num_t in;
+			const gpio_num_t out;
+
+
+
+			KeyboardMatrixButton(gpio_num_t in, gpio_num_t out, ButtonVK vk) : KeyboardButtonI(vk), in(in), out(out){}
+			
+			virtual void setup() override;
+			virtual bool readState() override;
 	};
 
 
@@ -84,10 +128,8 @@ namespace h
 			static Keyboard* instance();
 
 
-		private:
-			Keyboard(){}	//private constructor
-		public:
 
+			Keyboard(){}
 
 			/**
 			 * @param consumer колбэк куда будет кидать нажатия кнопок
@@ -124,6 +166,7 @@ namespace h
 			 */
 
 			void keyboardAddButton(gpio_num_t pin, ButtonVK vk);
+			void keyboardAddButton(KeyboardButtonI* button);
 
 			/**
 			 * @brief запускает поток обработки кнопок
@@ -149,7 +192,7 @@ namespace h
 			 * по сути вызывается внутри задачи, те можно самому вручную пуллить
 			 */
 			void tick();
-			void tick(gpio_num_t pin, bool state);
+			// void tick(gpio_num_t pin, bool state);
 		
 		private:
 			static Keyboard* _instance;
@@ -162,13 +205,13 @@ namespace h
 			int _minPressDurationMs = 50;
 			int _repeatPeriodMs = 300;
 			
-			std::vector<KeyboardButton> _buttons;
+			std::vector<KeyboardButtonI*> _buttons;
 
 			volatile bool _isTaskRunning = false;
 
 
 
-			void _handleButton(KeyboardButton& button, bool isPressed);
+			void _handleButton(KeyboardButtonI& button, bool isPressed);
 
 
 

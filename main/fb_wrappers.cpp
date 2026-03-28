@@ -48,9 +48,16 @@ void WrapperGpio::setValue(int value)
 bool WrapperPwm::_timer_states[] = {false};
 
 WrapperPwm::WrapperPwm(ledc_timer_t timer, ledc_channel_t channel, gpio_num_t gpio, bool highSpeed)
-	: _timer(timer), _channel(channel), _gpio(gpio), _isHighSpeed(highSpeed)
+	: _timer(timer), _channel(channel), _gpio(gpio), _frequency(highSpeed ? 30000 : 4000)
 {
 	
+}
+
+WrapperPwm::WrapperPwm(ledc_timer_t timer, ledc_channel_t channel, gpio_num_t gpio, int frequency)
+	: _timer(timer), _channel(channel), _gpio(gpio), _frequency(frequency)
+{
+	assert(frequency > 0);
+	assert(frequency < 30000);
 }
 
 void WrapperPwm::init()
@@ -60,7 +67,7 @@ void WrapperPwm::init()
 			.speed_mode = LEDC_LOW_SPEED_MODE,
 			.duty_resolution = LEDC_TIMER_8_BIT,
 			.timer_num = _timer,
-			.freq_hz = _isHighSpeed ? 300000ul : 4000,
+			.freq_hz = static_cast<uint32_t>(_frequency),
 			.clk_cfg = LEDC_USE_RC_FAST_CLK,
 			.deconfigure = false,
 		};
@@ -88,6 +95,11 @@ void WrapperPwm::init()
 void WrapperPwm::setValue(bool value)
 {
 	setValue(value ? 100 : 0);
+}
+
+void WrapperPwm::setFrequency(uint32_t frequency)
+{
+	ledc_set_freq(LEDC_LOW_SPEED_MODE, _timer, frequency);
 }
 
 void WrapperPwm::setValue(int value)

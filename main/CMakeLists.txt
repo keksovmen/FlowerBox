@@ -1,5 +1,5 @@
 # set(_PROJECT MINE)
-set(_PROJECT DIPLOM)
+# set(_PROJECT DIPLOM)
 # set(_PROJECT DIPLOM_C3)
 # set(_PROJECT RELAY)
 # set(_PROJECT STICKS)
@@ -9,6 +9,7 @@ set(_PROJECT DIPLOM)
 # set(_PROJECT CIPHER_BOX)
 # set(_PROJECT CIPHER_BOX_V2)
 # set(_PROJECT RFIDS)
+set(_PROJECT WASHER)
 
 
 
@@ -116,6 +117,14 @@ elseif(${_PROJECT} STREQUAL "RFIDS")
 
 	set(_ADD_INCLUDES
 		"include/projects/rfids"
+		)
+elseif(${_PROJECT} STREQUAL "WASHER")
+	file(GLOB _ADD_SRC
+		"projects/washer/*.cpp"
+		)
+
+	set(_ADD_INCLUDES
+		"include/projects/washer"
 		)
 endif()
 

@@ -1,0 +1,15 @@
+# settings.yml
+project: washer
+name: Washer
+version: 0.0.1
+settings:
+  - name: Url
+    type: std::string
+    default: "http://192.168.0.111:8080"
+    key: http_url
+  - name: BounceTimeMs
+    type: int
+    default: 50
+    key: bounce
+    min: 0
+    max: 500

@@ -29,22 +29,17 @@ Keyboard* Keyboard::instance()
 
 void Keyboard::keyboardAddButton(gpio_num_t pin, ButtonVK vk)
 {
-	_buttons.push_back(KeyboardButton(pin, vk));
-
-	#ifndef _ESP8266
-		gpio_reset_pin(pin);
-	#endif
-	
-	gpio_set_direction(pin, GPIO_MODE_INPUT);
-	gpio_pullup_en(pin);
-
-	if(!gpio_get_level(pin)){
-		_buttons.back().press();
-	}else{
-		_buttons.back().release();
-	}
-
+	auto* btn = new KeyboardButton(pin, vk);
+	btn->setup();
+	_buttons.push_back(btn);
 }
+
+void Keyboard::keyboardAddButton(KeyboardButtonI* button)
+{
+	button->setup();
+	_buttons.push_back(button);
+}
+
 
 bool Keyboard::keyboardStart(int stackSize, int priority, int core)
 {
@@ -70,27 +65,25 @@ void Keyboard::keyboardStop()
 
 void Keyboard::tick()
 {
-	for(KeyboardButton& b : _buttons){
-		const bool isPressed = !gpio_get_level(b.pin);
-
-		_handleButton(b, isPressed);
+	for(auto* b : _buttons){
+		_handleButton(*b, b->readState());
 	}
 }
 
-void Keyboard::tick(gpio_num_t pin, bool state)
-{
-	auto iter = std::find_if(_buttons.begin(), _buttons.end(), [pin](const auto& b){return pin == b.pin;});
-	if(iter == _buttons.end()){
-		return;
-	}
+// void Keyboard::tick(gpio_num_t pin, bool state)
+// {
+// 	auto iter = std::find_if(_buttons.begin(), _buttons.end(), [pin](const auto& b){return pin == b.pin;});
+// 	if(iter == _buttons.end()){
+// 		return;
+// 	}
 
-	auto& b = *iter;
-	const bool isPressed = !state;
+// 	auto& b = *iter;
+// 	const bool isPressed = !state;
 
-	_handleButton(b, isPressed);
-}
+// 	_handleButton(*b, isPressed);
+// }
 
-void Keyboard::_handleButton(KeyboardButton& button, bool isPressed)
+void Keyboard::_handleButton(KeyboardButtonI& button, bool isPressed)
 {
 	if(isPressed){
 		if(button.press()){
@@ -132,7 +125,7 @@ void Keyboard::_task(void* arg)
 
 
 
-bool KeyboardButton::press()
+bool KeyboardButtonI::press()
 {
 	if(_isPressed) return true;
 
@@ -143,7 +136,7 @@ bool KeyboardButton::press()
 	return false;
 }
 
-bool KeyboardButton::release()
+bool KeyboardButtonI::release()
 {
 	if(!_isPressed) return false;
 
@@ -152,17 +145,78 @@ bool KeyboardButton::release()
 	return true;
 }
 
-uint32_t KeyboardButton::holdDurationMs()
+uint32_t KeyboardButtonI::holdDurationMs()
 {
 	return pdTICKS_TO_MS(xTaskGetTickCount() - _whenPressed);
 }
 
-uint32_t KeyboardButton::currentDurationMs()
+uint32_t KeyboardButtonI::currentDurationMs()
 {
 	return pdTICKS_TO_MS(xTaskGetTickCount() - _currentStart);
 }
 
-void KeyboardButton::resetCurrentDuration()
+void KeyboardButtonI::resetCurrentDuration()
 {
 	_currentStart = xTaskGetTickCount();
+}
+
+
+
+void KeyboardButton::setup()
+{
+	#ifndef _ESP8266
+		gpio_reset_pin(pin);
+	#endif
+	
+	gpio_set_direction(pin, GPIO_MODE_INPUT);
+	gpio_pullup_en(pin);
+
+	if(readState()){
+		press();
+	}else{
+		release();
+	}
+}
+
+bool KeyboardButton::readState()
+{
+	const bool isPressed = !gpio_get_level(pin);
+	return isPressed;
+}
+
+
+
+void KeyboardMatrixButton::setup()
+{
+	#ifndef _ESP8266
+		gpio_reset_pin(in);
+		gpio_reset_pin(out);
+	#endif
+	
+	gpio_set_direction(in, GPIO_MODE_INPUT);
+	gpio_set_direction(out, GPIO_MODE_OUTPUT);
+	gpio_pulldown_en(in);
+
+	if(readState()){
+		press();
+	}else{
+		release();
+	}
+}
+
+bool KeyboardMatrixButton::readState()
+{
+	//first drive high
+	gpio_set_level(out, 1);
+	//then read input pin if all others pins are low, we should see pulled down as default
+	//if we see high than it is from out pin
+	bool isPressed = false;
+	//just to allow for io capacitance and wire capacitance to charge discharge
+	for(int i = 0; i < 10; i++){
+		isPressed = gpio_get_level(in);
+	}
+	//return to default state
+	gpio_set_level(out, 0);
+
+	return isPressed;
 }

@@ -122,6 +122,21 @@ namespace h
 		
 		case ButtonVK::VK_1:
 			return ButtonKeys::MODE;
+
+		case ButtonVK::VK_2:
+			return ButtonKeys::UP;
+
+		case ButtonVK::VK_3:
+			return ButtonKeys::DOWN;
+
+		case ButtonVK::VK_4:
+			return ButtonKeys::PLAY_STOP;
+
+		case ButtonVK::VK_5:
+			return ButtonKeys::SELECT;
+
+		case ButtonVK::VK_6:
+			return ButtonKeys::BACK;
 			
 		default:
 			return ButtonKeys::RESET;
