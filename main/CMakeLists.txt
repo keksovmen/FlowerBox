@@ -154,6 +154,7 @@ idf_component_register(
 		"fb_sleep.cpp"
 		"fb_expander_matrix.cpp"
 		"fb_http_request.cpp"
+		"fb_counter.cpp"
 		"fb_i2c.cpp"
 		"h_keyboard.cpp"
 		"main.cpp"

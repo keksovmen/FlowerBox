@@ -31,6 +31,21 @@ namespace fb
 			return def;
 		}
 
+		int parseIntFromJsonOrDefault(std::string_view data, std::string_view key, int def)
+		{
+			int result = def;
+			cJSON* json = cJSON_ParseWithLength(data.begin(), data.length());
+
+			auto* obj = cJSON_GetObjectItem(json, key.cbegin());
+			if(obj != nullptr){
+				result = static_cast<int>(cJSON_GetNumberValue(obj));
+			}
+
+			cJSON_Delete(json);
+
+			return result;
+		}
+
 		RGB parseRgbFromJson(std::string_view data)
 		{
 			cJSON* obj = cJSON_ParseWithLength(data.begin(), data.length());

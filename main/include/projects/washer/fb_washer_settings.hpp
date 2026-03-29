@@ -17,12 +17,24 @@ namespace fb {
 		
 		void setBounceTimeMs(int value);
 		
+		void setMqttId(int value);
+		
+		void setIp(std::string value);
+		
+		void setPort(int value);
+		
 
 		/*  ------- getters ------- */
 		
 		std::string getUrl();
 		
 		int getBounceTimeMs();
+		
+		int getMqttId();
+		
+		std::string getIp();
+		
+		int getPort();
 		
 
 	} // namespace settings

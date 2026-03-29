@@ -13,3 +13,19 @@ settings:
     key: bounce
     min: 0
     max: 500
+  - name: MqttId
+    type: int
+    default: 0
+    key: l_mqtt_id
+    min: 0
+    max: 4096
+  - name: Ip
+    type: std::string
+    default: 192.168.0.111
+    key: mq_ip
+  - name: Port
+    type: int
+    default: 8081
+    key: mq_port
+    min: 0
+    max: 65535

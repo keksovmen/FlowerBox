@@ -1,15 +1,25 @@
 #include "fb_washer_hw_obj.hpp"
 
 #include "fb_globals.hpp"
+#include "fb_json_util.hpp"
 #include "fb_keyboard_handler.hpp"
+#include "fb_mqtt_client.hpp"
+#include "fb_sensor_keyboard.hpp"
 #include "fb_washer_pins.hpp"
 #include "fb_washer_settings.hpp"
-#include "fb_sensor_keyboard.hpp"
 #include "fb_wrappers.hpp"
+#include "fb_counter.hpp"
 
 
 
 #define _BUZZER_FREQ_HZ 2800
+
+#define _MQTT_PATH_MELODY_PLAY ("/washer/" + std::to_string(settings::getMqttId()) + "/play")
+#define _MQTT_PATH_MELODY_STOP ("/washer/" + std::to_string(settings::getMqttId()) + "/stop")
+#define _MQTT_PATH_MELODY_SIGNAL ("/washer/" + std::to_string(settings::getMqttId()) + "/signal")
+#define _MQTT_PATH_SET_VALUE ("/washer/" + std::to_string(settings::getMqttId()) + "/set_value")
+#define _MQTT_PATH_SET_TARGET_VALUE ("/washer/" + std::to_string(settings::getMqttId()) + "/set_target")
+#define _MQTT_PATH_NOTIFICATION ("/washer/" + std::to_string(settings::getMqttId()) + "/updates")
 
 
 
@@ -35,9 +45,10 @@ static wrappers::WrapperPwm _buzzer(LEDC_TIMER_0, LEDC_CHANNEL_0, static_cast<gp
 static h::Keyboard _matrixKeyboard;
 
 static TaskHandle_t _melodyTaskHndl;
+static periph::MqttClient _mqtt;
 
-static int _value = 100;
-static int _multiplier = 1;
+static fb::util::Counter _counter(777, 000, [](int target){_mqtt.publish(_MQTT_PATH_NOTIFICATION, "{\"value\":" + std::to_string(target) + "}");});
+
 static volatile bool _stopFlag = false;
 
 
@@ -85,7 +96,7 @@ static void _displayTask(void* arg)
 		//read inputs here, we have the whole 1ms of time for this
 		_matrixKeyboard.tick();
 
-		int numbers[] = {_value / 100, (_value / 10) % 10, _value % 10};
+		int numbers[] = {_counter.getValue() / 100, (_counter.getValue() / 10) % 10, _counter.getValue() % 10};
 		//use only first 3 digits the forth is not interested to us
 		for(int i = 0; i < 3; i++)
 		{
@@ -126,6 +137,8 @@ static void _melodyTask(void* arg)
 		{
 			if(_stopFlag){
 				_stopFlag = false;
+				//take all previously applied request to play
+				ulTaskNotifyTake(pdTRUE, 0);
 				break;
 			}
 
@@ -190,14 +203,37 @@ static void _keyHandler(const h::ButtonAction& action)
 		_stopMelody();
 
 	}else if(action.isLongJustPressed(h::ButtonKeys::UP, 50)){
-		_multiplier *= 10;
-		_multiplier = (_multiplier > 100) ? 1 : _multiplier;
-		FB_DEBUG_LOG_I_TAG("Multiplier = %d", _multiplier);
+		_counter.changeMultiplier();
 
 	}else if(action.isJustPressed(h::ButtonKeys::DOWN)){
-		_value += _multiplier;
-		_value = (_value > 1000) ? _value - 1000 : _value;
-		FB_DEBUG_LOG_I_TAG("Value = %d", _value);
+		_counter.increment();
+	}
+}
+
+
+
+static void _mqttHandler(std::string_view topic, std::string_view data)
+{
+	//parse json data and see if you must fire
+	FB_DEBUG_LOG_I_TAG("Data handler: %.*s -> %.*s", topic.length(), topic.cbegin(), data.length(), data.cbegin());
+
+	if(topic == _MQTT_PATH_MELODY_PLAY){
+		_startMelody();
+
+	}else if(topic == _MQTT_PATH_MELODY_STOP){
+		_stopMelody();
+		
+	}else if(topic == _MQTT_PATH_MELODY_SIGNAL){
+		_playBuzz();
+
+	}else if(topic == _MQTT_PATH_SET_VALUE){
+		_counter.setValue(json_util::parseIntFromJsonOrDefault(data, "value", 0));
+
+	}else if(topic == _MQTT_PATH_SET_TARGET_VALUE){
+		_counter.setTarget(json_util::parseIntFromJsonOrDefault(data, "value", 777));
+
+	}else{
+		FB_DEBUG_LOG_W_TAG("Unexpected MQTT topic!");
 	}
 }
 
@@ -206,6 +242,15 @@ static void _keyHandler(const h::ButtonAction& action)
 static void _init_from_settings()
 {
 	//init keyboard here
+	_mqtt.init(settings::getIp(), settings::getPort(), 3 * 1024);
+	_mqtt.addDataHandler(&_mqttHandler);
+	_mqtt.registerSubscribeHandler([](const auto& handler){
+		std::invoke(handler, _MQTT_PATH_MELODY_PLAY, 2);
+		std::invoke(handler, _MQTT_PATH_MELODY_STOP, 2);
+		std::invoke(handler, _MQTT_PATH_MELODY_SIGNAL, 2);
+		std::invoke(handler, _MQTT_PATH_SET_VALUE, 2);
+		std::invoke(handler, _MQTT_PATH_SET_TARGET_VALUE, 2);
+	});
 }
 
 
@@ -244,7 +289,7 @@ void project::initHwObjs()
 		_matrixKeyboard.keyboardAddButton(new h::KeyboardMatrixButton(
 			static_cast<gpio_num_t>(pins::KEYBOARD_INPUT),
 			static_cast<gpio_num_t>(pins::DIGITS[i]),
-			(h::ButtonVK)((int)h::ButtonVK::VK_2)));
+			(h::ButtonVK)((int)h::ButtonVK::VK_2 + i)));
 	}
 
 	//add first washer machine key as up key
@@ -263,6 +308,7 @@ void project::initHwObjs()
 
 	//register key handler for dropping WIFI settings
 	global::getEventManager()->attachListener(&_keyboardHandler);
+	global::getEventManager()->attachListener(&_mqtt);
 
 	xTaskCreate(&_displayTask, "SCREEN_DRIVER", 4 * 1024, NULL, 15, NULL);
 	xTaskCreate(&_melodyTask, "MELODY", 4 * 1024, NULL, 16, &_melodyTaskHndl);
