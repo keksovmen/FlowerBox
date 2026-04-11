@@ -2,6 +2,9 @@
 
 
 
+#include <array>
+#include <span>
+
 #include "fb_wrappers.hpp"
 
 #include "driver/spi_master.h"
@@ -12,6 +15,7 @@ namespace fb
 {
 	namespace wrappers
 	{
+		template<int ChipsCount>
 		class WrapperDb135 : public WrapperIface
 		{
 			public:
@@ -21,6 +25,7 @@ namespace fb
 
 				virtual void IRAM_ATTR setValue(bool value) override;
 				virtual void IRAM_ATTR setValue(int value) override;
+				void IRAM_ATTR setValue(std::span<uint16_t, ChipsCount> value);
 
 				void setPin(int pin, bool isOn);
 				uint16_t getValue() const;
@@ -31,11 +36,14 @@ namespace fb
 				const int _gpioCs;
 
 				spi_device_handle_t _dev = nullptr;
-				uint16_t _state = 0;
+				std::array<uint16_t, ChipsCount> _states = {0};
 
 
 
 				void IRAM_ATTR _sendState();
 		};
+
+		template class WrapperDb135<1>;
+		template class WrapperDb135<2>;
 	}
 }

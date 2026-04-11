@@ -7,14 +7,16 @@ using namespace wrappers;
 
 
 
-WrapperDb135::WrapperDb135(int scl, int sda, int cs)
+template<int ChipsCount>
+WrapperDb135<ChipsCount>::WrapperDb135(int scl, int sda, int cs)
 	: _gpioScl(scl), _gpioSda(sda), _gpioCs(cs)
 {
 
 }
 
 
-void WrapperDb135::init()
+template<int ChipsCount>
+void WrapperDb135<ChipsCount>::init()
 {
 	//TODO: test no init structure what will be affected by random
 	spi_bus_config_t busCfg{};
@@ -53,50 +55,67 @@ void WrapperDb135::init()
 	setValue(0);
 }
 
-void WrapperDb135::setValue(bool value)
+template<int ChipsCount>
+void WrapperDb135<ChipsCount>::setValue(bool value)
 {
-	_state = value ? 0xFFFF : 0;
+	_states[0] = value ? 0xFFFF : 0;
 	_sendState();
 }
 
-void WrapperDb135::setValue(int value)
+template<int ChipsCount>
+void WrapperDb135<ChipsCount>::setValue(int value)
 {
-	_state = value;
+	_states[0] = value;
 	_sendState();
 }
 
-void WrapperDb135::setPin(int pin, bool isOn)
+template<int ChipsCount>
+void WrapperDb135<ChipsCount>::setValue(std::span<uint16_t, ChipsCount> value)
+{
+	for(int i = 0; i < value.size(); i++){
+		//по логике первый чип должен получить первые значения,
+		//но на деле наоборот, смотри документацию на чип и передачу данных
+		//так же надо сменить Little endian на Big endian при отправке
+		_states[ChipsCount - i - 1] = (value[i] >> 8) | (value[i] << 8);
+	}
+	_sendState();
+}
+
+template<int ChipsCount>
+void WrapperDb135<ChipsCount>::setPin(int pin, bool isOn)
 {
 	if(isOn){
-		_state |= 1 << pin;
+		_states[0] |= 1 << pin;
 	}else{
-		_state &= ~(1 << pin);
+		_states[0] &= ~(1 << pin);
 	}
 
 	_sendState();
 }
 
-uint16_t WrapperDb135::getValue() const
+template<int ChipsCount>
+uint16_t WrapperDb135<ChipsCount>::getValue() const
 {
-	return _state;
+	return _states[0];
 }
 
-void WrapperDb135::_sendState()
+template<int ChipsCount>
+void WrapperDb135<ChipsCount>::_sendState()
 {
 	//first byte is [8; 15] outputs, second byte is [0; 7] outputs
 	//bit position is equal, 0 bit is 0 output
 	//so need to know first byte is high value, despite it sending first
 	//it means it is MSB first if looking at 2 bytes
 
-	uint8_t data[2] = {static_cast<uint8_t>(_state >> 8), static_cast<uint8_t>(_state & 0xFF)};
+	// uint8_t data[2] = {static_cast<uint8_t>(_state >> 8), static_cast<uint8_t>(_state & 0xFF)};
 
 	//TODO: test no init structure what will be affected by random
     spi_transaction_t t{};
 	t.flags     = 0;
 	t.cmd       = 0;
-	t.length    = 16;        // 16 bits total
+	t.length    = 16 * ChipsCount;
 	t.rxlength  = 0;
-	t.tx_buffer = data;
+	t.tx_buffer = _states.data();
 	t.rx_buffer = NULL;
 
     // One transaction: bytes go out back-to-back, no gap on the bus

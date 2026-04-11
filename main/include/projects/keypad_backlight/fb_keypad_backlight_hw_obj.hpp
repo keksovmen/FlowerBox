@@ -11,7 +11,7 @@ namespace fb
 {
 	namespace project
 	{
-		wrappers::WrapperDb135& getHwWrapperDb();
+		wrappers::WrapperDb135<1>& getHwWrapperDb();
 		void setDbState(uint16_t state);
 		uint16_t getDbState();
 		void setPulseMode(int pin);
