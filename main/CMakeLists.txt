@@ -9,7 +9,8 @@
 # set(_PROJECT CIPHER_BOX)
 # set(_PROJECT CIPHER_BOX_V2)
 # set(_PROJECT RFIDS)
-set(_PROJECT WASHER)
+# set(_PROJECT WASHER)
+set(_PROJECT INPUT_MATRIX)
 
 
 
@@ -125,6 +126,14 @@ elseif(${_PROJECT} STREQUAL "WASHER")
 
 	set(_ADD_INCLUDES
 		"include/projects/washer"
+		)
+elseif(${_PROJECT} STREQUAL "INPUT_MATRIX")
+	file(GLOB _ADD_SRC
+		"projects/input_matrix/*.cpp"
+		)
+
+	set(_ADD_INCLUDES
+		"include/projects/input_matrix"
 		)
 endif()
 
