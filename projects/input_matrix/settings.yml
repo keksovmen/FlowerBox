@@ -25,3 +25,7 @@ settings:
     key: t_pulse
     min: 1
     max: 10
+  - name: Combination
+    type: std::string
+    default: "1"
+    key: comb

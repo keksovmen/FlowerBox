@@ -18,6 +18,8 @@
 
 #define _KEY_PULSETIME "t_pulse"
 
+#define _KEY_COMBINATION "comb"
+
 
 
 
@@ -57,6 +59,13 @@ void settings::setPulseTime(int value)
     
 }
 
+void settings::setCombination(std::string value)
+{
+    
+    settings::setStr(_PARTITION, _KEY_COMBINATION, value);
+	
+}
+
 
 
 
@@ -87,5 +96,12 @@ int settings::getPulseTime()
 {
     
     return settings::getIntOrDefault(_PARTITION, _KEY_PULSETIME, 4);
+    
+}
+
+std::string settings::getCombination()
+{
+    
+    return settings::getStrOrDefault(_PARTITION, _KEY_COMBINATION, "1");
     
 }

@@ -21,6 +21,8 @@ namespace fb {
 		
 		void setPulseTime(int value);
 		
+		void setCombination(std::string value);
+		
 
 		/*  ------- getters ------- */
 		
@@ -31,6 +33,8 @@ namespace fb {
 		int getPort();
 		
 		int getPulseTime();
+		
+		std::string getCombination();
 		
 
 	} // namespace settings

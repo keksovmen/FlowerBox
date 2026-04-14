@@ -69,6 +69,19 @@ void project::initMaperObjs()
 	getBox().addProperty(std::unique_ptr<box::PropertyIface>(PulseTimeProp));
 	getBox().addPropertyDependency(PulseTimeProp->getId());
 	
+	
+	auto* CombinationProp = new box::PropertyString("Combination", "Change Combination",
+    
+		box::Tid::PROPERTY_GENERAL,
+		[](std::string val){
+			settings::setCombination(val);
+			return true;
+		}, settings::getCombination()
+	);
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(CombinationProp));
+	getBox().addPropertyDependency(CombinationProp->getId());
+	
 }
 
 int project::mapBoxSensorIdToAddres(int id)
