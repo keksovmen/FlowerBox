@@ -17,7 +17,7 @@ namespace fb
 	namespace project
 	{
 		sensor::KeyboardSensor<1>& getHwKeyboardSensor();
-		switches::ArrayGpioSwitch<pins::RELAY_PINS_COUNT>& getHwGpioSwitch();
+		switches::ArrayGpioSwitch<pins::RELAY_PINS.size()>& getHwGpioSwitch();
 		
 		AbstractHttpPuller& getHwHttpPuller();
 	}

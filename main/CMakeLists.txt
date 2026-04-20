@@ -2,6 +2,7 @@
 # set(_PROJECT DIPLOM)
 # set(_PROJECT DIPLOM_C3)
 # set(_PROJECT RELAY)
+set(_PROJECT RELAY_NEW)
 # set(_PROJECT STICKS)
 # set(_PROJECT TRESSURE)
 # set(_PROJECT IR)
@@ -10,7 +11,7 @@
 # set(_PROJECT CIPHER_BOX_V2)
 # set(_PROJECT RFIDS)
 # set(_PROJECT WASHER)
-set(_PROJECT INPUT_MATRIX)
+# set(_PROJECT INPUT_MATRIX)
 
 
 
@@ -47,7 +48,7 @@ elseif(${_PROJECT} STREQUAL "DIPLOM" OR ${_PROJECT} STREQUAL "DIPLOM_C3")
 	set(_ADD_INCLUDES
 		"include/projects/dmx_light"
 		"include/df_player")
-elseif(${_PROJECT} STREQUAL "RELAY")
+elseif(${_PROJECT} STREQUAL "RELAY" OR ${_PROJECT} STREQUAL "RELAY_NEW")
 	set(_ADD_SRC 
 		"projects/relay/fb_project_box_obj.cpp"
 		"projects/relay/fb_project_hw_obj.cpp"
@@ -219,7 +220,7 @@ idf_component_register(
 		"include/core"
 		)
 		
-if(${_PROJECT} STREQUAL "DIPLOM_C3" OR ${_PROJECT} STREQUAL "CIPHER_BOX_V2")
+if(${_PROJECT} STREQUAL "DIPLOM_C3" OR ${_PROJECT} STREQUAL "CIPHER_BOX_V2" OR ${_PROJECT} STREQUAL "RELAY_NEW")
 	target_compile_definitions(${COMPONENT_TARGET} PRIVATE _HW_VERSION=2)
 endif()
 # if(${_PROJECT} STREQUAL "MINE")
