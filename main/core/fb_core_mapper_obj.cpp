@@ -46,8 +46,8 @@ void fb::project::util::createAndRegisterDefaultBoxProperties()
 	auto* currentTimeProp = new box::PropertyInt(
 		box::Tid::PROPERTY_SYSTEM_TIME,
 		[](int millis){
-
-			return false;
+			clock::setCurrentTime(millis);
+			return true;
 		},
 		clock::currentTimeStamp());
 	//made it dynamic

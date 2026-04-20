@@ -48,5 +48,6 @@ namespace fb
 		Time getCurrentTime();
 
 		Timestamp currentTimeStamp();
+		void setCurrentTime(uint32_t timeSec);
 	}
 }

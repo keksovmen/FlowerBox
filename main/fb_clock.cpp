@@ -197,3 +197,12 @@ Timestamp clock::currentTimeStamp()
 
 	return now;
 }
+
+
+void clock::setCurrentTime(uint32_t timeSec)
+{
+	struct timeval tv;
+	tv.tv_sec = timeSec;
+	
+	settimeofday(&tv, nullptr);
+}

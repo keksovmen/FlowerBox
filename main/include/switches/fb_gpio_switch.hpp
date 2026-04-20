@@ -3,6 +3,9 @@
 
 
 #include <array>
+#include <algorithm>
+#include <utility>
+
 #include "fb_switch_iface.hpp"
 
 
@@ -64,6 +67,15 @@ namespace fb
 				ArrayGpioSwitch(std::array<GpioSwitch, N> gpios) :
 					SwitchIface(SwitchIface::MockCondition, &_action),
 					_gpios(std::move(gpios))
+				{
+				}
+
+				ArrayGpioSwitch(std::array<int, N> gpios, bool isOd) :
+					SwitchIface(SwitchIface::MockCondition, &_action),
+					_gpios([&]<std::size_t... I>(std::index_sequence<I...>) {
+						return std::array{ GpioSwitch(gpios[I], isOd)... };
+					}(std::make_index_sequence<N>{}))
+
 				{
 				}
 
