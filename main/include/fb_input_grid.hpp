@@ -106,7 +106,7 @@ namespace fb
 							const gpio_num_t in = static_cast<gpio_num_t>(_columns[x]);
 							const bool isPressed = !gpio_get_level(in);
 
-							const int index = y * COLUMN + x;
+							const int index = x * ROW + y;
 
 							_handleButton(index, isPressed);
 						}
