@@ -23,6 +23,10 @@ namespace fb {
 		
 		void setCombination(std::string value);
 		
+		void setDebounceMs(int value);
+		
+		void setStillPeriodMs(int value);
+		
 
 		/*  ------- getters ------- */
 		
@@ -35,6 +39,10 @@ namespace fb {
 		int getPulseTime();
 		
 		std::string getCombination();
+		
+		int getDebounceMs();
+		
+		int getStillPeriodMs();
 		
 
 	} // namespace settings

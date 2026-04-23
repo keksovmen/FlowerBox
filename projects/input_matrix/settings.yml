@@ -29,3 +29,15 @@ settings:
     type: std::string
     default: "1"
     key: comb
+  - name: DebounceMs
+    type: int
+    default: 15
+    key: t_deb
+    min: 0
+    max: 10000
+  - name: StillPeriodMs
+    type: int
+    default: 500
+    key: t_still
+    min: 0
+    max: 100000

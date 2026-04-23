@@ -82,6 +82,32 @@ void project::initMaperObjs()
 	getBox().addProperty(std::unique_ptr<box::PropertyIface>(CombinationProp));
 	getBox().addPropertyDependency(CombinationProp->getId());
 	
+	
+	auto* DebounceMsProp = new box::PropertyInt("DebounceMs", "Change DebounceMs",
+	
+		box::Tid::PROPERTY_GENERAL,
+		[](int val){
+			settings::setDebounceMs(val);
+			return true;
+		}, settings::getDebounceMs(), 0, 10000 
+	);
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(DebounceMsProp));
+	getBox().addPropertyDependency(DebounceMsProp->getId());
+	
+	
+	auto* StillPeriodMsProp = new box::PropertyInt("StillPeriodMs", "Change StillPeriodMs",
+	
+		box::Tid::PROPERTY_GENERAL,
+		[](int val){
+			settings::setStillPeriodMs(val);
+			return true;
+		}, settings::getStillPeriodMs(), 0, 100000 
+	);
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(StillPeriodMsProp));
+	getBox().addPropertyDependency(StillPeriodMsProp->getId());
+	
 }
 
 int project::mapBoxSensorIdToAddres(int id)

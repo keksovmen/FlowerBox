@@ -20,6 +20,10 @@
 
 #define _KEY_COMBINATION "comb"
 
+#define _KEY_DEBOUNCEMS "t_deb"
+
+#define _KEY_STILLPERIODMS "t_still"
+
 
 
 
@@ -66,6 +70,20 @@ void settings::setCombination(std::string value)
 	
 }
 
+void settings::setDebounceMs(int value)
+{
+    
+    settings::setInt(_PARTITION, _KEY_DEBOUNCEMS, value);
+    
+}
+
+void settings::setStillPeriodMs(int value)
+{
+    
+    settings::setInt(_PARTITION, _KEY_STILLPERIODMS, value);
+    
+}
+
 
 
 
@@ -103,5 +121,19 @@ std::string settings::getCombination()
 {
     
     return settings::getStrOrDefault(_PARTITION, _KEY_COMBINATION, "1");
+    
+}
+
+int settings::getDebounceMs()
+{
+    
+    return settings::getIntOrDefault(_PARTITION, _KEY_DEBOUNCEMS, 15);
+    
+}
+
+int settings::getStillPeriodMs()
+{
+    
+    return settings::getIntOrDefault(_PARTITION, _KEY_STILLPERIODMS, 500);
     
 }
