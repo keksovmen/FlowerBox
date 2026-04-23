@@ -191,13 +191,15 @@ static void _dataHandler(std::string_view topic, std::string_view data)
 
 static void _handleButtonPresses(decltype(_inputMatrix)::ButtonEntry button)
 {
-	const int index = button.index;
-	_toggleStates[index] = !_toggleStates[index];
-	
 	_buttonsQueue.addEntry(button);
 
-	if(!_checkTargetCondition()){
-		_dbPwm.setMode(index, _toggleStates[index] ? decltype(_dbPwm)::Mode::ON : decltype(_dbPwm)::Mode::OFF);
+	const int index = button.index;
+	if(button.action == decltype(_inputMatrix)::ButtonAction::RELEASED){
+		_toggleStates[index] = !_toggleStates[index];
+
+		if(!_checkTargetCondition()){
+			_dbPwm.setMode(index, _toggleStates[index] ? decltype(_dbPwm)::Mode::ON : decltype(_dbPwm)::Mode::OFF);
+		}
 	}
 }
 
