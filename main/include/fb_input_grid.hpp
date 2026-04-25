@@ -69,6 +69,7 @@ namespace fb
 					for(int in : _columns){
 						cfg.pin_bit_mask = 1ull << in;
 						cfg.mode = GPIO_MODE_INPUT;
+						cfg.pull_up_en = GPIO_PULLUP_ENABLE;
 
 						gpio_config(&cfg);
 					}
@@ -76,6 +77,8 @@ namespace fb
 					for(int out : _rows){
 						cfg.pin_bit_mask = 1ull << out;
 						cfg.mode = GPIO_MODE_OUTPUT;
+						cfg.pull_up_en = GPIO_PULLUP_DISABLE;
+
 
 						gpio_config(&cfg);
 					}
