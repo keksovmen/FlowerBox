@@ -285,19 +285,19 @@ void project::initHwObjs()
 	_buzzer.init();
 
 
-	for(int i = 0; i < sizeof(pins::DIGITS) / sizeof(pins::DIGITS[0]); i++){
-		_matrixKeyboard.keyboardAddButton(new h::KeyboardMatrixButton(
-			static_cast<gpio_num_t>(pins::KEYBOARD_INPUT),
-			static_cast<gpio_num_t>(pins::DIGITS[i]),
-			(h::ButtonVK)((int)h::ButtonVK::VK_2 + i)));
-	}
+	// for(int i = 0; i < sizeof(pins::DIGITS) / sizeof(pins::DIGITS[0]); i++){
+	// 	_matrixKeyboard.keyboardAddButton(new h::KeyboardMatrixButton(
+	// 		static_cast<gpio_num_t>(pins::KEYBOARD_INPUT),
+	// 		static_cast<gpio_num_t>(pins::DIGITS[i]),
+	// 		(h::ButtonVK)((int)h::ButtonVK::VK_2 + i)));
+	// }
 
 	//add first washer machine key as up key
 	//TODO: uncomment
-	// _matrixKeyboard.keyboardAddButton(new h::KeyboardMatrixButton(
-	// 		static_cast<gpio_num_t>(pins::KEYBOARD_INPUT),
-	// 		static_cast<gpio_num_t>(pins::DIGITS[3]),
-	// 		(h::ButtonVK)((int)h::ButtonVK::VK_2)));
+	_matrixKeyboard.keyboardAddButton(new h::KeyboardMatrixButton(
+			static_cast<gpio_num_t>(pins::KEYBOARD_INPUT),
+			static_cast<gpio_num_t>(pins::DIGITS[3]),
+			(h::ButtonVK)((int)h::ButtonVK::VK_2)));
 	//add second washer machine key as down key
 	_matrixKeyboard.keyboardAddButton(new h::KeyboardButton(static_cast<gpio_num_t>(pins::PIN_WASHER_2_INPUT), h::ButtonVK::VK_3));
 	_matrixKeyboard.setConsumer(&_keyHandler);

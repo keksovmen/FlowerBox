@@ -6,13 +6,15 @@
 
 - Микро теплица - папка green_house - "_PROJECT MINE"
 - Диплом (DMX) светильник с MQTT управлением, две аппаратные версии, "_PROJECT DIPLOM" "_PROJECT DIPLOM_C3" [ссылка на документацию](projects/dmx_light/README.md)
-- Реле - просто WIFI и реле модули "_PROJECT RELAY", [ссылка на документацию](projects/relay/README.md)
+- Реле - просто WIFI и реле модули "_PROJECT RELAY", либо твердотельные реле "_PROJECT_NEW", [ссылка на документацию](projects/relay/README.md)
 - Управление китайскими игрушками - папка sticks_project, использует esp8266, так же должно собираться и под esp32, "_PROJECT STICKS"
 - Коробка на аккумуляторе с дверью на замке и MQTT управлении, "_PROJECT TRESSURE", [ссылка на документацию](projects/tressure/README.md)
 - MQTT контроллер для драйверов светодиодов, "_PROJECT KEY_BACKLIGHT", [ссылка на документацию](projects/keypad_backlight/README.md)
 - Монитор аналоговых сигналов, с потенциалом в 64 канала, и двумя аппаратными версиями "_PROJECT CIPHER_BOX" "_PROJECT CIPHER_BOX_V2", данные передает через POST при изменении, [ссылка на документацию](projects/cipher_box/README.md)
 - Считыватель 10 RDM6300 RFID модулей, циклично сканирует все 10 каналов, уведомляет об изменении через POST, "_PROJECT RFIDS", [ссылка на документацию](projects/rfids/README.md)
 - Аналоговый (555) генератор импульса для открытия электромагнитных замков, по **изменению** напряжения сигнала [ссылка на документацию](projects/boots/README.md)
+- Матрица кнопок с управлением подсветкой этих кнопок, 6 на 5, "_PROJECT_INPUT_MATRIX", [ссылка на документацию](projects/input_matrix/README.md)
+- Плата управления интерфейсом стиральной машины и ее дисплеем, "_PROJECT_WASHER", [ссылка на документацию](projects/washer/README.md)
 
 ## Как собрать
 1. В main/CMakeLists.txt раскоментировать одну из строк с определением константы _PROJECT в начале файла, остальные должны быть закоментированы

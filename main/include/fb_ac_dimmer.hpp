@@ -105,6 +105,16 @@ namespace fb
 					}
 				}
 
+				Mode getMode(int index) const
+				{
+					if(index < 0 || index >= N){
+						FB_DEBUG_LOG_E_OBJ("Illegal get index: %d", index);
+						return Mode::MAX;
+					}
+
+					return _modes[index];
+				}
+
 
 			private:
 				struct Entry
