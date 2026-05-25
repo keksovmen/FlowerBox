@@ -82,6 +82,58 @@ void project::initMaperObjs()
 	getBox().addProperty(std::unique_ptr<box::PropertyIface>(ReadingsCountProp));
 	getBox().addPropertyDependency(ReadingsCountProp->getId());
 	
+	
+	auto* MqttIdProp = new box::PropertyInt("MqttId", "Change MqttId",
+	
+		box::Tid::PROPERTY_GENERAL,
+		[](int val){
+			settings::setMqttId(val);
+			return true;
+		}, settings::getMqttId(), 0, 4096 
+	);
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(MqttIdProp));
+	getBox().addPropertyDependency(MqttIdProp->getId());
+	
+	
+	auto* IpProp = new box::PropertyString("Ip", "Change Ip",
+    
+		box::Tid::PROPERTY_GENERAL,
+		[](std::string val){
+			settings::setIp(val);
+			return true;
+		}, settings::getIp()
+	);
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(IpProp));
+	getBox().addPropertyDependency(IpProp->getId());
+	
+	
+	auto* PortProp = new box::PropertyInt("Port", "Change Port",
+	
+		box::Tid::PROPERTY_GENERAL,
+		[](int val){
+			settings::setPort(val);
+			return true;
+		}, settings::getPort(), 0, 65535 
+	);
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(PortProp));
+	getBox().addPropertyDependency(PortProp->getId());
+	
+	
+	auto* UseHttpProp = new box::PropertyInt("UseHttp", "Change UseHttp",
+	
+		box::Tid::PROPERTY_GENERAL,
+		[](int val){
+			settings::setUseHttp(val);
+			return true;
+		}, settings::getUseHttp(), 0, 1 
+	);
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(UseHttpProp));
+	getBox().addPropertyDependency(UseHttpProp->getId());
+	
 }
 
 int project::mapBoxSensorIdToAddres(int id)

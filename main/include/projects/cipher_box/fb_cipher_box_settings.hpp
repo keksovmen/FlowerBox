@@ -23,6 +23,14 @@ namespace fb {
 		
 		void setReadingsCount(int value);
 		
+		void setMqttId(int value);
+		
+		void setIp(std::string value);
+		
+		void setPort(int value);
+		
+		void setUseHttp(int value);
+		
 
 		/*  ------- getters ------- */
 		
@@ -35,6 +43,14 @@ namespace fb {
 		int getChipsCount();
 		
 		int getReadingsCount();
+		
+		int getMqttId();
+		
+		std::string getIp();
+		
+		int getPort();
+		
+		int getUseHttp();
 		
 
 	} // namespace settings

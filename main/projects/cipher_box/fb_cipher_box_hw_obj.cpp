@@ -8,6 +8,7 @@
 #include "fb_i2c.hpp"
 #include "fb_keyboard_handler.hpp"
 #include "fb_sensor_keyboard.hpp"
+#include "fb_mqtt_client.hpp"
 
 #include "ex_protocol.h"
 
@@ -17,6 +18,10 @@
 
 using namespace fb;
 using namespace project;
+
+
+
+#define _MQTT_PATH_STATE ("/cipher_box/" + std::to_string(settings::getMqttId()) + "/state")
 
 
 
@@ -40,7 +45,6 @@ static sensor::SensorStorage _sensorStorage;
 static keyboard::KeyboardHandler _keyboardHandler;
 static sensor::KeyboardSensor<1> _keyboardSensor({std::pair{pins::PIN_KEYBOARD_RESET, h::ButtonVK::VK_0}});
 
-
 static interfaces::I2c _i2c;
 static ex_master_t _expander;
 
@@ -50,6 +54,7 @@ static ex_master_t _expander;
 	static periph::ExpanderMatrix _matrix(_expander);
 #endif
 static periph::HttpRequest _http;
+static periph::MqttClient _mqtt;
 
 static bool _i2cErrorFlag = false;
 
@@ -97,8 +102,7 @@ static void _monitorTask(void* arg)
 	_http.init();
 	auto prevState = _matrix.readPins();
 	std::vector<_Entry> timeStates(prevState.size());
-	//make post request
-	const int error = settings::getDeltaError();	// just to reduce log output from internal NVS handling
+	const int error = settings::getDeltaError();
 	const int bounceTimeUs = settings::getBounceTimeMs() * 1000;
 
 	for(;;){
@@ -135,7 +139,6 @@ static void _monitorTask(void* arg)
 
 		if(changedFlag){
 			changedFlag = false;
-			// prevState = std::move(state);
 
 			char buffer[256] = "[";
 			char* ptr = &buffer[1];
@@ -147,11 +150,14 @@ static void _monitorTask(void* arg)
 			ptr[1] = '\0';
 
 			FB_DEBUG_LOG_I_TAG("%s", buffer);
-			_http.post(settings::getUrl(), buffer);
+			if(settings::getUseHttp()){
+				_http.post(settings::getUrl(), buffer);
+			}else{
+				_mqtt.publish(_MQTT_PATH_STATE, buffer);
+			}
 		}else{
 			vTaskDelay(pdMS_TO_TICKS(100));
 		}
-		
 	}
 
 	vTaskDelete(NULL);
@@ -201,9 +207,9 @@ void project::initHwObjs()
 
 	_init_from_settings();
 
-
-	//register key handler for dropping WIFI settings
+	// Подписка на глобальные события (WiFi и т.д.)
 	global::getEventManager()->attachListener(&_keyboardHandler);
+	global::getEventManager()->attachListener(&_mqtt);
 
 	_i2c.init(0, pins::PIN_SDA, pins::PIN_SCL);
 	_i2c.addDevice(100000, EX_PROTOCOL_DEFAULT_I2C_ADDRESS >> 1);
@@ -229,6 +235,10 @@ void project::initHwObjs()
 
 	_initExpander();
 	_registerMatrix();
+
+	// Инициализация MQTT (используются те же настройки IP/порта, что и в примере с матрицей)
+	_mqtt.init(settings::getIp(), settings::getPort(), 3 * 1024);
+	// При необходимости можно добавить обработчик входящих сообщений (не требуется для отправки)
 
 	if(xTaskCreate(&_monitorTask, "mon", 4 * 1024, NULL, 8, NULL) != pdPASS){
 		FB_DEBUG_LOG_E_TAG("Failed to create the monitor task");

@@ -20,6 +20,14 @@
 
 #define _KEY_READINGSCOUNT "readings"
 
+#define _KEY_MQTTID "l_mqtt_id"
+
+#define _KEY_IP "mq_ip"
+
+#define _KEY_PORT "mq_port"
+
+#define _KEY_USEHTTP "http_en"
+
 
 
 
@@ -66,6 +74,34 @@ void settings::setReadingsCount(int value)
     
 }
 
+void settings::setMqttId(int value)
+{
+    
+    settings::setInt(_PARTITION, _KEY_MQTTID, value);
+    
+}
+
+void settings::setIp(std::string value)
+{
+    
+    settings::setStr(_PARTITION, _KEY_IP, value);
+	
+}
+
+void settings::setPort(int value)
+{
+    
+    settings::setInt(_PARTITION, _KEY_PORT, value);
+    
+}
+
+void settings::setUseHttp(int value)
+{
+    
+    settings::setInt(_PARTITION, _KEY_USEHTTP, value);
+    
+}
+
 
 
 
@@ -103,5 +139,33 @@ int settings::getReadingsCount()
 {
     
     return settings::getIntOrDefault(_PARTITION, _KEY_READINGSCOUNT, 4);
+    
+}
+
+int settings::getMqttId()
+{
+    
+    return settings::getIntOrDefault(_PARTITION, _KEY_MQTTID, 0);
+    
+}
+
+std::string settings::getIp()
+{
+    
+    return settings::getStrOrDefault(_PARTITION, _KEY_IP, "192.168.0.111");
+    
+}
+
+int settings::getPort()
+{
+    
+    return settings::getIntOrDefault(_PARTITION, _KEY_PORT, 8081);
+    
+}
+
+int settings::getUseHttp()
+{
+    
+    return settings::getIntOrDefault(_PARTITION, _KEY_USEHTTP, 0);
     
 }
