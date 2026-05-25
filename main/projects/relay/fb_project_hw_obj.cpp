@@ -18,7 +18,6 @@
 
 
 #define _MQTT_PATH_MODE ("/relay/" + std::to_string(settings::getMqttId()) + "/state")
-#define _MQTT_PATH_TOGGLE ("/relay/" + std::to_string(settings::getMqttId()) + "/toggle")
 
 
 
@@ -141,29 +140,15 @@ static void _handleMqtt(std::string_view topic, std::string_view data)
 			}
 
 			_dimmer.setState(index, (decltype(_dimmer)::Mode) mode);
-		});
-
-	}else if(topic == _MQTT_PATH_TOGGLE){
-		fb::json_util::parseObjArray(data, "data", [](cJSON* root){
-			const int index = fb::json_util::getIntFromJsonOrDefault(root, "i", -1);
-			if(index < 0 || index >= pins::RELAY_PINS.size()){
-				FB_DEBUG_LOG_W_TAG("Illegal index %d", index);
-				return;
-			}
 
 			const int duration = fb::json_util::getIntFromJsonOrDefault(root, "duration", -1);
-			if(duration < 0){
-				FB_DEBUG_LOG_W_TAG("Illegal duration %d", duration);
+			if(duration > 0){
+				auto oldState = _dimmer.getMode(index);
+				global::getTimeScheduler()->addActionDelayed([index, oldState](){
+								_dimmer.setState(index, oldState);
+							}, duration, 1000);
 				return;
 			}
-
-			const int mode = fb::json_util::getIntFromJsonOrDefault(root, "state", -1);
-			auto oldState = _dimmer.getMode(index);
-
-			_dimmer.setState(index, mode ? decltype(_dimmer)::Mode::ON : decltype(_dimmer)::Mode::OFF);
-			global::getTimeScheduler()->addActionDelayed([index, oldState](){
-				_dimmer.setState(index, oldState);
-			}, duration, 1000);
 		});
 	}
 }
@@ -186,7 +171,6 @@ void project::initHwObjs()
 	_mqtt.addDataHandler(&_handleMqtt);
 	_mqtt.registerSubscribeHandler([](const auto& handler){
 		std::invoke(handler, _MQTT_PATH_MODE, 2);
-		std::invoke(handler, _MQTT_PATH_TOGGLE, 2);
 	});
 	global::getEventManager()->attachListener(&_mqtt);
 
