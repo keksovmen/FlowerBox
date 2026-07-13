@@ -139,11 +139,11 @@ static void _handleMqtt(std::string_view topic, std::string_view data)
 				_dimmer.setBlinkPeriod(index, std::min(minTick, maxTick), std::max(maxTick, minTick));
 			}
 
+			auto oldState = _dimmer.getMode(index);
 			_dimmer.setState(index, (decltype(_dimmer)::Mode) mode);
 
 			const int duration = fb::json_util::getIntFromJsonOrDefault(root, "duration", -1);
 			if(duration > 0){
-				auto oldState = _dimmer.getMode(index);
 				global::getTimeScheduler()->addActionDelayed([index, oldState](){
 								_dimmer.setState(index, oldState);
 							}, duration, 1000);
