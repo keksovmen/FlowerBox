@@ -98,6 +98,47 @@ static void _initHttpPuller()
 	getBox().addSwitch(&_hhtpPullerSwitch);
 }
 
+static void _initMqtt()
+{
+	auto* MqttIdProp = new box::PropertyInt("MqttId", "Change MqttId",
+	
+		box::Tid::PROPERTY_GENERAL,
+		[](int val){
+			settings::setMqttId(val);
+			return true;
+		}, settings::getMqttId(), 0, 4096 
+	);
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(MqttIdProp));
+	getBox().addPropertyDependency(MqttIdProp->getId());
+	
+	
+	auto* IpProp = new box::PropertyString("Ip", "Change Ip",
+    
+		box::Tid::PROPERTY_GENERAL,
+		[](std::string val){
+			settings::setIp(val);
+			return true;
+		}, settings::getIp()
+	);
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(IpProp));
+	getBox().addPropertyDependency(IpProp->getId());
+	
+	
+	auto* PortProp = new box::PropertyInt("Port", "Change Port",
+	
+		box::Tid::PROPERTY_GENERAL,
+		[](int val){
+			settings::setPort(val);
+			return true;
+		}, settings::getPort(), 0, 65535 
+	);
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(PortProp));
+	getBox().addPropertyDependency(PortProp->getId());
+}
+
 
 
 void project::initMaperObjs()
@@ -105,6 +146,10 @@ void project::initMaperObjs()
 	util::createAndRegisterDefaultBoxProperties();
 	_initGpioArray();
 	_initHttpPuller();
+	
+	#if _HW_VERSION == 2
+		_initMqtt();
+	#endif
 }
 
 int project::mapBoxSensorIdToAddres(int id)
