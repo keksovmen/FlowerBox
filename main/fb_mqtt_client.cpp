@@ -66,17 +66,21 @@ void MqttClient::init(std::string_view ip, int port, int bufferSize)
 	init(std::string_view(buff, len), bufferSize);
 }
 
-void MqttClient::publish(std::string_view topic, std::string_view data)
+bool MqttClient::publish(std::string_view topic, std::string_view data)
 {
 	if(!_handle){
 		FB_DEBUG_LOG_E_OBJ("Have no client for publish action!");
-		return;
+		return false;
 	}
 
 	const auto err = esp_mqtt_client_publish(_handle, topic.begin(), data.begin(), 0, 2, 0);
 	if(err <= 0){
 		FB_DEBUG_LOG_E_OBJ("Failed to publish!: %s = %s", topic.begin(), data.begin());
+
+		return false;
 	}
+
+	return true;
 }
 
 void MqttClient::addDataHandler(const DataHandler& handler)

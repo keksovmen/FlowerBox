@@ -20,7 +20,7 @@ namespace fb
 				virtual const char* getName() const override;
 
 				void init();
-				void post(std::string url, std::string data);
+				bool post(std::string url, std::string data);
 
 			private:
 				esp_http_client_handle_t _httpClient = NULL;

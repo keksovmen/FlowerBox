@@ -32,7 +32,7 @@ namespace fb
 
 				//add subscribe action with callback handler for data
 				//add publish action
-				void publish(std::string_view topic, std::string_view data);
+				bool publish(std::string_view topic, std::string_view data);
 				void addDataHandler(const DataHandler& handler);
 				void registerSubscribeHandler(const SubscribeHandler& handler);
 			

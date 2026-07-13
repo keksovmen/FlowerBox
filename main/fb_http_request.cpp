@@ -39,7 +39,7 @@ void HttpRequest::init()
 	// assert(_httpClient != nullptr);
 }
 
-void HttpRequest::post(std::string url, std::string data)
+bool HttpRequest::post(std::string url, std::string data)
 {
 	esp_http_client_set_method(_httpClient, HTTP_METHOD_POST);
 	esp_http_client_set_url(_httpClient, url.c_str());
@@ -51,10 +51,14 @@ void HttpRequest::post(std::string url, std::string data)
         int status = esp_http_client_get_status_code(_httpClient);
         int content_length = esp_http_client_get_content_length(_httpClient);
         FB_DEBUG_LOG_I_OBJ("HTTP POST Status = %d, content_length = %d", status, content_length);
+
+		return true;
     } else {
         FB_DEBUG_LOG_E_OBJ("HTTP POST request failed: %s", esp_err_to_name(err));
 		esp_http_client_cleanup(_httpClient);
 		_httpClient = nullptr;
 		init();
+
+		return false;
     }
 }

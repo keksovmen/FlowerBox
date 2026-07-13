@@ -105,6 +105,8 @@ static void _monitorTask(void* arg)
 	const int error = settings::getDeltaError();
 	const int bounceTimeUs = settings::getBounceTimeMs() * 1000;
 
+	bool changedFlag = false;
+
 	for(;;){
 		auto state = _matrix.readPins();
 		if(_i2cErrorFlag){
@@ -115,7 +117,6 @@ static void _monitorTask(void* arg)
 			continue;
 		}
 
-		bool changedFlag = false;
 		for (size_t i = 0; i < state.size(); i++)
 		{
 			if(abs((int)prevState[i] - (int)state[i]) > error){
@@ -138,8 +139,6 @@ static void _monitorTask(void* arg)
 		prevState = std::move(state);
 
 		if(changedFlag){
-			changedFlag = false;
-
 			char buffer[256] = "[";
 			char* ptr = &buffer[1];
 			for(auto v : prevState){
@@ -151,9 +150,9 @@ static void _monitorTask(void* arg)
 
 			FB_DEBUG_LOG_I_TAG("%s", buffer);
 			if(settings::getUseHttp()){
-				_http.post(settings::getUrl(), buffer);
+				changedFlag = !_http.post(settings::getUrl(), buffer);
 			}else{
-				_mqtt.publish(_MQTT_PATH_STATE, buffer);
+				changedFlag = !_mqtt.publish(_MQTT_PATH_STATE, buffer);
 			}
 		}else{
 			vTaskDelay(pdMS_TO_TICKS(100));
