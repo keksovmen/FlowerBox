@@ -236,7 +236,9 @@ void project::initHwObjs()
 	_registerMatrix();
 
 	// Инициализация MQTT (используются те же настройки IP/порта, что и в примере с матрицей)
-	_mqtt.init(settings::getIp(), settings::getPort(), 3 * 1024);
+	if(!settings::getUseHttp()){
+		_mqtt.init(settings::getIp(), settings::getPort(), 3 * 1024);
+	}
 	// При необходимости можно добавить обработчик входящих сообщений (не требуется для отправки)
 
 	if(xTaskCreate(&_monitorTask, "mon", 4 * 1024, NULL, 8, NULL) != pdPASS){
