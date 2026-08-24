@@ -29,6 +29,7 @@ namespace fb
 				void setValue(int value);
 
 				int getValue() const;
+				int getMultiplier() const;
 			
 			private:
 				const OnAchieveTarget _resultCb;

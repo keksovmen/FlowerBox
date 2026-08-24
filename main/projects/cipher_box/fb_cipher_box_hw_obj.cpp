@@ -152,7 +152,7 @@ static void _monitorTask(void* arg)
 			if(settings::getUseHttp()){
 				changedFlag = !_http.post(settings::getUrl(), buffer);
 			}else{
-				changedFlag = !_mqtt.publish(_MQTT_PATH_STATE, buffer);
+				changedFlag = !_mqtt.publish(_MQTT_PATH_STATE, buffer, true);
 			}
 		}else{
 			vTaskDelay(pdMS_TO_TICKS(100));

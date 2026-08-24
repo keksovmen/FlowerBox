@@ -20,6 +20,8 @@
 
 #define _KEY_PORT "mq_port"
 
+#define _KEY_BLINKPERIODMS "blink_ms"
+
 
 
 
@@ -66,6 +68,13 @@ void settings::setPort(int value)
     
 }
 
+void settings::setBlinkPeriodMs(int value)
+{
+    
+    settings::setInt(_PARTITION, _KEY_BLINKPERIODMS, value);
+    
+}
+
 
 
 
@@ -103,5 +112,12 @@ int settings::getPort()
 {
     
     return settings::getIntOrDefault(_PARTITION, _KEY_PORT, 8081);
+    
+}
+
+int settings::getBlinkPeriodMs()
+{
+    
+    return settings::getIntOrDefault(_PARTITION, _KEY_BLINKPERIODMS, 500);
     
 }

@@ -29,3 +29,9 @@ settings:
     key: mq_port
     min: 0
     max: 65535
+  - name: BlinkPeriodMs
+    type: int
+    default: 500
+    key: blink_ms
+    min: 0
+    max: 65535

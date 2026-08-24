@@ -23,6 +23,8 @@ namespace fb {
 		
 		void setPort(int value);
 		
+		void setBlinkPeriodMs(int value);
+		
 
 		/*  ------- getters ------- */
 		
@@ -35,6 +37,8 @@ namespace fb {
 		std::string getIp();
 		
 		int getPort();
+		
+		int getBlinkPeriodMs();
 		
 
 	} // namespace settings

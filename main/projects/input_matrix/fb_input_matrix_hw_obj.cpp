@@ -90,6 +90,11 @@ static void _mqttPublishTask(void* arg)
 
 static bool _checkTargetCondition()
 {
+	//read settings flag
+	if(!settings::getEnableTarget()){
+		return false;
+	}
+	
 	//compare to what needed and if good, send mqtt and start blinking on all sequence
 	if(_toggleStates == _targetState){
 		for(int i = 0; i < _MATRIX_SIZE; i++){

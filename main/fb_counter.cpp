@@ -64,6 +64,11 @@ int Counter::getValue() const
 	return _value;
 }
 
+int Counter::getMultiplier() const
+{
+	return _multiplier;
+}
+
 void Counter::_checkCondition()
 {
 	if(_target == _value){

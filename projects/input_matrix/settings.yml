@@ -41,3 +41,9 @@ settings:
     key: t_still
     min: 0
     max: 100000
+  - name: EnableTarget
+    type: int
+    default: 1
+    key: e_target
+    min: 0
+    max: 1

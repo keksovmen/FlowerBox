@@ -108,6 +108,19 @@ void project::initMaperObjs()
 	getBox().addProperty(std::unique_ptr<box::PropertyIface>(StillPeriodMsProp));
 	getBox().addPropertyDependency(StillPeriodMsProp->getId());
 	
+	
+	auto* EnableTargetProp = new box::PropertyInt("EnableTarget", "Change EnableTarget",
+	
+		box::Tid::PROPERTY_GENERAL,
+		[](int val){
+			settings::setEnableTarget(val);
+			return true;
+		}, settings::getEnableTarget(), 0, 1 
+	);
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(EnableTargetProp));
+	getBox().addPropertyDependency(EnableTargetProp->getId());
+	
 }
 
 int project::mapBoxSensorIdToAddres(int id)

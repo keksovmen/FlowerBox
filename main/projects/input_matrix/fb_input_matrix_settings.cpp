@@ -24,6 +24,8 @@
 
 #define _KEY_STILLPERIODMS "t_still"
 
+#define _KEY_ENABLETARGET "e_target"
+
 
 
 
@@ -84,6 +86,13 @@ void settings::setStillPeriodMs(int value)
     
 }
 
+void settings::setEnableTarget(int value)
+{
+    
+    settings::setInt(_PARTITION, _KEY_ENABLETARGET, value);
+    
+}
+
 
 
 
@@ -135,5 +144,12 @@ int settings::getStillPeriodMs()
 {
     
     return settings::getIntOrDefault(_PARTITION, _KEY_STILLPERIODMS, 500);
+    
+}
+
+int settings::getEnableTarget()
+{
+    
+    return settings::getIntOrDefault(_PARTITION, _KEY_ENABLETARGET, 1);
     
 }

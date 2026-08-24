@@ -91,6 +91,18 @@ static void _setDigit(uint8_t digit)
 
 static void _displayTask(void* arg)
 {
+	volatile bool animationFlag = true;
+
+	auto blinkAnimation = [&animationFlag](){
+		animationFlag = !animationFlag;
+	};
+
+	if(settings::getBlinkPeriodMs() != 0){
+		global::getTimeScheduler()->addActionDelayed(blinkAnimation, settings::getBlinkPeriodMs(), 1000, true);
+	}
+
+
+
 	for(;;)
 	{
 		//read inputs here, we have the whole 1ms of time for this
@@ -100,8 +112,19 @@ static void _displayTask(void* arg)
 		//use only first 3 digits the forth is not interested to us
 		for(int i = 0; i < 3; i++)
 		{
-			int digit = pins::DIGITS[i];
+			const int digit = pins::DIGITS[i];
 			_setDigit(static_cast<uint8_t>(numbers[i]));
+
+			//check if current digit need to be blinked
+			if((1 * std::pow(10, 2 - i)) == _counter.getMultiplier()){
+				//blink with the whole digit
+				if(!animationFlag){
+					for (int seg : pins::SEGMENTS) {
+						gpio_set_level(static_cast<gpio_num_t>(seg), 0);
+					}
+				}
+			}
+
 			gpio_set_level(static_cast<gpio_num_t>(digit), 1);
 
 			vTaskDelay(pdMS_TO_TICKS(3));
@@ -192,15 +215,16 @@ static void _keyHandler(const h::ButtonAction& action)
 	FB_DEBUG_LOG_I_TAG("Button action: key = %d, mov = %d, %d ms", (int) action.button, (int) action.movement, (int) action.holdMs);
 
 	if(action.isJustPressed(h::ButtonKeys::PLAY_STOP)){
-		_playBuzz();
+		//fo debug only
+		// _playBuzz();
 
 	}else if(action.isLongJustPressed(h::ButtonKeys::UP, 2000)){
-		//notify melody task
-		_startMelody();
+		//fo debug only
+		// _startMelody();
 
 	}else if(action.isLongJustPressed(h::ButtonKeys::DOWN, 2000)){
-		//notify melody task
-		_stopMelody();
+		//fo debug only
+		// _stopMelody();
 
 	}else if(action.isLongJustPressed(h::ButtonKeys::UP, 50)){
 		_counter.changeMultiplier();

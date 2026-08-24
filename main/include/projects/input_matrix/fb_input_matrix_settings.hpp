@@ -27,6 +27,8 @@ namespace fb {
 		
 		void setStillPeriodMs(int value);
 		
+		void setEnableTarget(int value);
+		
 
 		/*  ------- getters ------- */
 		
@@ -43,6 +45,8 @@ namespace fb {
 		int getDebounceMs();
 		
 		int getStillPeriodMs();
+		
+		int getEnableTarget();
 		
 
 	} // namespace settings

@@ -82,6 +82,19 @@ void project::initMaperObjs()
 	getBox().addProperty(std::unique_ptr<box::PropertyIface>(PortProp));
 	getBox().addPropertyDependency(PortProp->getId());
 	
+	
+	auto* BlinkPeriodMsProp = new box::PropertyInt("BlinkPeriodMs", "Change BlinkPeriodMs",
+	
+		box::Tid::PROPERTY_GENERAL,
+		[](int val){
+			settings::setBlinkPeriodMs(val);
+			return true;
+		}, settings::getBlinkPeriodMs(), 0, 65535 
+	);
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(BlinkPeriodMsProp));
+	getBox().addPropertyDependency(BlinkPeriodMsProp->getId());
+	
 }
 
 int project::mapBoxSensorIdToAddres(int id)
