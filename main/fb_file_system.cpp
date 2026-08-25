@@ -43,3 +43,8 @@ void fs::deinit()
 {
 	ESP_ERROR_CHECK(esp_vfs_spiffs_unregister(_PARTITION_NAME));
 }
+
+const char* fs::getSpiffName()
+{
+	return _PARTITION_NAME;
+}

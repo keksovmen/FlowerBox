@@ -8,5 +8,6 @@ namespace fb
 	{
 		void init();
 		void deinit();
+		const char* getSpiffName();
 	}
 }

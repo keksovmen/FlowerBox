@@ -9,6 +9,7 @@
 #define _CONTENT_TYPE_BOUNDARY "boundary="
 #define _DATA_DELIMETER "\r\n\r\n"
 #define _UPDATE_PATH "/update"
+#define _UPDATE_SPIFF_PATH "/update_spiff"
 
 
 
@@ -184,7 +185,34 @@ static esp_err_t _update_cb(httpd_req_t* r)
 
 
 
+static esp_err_t _update_spiff_cb(httpd_req_t* r)
+{
+	FB_DEBUG_ENTER_I_TAG();
+
+	if(!update::beginSpiff()){
+		httpd_resp_send_err(r, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to start spiff update");
+		return ESP_FAIL;
+	}
+
+	esp_err_t err = _multipartFileInputHandler(r, [](const char* data, int size){
+		// FB_DEBUG_LOG_I_TAG("Data block of size %d:\n%.*s", size, size, data);
+		return update::writeSequentialSpiff(data, size);
+	});
+
+	if(err == ESP_OK){
+		if(update::endSpiff()){
+			err |= httpd_resp_sendstr(r, "<h1>Success</h1>");
+		}else{
+			err |= httpd_resp_send_err(r, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to end spiff update");
+		}
+	}
+
+	return err;
+}
+
+
 void server::registerServerUpdate(Builder& builder)
 {
 	builder.addEndpoint(Endpoint{_UPDATE_PATH, EndpointMethod::POST, nullptr, &_update_cb});
+	builder.addEndpoint(Endpoint{_UPDATE_SPIFF_PATH, EndpointMethod::POST, nullptr, &_update_spiff_cb});
 }

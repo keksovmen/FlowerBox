@@ -10,9 +10,18 @@
 
 <body>
 	<div class="container">
-		<h1 class="page-header">Меню обновления</h1>
+		<h1 class="page-header">Меню обновления ПО</h1>
 		<div class="list-container">
 			<form class="list-container" method="post" enctype="multipart/form-data" action="/update">
+				<input type="file" name="file" class="btn">
+				<input type="submit" class="btn" value="Отправить">
+			</form>
+		</div>
+	</div>
+	<div class="container">
+		<h1 class="page-header">Меню обновления SPIFF</h1>
+		<div class="list-container">
+			<form class="list-container" method="post" enctype="multipart/form-data" action="/update_spiff">
 				<input type="file" name="file" class="btn">
 				<input type="submit" class="btn" value="Отправить">
 			</form>

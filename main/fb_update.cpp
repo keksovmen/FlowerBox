@@ -1,11 +1,11 @@
 #include "fb_update.hpp"
 
 #include "fb_debug.hpp"
+#include "fb_file_system.hpp"
 #include "fb_globals.hpp"
 
-
-#include "esp_partition.h"
 #include "esp_ota_ops.h"
+#include "esp_partition.h"
 
 #ifdef _ESP8266
 	#define OTA_WITH_SEQUENTIAL_WRITES OTA_SIZE_UNKNOWN
@@ -21,7 +21,8 @@ using namespace update;
 static const char* TAG = "fb_update";
 
 static esp_ota_handle_t _otaHndl = 0;
-const esp_partition_t* _partition = NULL;
+static const esp_partition_t* _partition = NULL;
+static size_t _dst = 0;
 
 
 
@@ -100,6 +101,56 @@ bool update::end()
 	}
 
 	global::getEventManager()->pushEvent({event::EventGroup::UPDATE, static_cast<int>(UpdateEventId::END), NULL});
+
+	return true;
+}
+
+
+
+bool update::beginSpiff()
+{
+	assert(!_partition);
+
+	fs::deinit();
+
+    // 2. Find the partition by name
+    _partition = esp_partition_find_first(
+        ESP_PARTITION_TYPE_DATA, 
+        ESP_PARTITION_SUBTYPE_DATA_SPIFFS, 
+        fs::getSpiffName()
+    );
+
+    if (!_partition){
+		FB_DEBUG_LOG_E_TAG("SPIFFS partition is not found!")
+		return false;
+	}
+    // 3. Erase the entire partition (must be done before writing)
+    if(esp_partition_erase_range(_partition, 0, _partition->size) != ESP_OK){
+		FB_DEBUG_LOG_E_TAG("SPIFFS failed to be erased!")
+		return false;
+	}
+
+	_dst = 0;
+
+	return true;
+}
+
+bool update::writeSequentialSpiff(const char* data, int size)
+{
+	if(!esp_partition_write(_partition, _dst, data, size) == ESP_OK){
+		FB_DEBUG_LOG_E_TAG("SPIFFS failed to be written!")
+		return false;
+	}
+
+	_dst += size;
+	return true;
+}
+
+bool update::endSpiff()
+{
+	_partition = NULL;
+
+	fs::init();
 
 	return true;
 }

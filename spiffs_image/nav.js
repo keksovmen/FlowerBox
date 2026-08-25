@@ -1,34 +1,8 @@
 function loadPage(pageUrl) {
     // Показываем индикатор загрузки
-    document.getElementById('loading-overlay').style.display = 'flex';
-    window.location.href = pageUrl;
-    // // Создаем AJAX запрос
-    // const xhr = new XMLHttpRequest();
-    // xhr.open('GET', pageUrl, true);
-    
-    // xhr.onload = function() {
-    //     if (this.status === 200) {
-    //         // Заменяем весь HTML документа на полученный
-    //         document.documentElement.innerHTML = this.responseText;
-            
-    //         // Восстанавливаем обработчики событий (так как весь DOM был заменен)
-    //         restoreEventListeners();
-    //     } else {
-    //         console.error('Ошибка загрузки страницы:', this.statusText);
-    //         alert('Произошла ошибка при загрузке страницы');
-    //     }
-        
-    //     // Скрываем индикатор загрузки
-    //     document.getElementById('loading-overlay').style.display = 'none';
-    // };
-    
-    // xhr.onerror = function() {
-    //     console.error('Ошибка запроса');
-    //     alert('Произошла ошибка сети');
-    //     document.getElementById('loading-overlay').style.display = 'none';
-    // };
-    
-    // xhr.send();
+    // document.getElementById('loading-overlay').style.display = 'flex';
+    window.location.href = window.location.protocol + '//' + 
+		window.location.hostname + pageUrl;
 }
 
 // Восстанавливаем обработчики событий после замены DOM

@@ -1,23 +1,24 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<title>MainMenu</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<link rel="stylesheet" href="/html/style.css">
-	</head>
-	<body>
-		<div class="panel">
-			<h2 class="title">Main menu</h2>
-			<div class="button">
-				<a href="/html/menu.html">Menu</a>
-			</div>
-			<div class="button">
-				<a href="/html/update.html">Update</a>
-			</div>
-			<!-- <div class="button">
-				<a href="/html/time.html">Set time periods</a>
-			</div> -->
+
+<head>
+	<title>Index</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="/html/test_style.css">
+</head>
+
+<body>
+	<div class="container">
+		<h1 class="page-header">Главное меню</h1>
+		<div class="nav-menu">
+			<button class="btn" onclick="loadPage('/html/main_menu.html')">Управление</button>
+			<button class="btn" onclick="loadPage(':8080/debug')">Дебаг</button>
+			<button class="btn" onclick="loadPage('/html/update.html')">Обновление</button>
 		</div>
-	</body>
+	</div>
+	</div>
+	<script src="/html/nav.js"></script>
+</body>
+
 </html>

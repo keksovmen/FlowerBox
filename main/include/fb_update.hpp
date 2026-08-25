@@ -20,5 +20,9 @@ namespace fb
 		bool begin();
 		bool writeSequential(const char* data, int size);
 		bool end();
+
+		bool beginSpiff();
+		bool writeSequentialSpiff(const char* data, int size);
+		bool endSpiff();
 	}
 }
