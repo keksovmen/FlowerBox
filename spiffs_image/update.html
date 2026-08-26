@@ -5,24 +5,29 @@
 	<title>Меню обновления</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" href="test_style.css">
+	<link rel="stylesheet" href="/html/test_style.css">
 </head>
 
 <body>
 	<div class="container">
-		<h1 class="page-header">Меню обновления ПО</h1>
+		<!-- Header with back button -->
+		<div class="header-bar">
+			<button class="btn-back" onclick="history.back()">&larr; Back</button>
+			<h1 class="header-title">Обновление ПО</h1>
+		</div>
+
+		<h2 class="page-header" style="font-size:18px; margin-top:10px;">Прошивка</h2>
 		<div class="list-container">
 			<form class="list-container" method="post" enctype="multipart/form-data" action="/update">
-				<input type="file" name="file" class="btn">
+				<input type="file" name="file" class="btn" style="display:block; width:100%; margin-bottom:10px;">
 				<input type="submit" class="btn" value="Отправить">
 			</form>
 		</div>
-	</div>
-	<div class="container">
-		<h1 class="page-header">Меню обновления SPIFF</h1>
+
+		<h2 class="page-header" style="font-size:18px; margin-top:20px;">SPIFFS</h2>
 		<div class="list-container">
 			<form class="list-container" method="post" enctype="multipart/form-data" action="/update_spiff">
-				<input type="file" name="file" class="btn">
+				<input type="file" name="file" class="btn" style="display:block; width:100%; margin-bottom:10px;">
 				<input type="submit" class="btn" value="Отправить">
 			</form>
 		</div>

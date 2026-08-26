@@ -1,22 +1,26 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Главное меню</title>
-    <link rel="stylesheet" href="/html/test_style.css">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Главное меню</title>
+	<link rel="stylesheet" href="/html/test_style.css">
 </head>
 <body>
-    <div class="container">
-        <h1 class="page-header">Главное меню {{ puts label }}</h1>
-        
-        <div class="nav-menu">
-            <button class="btn" onclick="loadPage('/html/sensors.html')">Сенсоры</button>
-            <button class="btn" onclick="loadPage('/html/switches.html')">Переключатели</button>
-            <button class="btn" onclick="loadPage('/html/properties.html?source=device&id=0')">Свойства</button>
-        </div>
-    </div>
+	<div class="container">
+		<!-- Header with back button -->
+		<div class="header-bar">
+			<button class="btn-back" onclick="history.back()">&larr; Back</button>
+			<h1 class="header-title">Главное меню {{ puts label }}</h1>
+		</div>
 
-    <script src="/html/nav.js"></script>
+		<div class="nav-menu">
+			<button class="btn" onclick="loadPage('/html/sensors.html')">Сенсоры</button>
+			<button class="btn" onclick="loadPage('/html/switches.html')">Переключатели</button>
+			<button class="btn" onclick="loadPage('/html/properties.html?source=device&id=0')">Свойства</button>
+		</div>
+	</div>
+
+	<script src="/html/nav.js"></script>
 </body>
 </html>

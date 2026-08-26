@@ -10,65 +10,76 @@
 
 <body>
 	<div class="container">
-		<div class="top-right-button" onclick="loadPage('main_menu.html')">В главное меню</div>
-		<h1 class="page-header">Список свойств для {{ puts label }}</h1>
+		<!-- Header with back button -->
+		<div class="header-bar">
+			<button class="btn-back" onclick="history.back()">&larr; Back</button>
+			<h1 class="header-title">Свойства для {{ puts label }}</h1>
+		</div>
+
 		<div class="list-container">
 			{{ begin count }}
-			<div class="list-item" {{ if tid[i] == 515 }} onclick="openColorPicker('{{ puta id[i] }}')"  {{ elseif tid[i] != 514 }} onclick="onPropertyClick('{{ puta id[i] }}')" {{ endif }}>
+			<div class="list-item" data-id="{{ puta id[i] }}" data-value="{{ puta value[i] }}"
+				 data-min="{{ puta min[i] }}" data-max="{{ puta max[i] }}" data-type="{{ puta v_type[i] }}"
+				 onclick="openPropertyModal(this)">
 				<div class="item-name">{{ puta name[i] }}</div>
 				<div class="item-description">{{ puta description[i] }}</div>
-				<div id="item-value-{{ puta id[i] }}" class="item-value {{ if tid[i] == 515 }} color-me {{ endif }}">{{ puta value[i] }}</div>
+				<div class="item-value" id="value-{{ puta id[i] }}">
+					{{ puta value[i] }}
+				</div>
+				<div class="item-meta">
+					<span class="meta-badge">Тип: {{ puta v_type[i] }}</span>
+					{{ if min[i] != "" }}
+						<span class="meta-badge">Мин: {{ puta min[i] }}</span>
+						<span class="meta-badge">Макс: {{ puta max[i] }}</span>
+					{{ endif }}
+				</div>
 
+				<!-- Special mode buttons for property ID 514 -->
 				{{ if tid[i] == 514 }}
-				<div class="list-item-actions">
-					<button class="list-item-btn list-item-btn-secondary" onclick="onAutoButtonClicked({{ puta id[i] }}, 2)">Выкл.</button>
-					<button class="list-item-btn list-item-btn-primary" onclick="onAutoButtonClicked({{ puta id[i] }}, 0)">Авто</button>
-					<button class="list-item-btn list-item-btn-secondary" onclick="onAutoButtonClicked({{ puta id[i] }}, 1)">Вкл</button>
+				<div class="list-item-actions mode-btn-group" data-prop-id="{{ puta id[i] }}" data-current-value="{{ puta value[i] }}" onclick="event.stopPropagation();">
+					<button class="mode-btn mode-off" data-state="2" onclick="setMode({{ puta id[i] }}, 2)">Выкл.</button>
+					<button class="mode-btn mode-auto" data-state="0" onclick="setMode({{ puta id[i] }}, 0)">Авто</button>
+					<button class="mode-btn mode-on" data-state="1" onclick="setMode({{ puta id[i] }}, 1)">Вкл</button>
 				</div>
 				{{ endif }}
 			</div>
 			{{ end }}
 		</div>
+	</div>
 
-		<div id="loading-overlay" class="loading-overlay" style="display: none;">
-			<div class="loading-spinner"></div>
-		</div>
-
-		<!-- окно изменения свойства -->
-		<div id="property-modal" class="modal-overlay" style="display: none;">
-			<div class="modal-content">
-				<div class="modal-title">Изменение свойства</div>
-				<div class="modal-description">Введите новое значение</div>
-				<input class="input-field" id="property-value" value="">
-				<div class="error-message" id="error-message" style="display: none;">Ошибка изменения</div>
-			</div>
+	<!-- Modal for editing property (input field) -->
+	<div id="property-modal" class="modal-overlay" style="display: none;" onclick="closeModalOutside(event)">
+		<div class="modal-content" onclick="event.stopPropagation();">
+			<h2 class="modal-title" id="modal-title">Изменить свойство</h2>
+			<div class="modal-description" id="modal-desc">Введите новое значение</div>
+			<div class="modal-range" id="modal-range" style="display: none;"></div>
+			<input class="input-field" id="property-value-input" type="text" value="">
+			<div id="modal-error" class="error-message" style="display: none;">Ошибка</div>
 			<div class="modal-actions">
-				<div class="btn btn-secondary" onclick="onChangeCancel()">Отмена</div>
-				<div class="btn" onclick="onChangeApply()">Изменить</div>
+				<button class="btn btn-secondary" onclick="closeModal()">Отмена</button>
+				<button class="btn" id="modal-send-btn" onclick="sendProperty()">Отправить</button>
 			</div>
-		</div>
-
-		<div id="colorPickerModal" class="modal-overlay color-picker-modal" style="display: none;">
-			<div class="modal-content">
-				<h2 class="modal-title">Выберите цвет</h2>
-	
-				<div class="color-picker-preview-container">
-					<div class="color-picker-preview" id="colorPreview"></div>
-					<div class="color-picker-preview" id="colorSelected"></div>
-				</div>
-				<div class="color-picker-hex" id="colorHex">#FFFFFF</div>
-	
-				<div class="color-wheel-container" id="colorWheel">
-					<div class="color-wheel-selector" id="colorSelector"></div>
-				</div>
-	
-				<div class="modal-actions">
-					<button class="btn btn-secondary" id="colorCancelBtn">Отмена</button>
-					<button class="btn" id="colorConfirmBtn">Выбрать</button>
-				</div>
+			<div id="modal-loading-overlay" class="modal-loading-overlay" style="display: none;">
+				<div class="loading-spinner"></div>
+				<div class="loading-text">Отправка...</div>
 			</div>
 		</div>
 	</div>
+
+	<!-- Confirmation modal for "none" type properties (no input) -->
+	<div id="confirm-modal" class="modal-overlay" style="display: none;" onclick="closeConfirmModalOutside(event)">
+		<div class="modal-content" onclick="event.stopPropagation();">
+			<h2 class="modal-title" id="confirm-title">Подтверждение</h2>
+			<div class="modal-description" id="confirm-message">Выполнить действие?</div>
+			<div class="modal-actions">
+				<button class="btn btn-secondary" onclick="closeConfirmModal()">Отмена</button>
+				<button class="btn" id="confirm-btn" onclick="executeNoneAction()">Подтвердить</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- Toast notifications -->
+	<div id="toast-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 2000;"></div>
 
 	<script src="/html/nav.js"></script>
 	<script src="/html/properties.js"></script>

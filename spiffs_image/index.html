@@ -10,13 +10,16 @@
 
 <body>
 	<div class="container">
-		<h1 class="page-header">Главное меню</h1>
+		<!-- Header bar without back button -->
+		<div class="header-bar">
+			<h1 class="header-title">Главное меню</h1>
+		</div>
+
 		<div class="nav-menu">
 			<button class="btn" onclick="loadPage('/html/main_menu.html')">Управление</button>
 			<button class="btn" onclick="loadPage('/html/debug.html')">Дебаг</button>
 			<button class="btn" onclick="loadPage('/html/update.html')">Обновление</button>
 		</div>
-	</div>
 	</div>
 	<script src="/html/nav.js"></script>
 </body>

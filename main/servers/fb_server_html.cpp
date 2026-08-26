@@ -22,6 +22,9 @@
 #define _TEMPLATE_KEYWORD_ARRAY_VALUE "value"
 #define _TEMPLATE_KEYWORD_ARRAY_LABEL "label"
 #define _TEMPLATE_KEYWORD_ARRAY_TID "tid"
+#define _TEMPLATE_KEYWORD_ARRAY_VALUE_TYPE "v_type"
+#define _TEMPLATE_KEYWORD_ARRAY_MIN "min"
+#define _TEMPLATE_KEYWORD_ARRAY_MAX "max"
 
 #define _URL_PROPERTY_SOURCE_BOX "device"
 #define _URL_PROPERTY_SOURCE_SENSOR "sensor"
@@ -261,12 +264,15 @@ static void _properties_cb(templates::Engine& engine, const std::unordered_map<s
 	engine.addIntArg(entriesIds->size(), _TEMPLATE_KEYWORD_ARRAY_SIZE);
 	std::for_each(entriesIds->begin(), entriesIds->end(),
 		[&engine](int i){
-			auto e = global::getFlowerBox()->getProperty(i);
+			auto* e = global::getFlowerBox()->getProperty(i);
 			engine.appendArgArray(e->getName(), _TEMPLATE_KEYWORD_ARRAY_NAME);
 			engine.appendArgArray(e->getDescription(), _TEMPLATE_KEYWORD_ARRAY_DESCRIPTION);
 			engine.appendArgArray(std::to_string(e->getId()), _TEMPLATE_KEYWORD_ARRAY_ID);
 			engine.appendArgArray(e->getValue(), _TEMPLATE_KEYWORD_ARRAY_VALUE);
 			engine.appendArgArray(std::to_string(std::to_underlying(e->getTid())), _TEMPLATE_KEYWORD_ARRAY_TID);
+			engine.appendArgArray(e->getValueType(), _TEMPLATE_KEYWORD_ARRAY_VALUE_TYPE);
+			engine.appendArgArray(e->getMinValueStr(), _TEMPLATE_KEYWORD_ARRAY_MIN);
+			engine.appendArgArray(e->getMaxValueStr(), _TEMPLATE_KEYWORD_ARRAY_MAX);
 		});
 }
 
