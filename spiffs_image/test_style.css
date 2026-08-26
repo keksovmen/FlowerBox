@@ -29,13 +29,6 @@ body {
 }
 
 /* Navigation */
-.nav-menu {
-	display: flex;
-	flex-direction: column;
-	gap: 15px;
-	margin-top: 30px;
-}
-
 .btn {
 	background-color: var(--primary-color);
 	color: var(--text-color);
@@ -287,10 +280,6 @@ body {
 
 /* Responsive */
 @media (min-width: 768px) {
-	.nav-menu {
-		flex-direction: row;
-		justify-content: center;
-	}
 	.btn {
 		min-width: 200px;
 		text-align: center;
