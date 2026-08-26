@@ -8,7 +8,7 @@ function loadPage(pageUrl) {
 // Восстанавливаем обработчики событий после замены DOM
 function restoreEventListeners() {
     // Находим все кнопки с классом btn и проверяем их атрибут onclick
-    const buttons = document.querySelectorAll('.btn');
+    const buttons = document.querySelectorAll('.list-item');
     buttons.forEach(button => {
         const onClick = button.getAttribute('onclick');
         if (onClick && onClick.startsWith('loadPage')) {
