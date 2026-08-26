@@ -54,12 +54,11 @@ void server::startProvision()
 	_server = builder.build();
 
 	#ifndef _ESP8266
-		builder = Builder();
-		builder.setPort(8080);
-		builder.setCtrlPort(ESP_HTTPD_DEF_CTRL_PORT + 1);
-		registerServerDebug(builder);
+		// builder = Builder();
+		// builder.setPort(8080);
+		// builder.setCtrlPort(ESP_HTTPD_DEF_CTRL_PORT + 1);
 
-		_serverDebug = builder.build();
+		// _serverDebug = builder.build();
 	#endif
 }
 

@@ -26,13 +26,13 @@ body {
 	background-color: var(--background-color);
 	color: var(--text-color);
 	min-height: 100vh;
-	padding: 20px;
+	padding: 8px;
 }
 
 .container {
 	max-width: 1200px;
 	margin: 0 auto;
-	padding: 15px;
+	padding: 8px;
 }
 
 /* Навигация и кнопки */
@@ -180,12 +180,12 @@ body {
 /* Адаптация для маленьких экранов */
 /* @media (max-width: 480px) {
   .list-item-actions {
-    gap: 8px;
+	gap: 8px;
   }
   
   .list-item-btn {
-    padding: 6px 10px;
-    font-size: 13px;
+	padding: 6px 10px;
+	font-size: 13px;
   }
 } */
 
@@ -394,5 +394,177 @@ body {
 	.color-wheel-container {
 		width: 200px;
 		height: 200px;
+	}
+}
+
+/* ========== NEW STYLES FOR DEBUG LOG ========== */
+
+/* Status bar */
+.status-bar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	background-color: var(--card-bg);
+	padding: 8px 12px;
+	border-radius: 8px;
+	margin-bottom: 10px;
+	gap: 10px;
+	box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+.status-indicator {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	font-size: 16px;
+}
+
+.status-dot {
+	display: inline-block;
+	width: 14px;
+	height: 14px;
+	border-radius: 50%;
+	transition: background-color 0.3s;
+}
+
+.status-dot.connected {
+	background-color: #4caf50;
+	box-shadow: 0 0 8px #4caf50;
+}
+
+.status-dot.disconnected {
+	background-color: #f44336;
+	box-shadow: 0 0 8px #f44336;
+}
+
+.status-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.btn-status {
+	background-color: var(--secondary-color);
+	color: var(--text-color);
+	border: none;
+	padding: 8px 16px;
+	border-radius: 6px;
+	font-size: 14px;
+	cursor: pointer;
+	transition: background-color 0.2s, transform 0.1s;
+	white-space: nowrap;
+}
+
+.btn-status:hover {
+	background-color: #454d38;
+	transform: translateY(-1px);
+}
+
+.btn-status:active {
+	transform: translateY(0px);
+}
+
+/* Log content area */
+.log-content {
+	background-color: rgba(0, 0, 0, 0.3);
+	border-radius: 8px;
+	padding: 10px 0;
+	max-height: calc(100vh - 160px); /* adjust based on status bar height */
+	min-height: 300px; /* fallback */
+	overflow-y: auto;
+	font-family: 'Courier New', monospace;
+	font-size: 14px;
+	line-height: 1.5;
+	border: 1px solid var(--secondary-color);
+}
+
+/* Individual log messages */
+.log-message {
+	padding: 4px 16px;
+	border-left: 4px solid transparent;
+	margin: 2px 0;
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+/* Type-based colors (background + border) */
+.log-i {
+	background-color: rgba(76, 175, 80, 0.2);
+	border-left-color: #4caf50;
+}
+.log-w {
+	background-color: rgba(255, 152, 0, 0.25);
+	border-left-color: #ff9800;
+}
+.log-e {
+	background-color: rgba(244, 67, 54, 0.25);
+	border-left-color: #f44336;
+}
+.log-d {
+	background-color: rgba(158, 158, 158, 0.2);
+	border-left-color: #9e9e9e;
+}
+.log-plain {
+	background-color: rgba(255, 255, 255, 0.05);
+	border-left-color: #aaa;
+}
+
+/* Back button – keep it small and aligned */
+.status-left {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+#btnBack {
+	background-color: var(--secondary-color);
+	color: var(--text-color);
+	border: none;
+	padding: 6px 12px;
+	border-radius: 6px;
+	font-size: 14px;
+	cursor: pointer;
+	transition: background-color 0.2s;
+}
+#btnBack:hover {
+	background-color: #454d38;
+}
+
+/* For small screens */
+@media (max-width: 600px) {
+	.status-bar {
+		flex-wrap: wrap;
+		justify-content: space-between;
+		flex-direction: column;
+		align-items: stretch;
+		gap: 8px;
+	}
+	.status-actions {
+		order: 2;
+		flex: 1 1 100%;
+		justify-content: center;
+	}
+	.btn-status {
+		flex: 1 1 auto;    /* allow them to wrap naturally */
+		text-align: center;
+		font-size: 16px;
+		padding: 12px 10px;
+	}
+	.log-content {
+		max-height: 60vh;
+		font-size: 13px;
+	}
+	.status-left {
+		order: 0;
+		flex: 0 0 auto;
+	}
+	.status-indicator {
+		order: 1;
+		flex: 1 1 auto;
+		justify-content: center;
+	}
+	#btnBack {
+		font-size: 16px;
+		padding: 8px 14px;
 	}
 }

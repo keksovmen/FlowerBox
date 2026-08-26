@@ -125,17 +125,22 @@ static int _logPrintf(const char* format, va_list args)
 	//transform into html
 	char color[16];
 	if(view.starts_with(LOG_COLOR_I)){
-		strcpy(color, "green");
+		// strcpy(color, "green");
+		strcpy(color, "l=i");
 	}else if(view.starts_with(LOG_COLOR_W)){
-		strcpy(color, "orange");
+		// strcpy(color, "orange");
+		strcpy(color, "l=w");
 	}else if(view.starts_with(LOG_COLOR_E)){
-		strcpy(color, "red");
+		// strcpy(color, "red");
+		strcpy(color, "l=e");
 	}else{
-		strcpy(color, "black");
+		// strcpy(color, "black");
+		strcpy(color, "l=d");
 	}
 
 	char html[512];
-	const int result = sprintf(html, "<p style=\"color: %s;\">%.*s</p>", color, clear_size, tmp + sizeof(LOG_COLOR_I));
+	// const int result = sprintf(html, "<p style=\"color: %s;\">%.*s</p>", color, clear_size, tmp + sizeof(LOG_COLOR_I));
+	const int result = sprintf(html, "{{%s %.*s}}", color, clear_size, tmp + sizeof(LOG_COLOR_I));
 
 	{
 		//take lock

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Log console</title>
+	<link rel="stylesheet" href="/html/test_style.css">
+</head>
+
+<body>
+	<div class="container">
+		<!-- Status bar -->
+		<div class="status-bar">
+			<div class="status-left">
+				<button id="btnBack" class="btn-status">&leftarrow; Back</button>
+			</div>
+			<div class="status-indicator">
+				<span id="statusDot" class="status-dot disconnected"></span>
+				<span id="statusText">Disconnected</span>
+			</div>
+			<div class="status-actions">
+				<button id="btnReconnect" class="btn-status">Reconnect</button>
+				<button id="btnDisconnect" class="btn-status">Disconnect</button>
+				<button id="btnScroll" class="btn-status">Enable scroll</button>
+			</div>
+		</div>
+
+		<!-- Log content -->
+		<div id="content" class="log-content"></div>
+	</div>
+
+	<script src="/html/debug.js"></script>
+</body>
+
+</html>
