@@ -18,6 +18,7 @@
 #define _MQTT_PATH_TOGGLE ("/input_matrix/" + std::to_string(settings::getMqttId()) + "/toggle")
 #define _MQTT_PATH_NOTIFICATION ("/input_matrix/" + std::to_string(settings::getMqttId()) + "/notification")
 #define _MQTT_PATH_BUTTONS ("/input_matrix/" + std::to_string(settings::getMqttId()) + "/buttons")
+#define _MQTT_PATH_STATE ("/input_matrix/" + std::to_string(settings::getMqttId()) + "/state")
 
 
 
@@ -48,44 +49,89 @@ static std::array<bool, _MATRIX_SIZE> _targetState;
 
 static fb::util::StaticQueue<20, decltype(_inputMatrix)::ButtonEntry> _buttonsQueue;
 
+static volatile bool _dirtyFlag = true;
 
+
+
+static void _publishMoveQueue()
+{
+	auto data = _buttonsQueue.readQueue();
+	if(data.empty()){
+		vTaskDelay(pdMS_TO_TICKS(10));
+		return;
+	}
+
+	cJSON* root = cJSON_CreateObject();
+	cJSON* arr = cJSON_AddArrayToObject(root, "data");
+	//send data
+	for(const auto& e : data)
+	{
+		//convert to json
+		cJSON* obj = cJSON_CreateObject();
+		cJSON_AddNumberToObject(obj, "i", e.index);
+		cJSON_AddNumberToObject(obj, "mov", (int) e.action);
+		cJSON_AddNumberToObject(obj, "ms", e.durationMs);
+		cJSON_AddItemToArray(arr, obj);
+	}
+
+	char* jsonStr = cJSON_PrintUnformatted(arr);
+	cJSON_Delete(root);
+
+	FB_DEBUG_LOG_I_TAG("Sending buttons: %s", jsonStr);
+	
+	_mqtt.publish(_MQTT_PATH_BUTTONS, jsonStr);
+
+	cJSON_free(jsonStr);
+}
+
+static void _publishState()
+{
+	if(!_dirtyFlag){
+		return;
+	}
+
+	_dirtyFlag = false;
+
+	//convert data
+	std::array<int, _toggleStates.size()> converted;
+	std::transform(_toggleStates.begin(), _toggleStates.end(), converted.begin(), [](bool val){return val ? 1 : 0;});
+
+	//create json
+	cJSON* root = cJSON_CreateObject();
+	cJSON* arr = cJSON_CreateIntArray(converted.begin(), converted.size());
+	cJSON_AddItemToObject(root, "state", arr);
+
+	//format
+	char* jsonStr = cJSON_PrintUnformatted(root);
+	cJSON_Delete(root);
+
+	FB_DEBUG_LOG_I_TAG("Sending state: %s", jsonStr);
+	
+	//send
+	_mqtt.publish(_MQTT_PATH_STATE, jsonStr, true);
+
+	//clear
+	cJSON_free(jsonStr);
+}
 
 static void _mqttPublishTask(void* arg)
 {
 	for(;;)
 	{
-		auto data = _buttonsQueue.readQueue();
-		if(data.empty()){
-			vTaskDelay(pdMS_TO_TICKS(10));
-			continue;
-		}
-
-		cJSON* root = cJSON_CreateObject();
-		cJSON* arr = cJSON_AddArrayToObject(root, "data");
-		//send data
-		for(const auto& e : data)
-		{
-			//convert to json
-			cJSON* obj = cJSON_CreateObject();
-			cJSON_AddNumberToObject(obj, "i", e.index);
-			cJSON_AddNumberToObject(obj, "mov", (int) e.action);
-			cJSON_AddNumberToObject(obj, "ms", e.durationMs);
-			cJSON_AddItemToArray(arr, obj);
-		}
-
-		char* jsonStr = cJSON_PrintUnformatted(arr);
-		cJSON_Delete(root);
-
-		FB_DEBUG_LOG_I_TAG("Sending buttons: %s", jsonStr);
-		
-		_mqtt.publish(_MQTT_PATH_BUTTONS, jsonStr);
-
-		cJSON_free(jsonStr);
+		_publishMoveQueue();
+		_publishState();
 	}
 
 	vTaskDelete(NULL);
 }
 
+
+
+static void _changeToggleState(int i, bool state)
+{
+	_toggleStates[i] = state;
+	_dirtyFlag = true;
+}
 
 
 static bool _checkTargetCondition()
@@ -155,7 +201,7 @@ static void _handleToggleTopic(std::string_view data)
 			FB_DEBUG_LOG_W_TAG("Illegal index");
 			return;
 		}
-		_toggleStates[i] = val != 0;
+		_changeToggleState(i, val != 0);
 		i++;
 	});
 
@@ -200,7 +246,7 @@ static void _handleButtonPresses(decltype(_inputMatrix)::ButtonEntry button)
 
 	const int index = button.index;
 	if(button.action == decltype(_inputMatrix)::ButtonAction::RELEASED){
-		_toggleStates[index] = !_toggleStates[index];
+		_changeToggleState(index, !_toggleStates[index]);
 
 		if(!_checkTargetCondition()){
 			_dbPwm.setMode(index, _toggleStates[index] ? decltype(_dbPwm)::Mode::ON : decltype(_dbPwm)::Mode::OFF);
