@@ -23,9 +23,11 @@
 				 onclick="openPropertyModal(this)">
 				<div class="item-name">{{ puta name[i] }}</div>
 				<div class="item-description">{{ puta description[i] }}</div>
-				<div class="item-value" id="value-{{ puta id[i] }}">
-					{{ puta value[i] }}
-				</div>
+				{{ if v_type[i] != "none" }}
+					<div class="item-value" id="value-{{ puta id[i] }}">
+						{{ puta value[i] }}
+					</div>
+				{{ endif }}
 				<div class="item-meta">
 					<span class="meta-badge">Тип: {{ puta v_type[i] }}</span>
 					{{ if v_type[i] == "int" }}
