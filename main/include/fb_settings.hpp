@@ -92,6 +92,8 @@ namespace fb
 
 		bool isWifiProvided();
 
+		int getSpiffId();
+
 
 		//setters
 		void setApSsid(const std::string& val);
@@ -105,6 +107,8 @@ namespace fb
 		void setSntpPass(const std::string& val);
 
 		void setWifiProvisioned();
+
+		void setSpiffId(int id);
 
 		void clearWifi();
 	} // namespace settings

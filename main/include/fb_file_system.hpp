@@ -2,12 +2,16 @@
 
 
 
+#include <string>
+
+
+
 namespace fb
 {
 	namespace fs
 	{
 		void init();
 		void deinit();
-		const char* getSpiffName();
+		std::string getSpiffName();
 	}
 }

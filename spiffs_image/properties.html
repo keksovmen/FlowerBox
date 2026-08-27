@@ -28,7 +28,7 @@
 				</div>
 				<div class="item-meta">
 					<span class="meta-badge">Тип: {{ puta v_type[i] }}</span>
-					{{ if min[i] != "" }}
+					{{ if v_type[i] == "int" }}
 						<span class="meta-badge">Мин: {{ puta min[i] }}</span>
 						<span class="meta-badge">Макс: {{ puta max[i] }}</span>
 					{{ endif }}

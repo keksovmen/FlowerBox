@@ -3,6 +3,7 @@
 #include "esp_spiffs.h"
 
 #include "fb_debug.hpp"
+#include "fb_settings.hpp"
 
 
 
@@ -23,9 +24,11 @@ void fs::init()
 {
 	FB_DEBUG_ENTER_I_TAG();
 
+	const auto partitionName = getSpiffName();
+
 	esp_vfs_spiffs_conf_t conf = {
 		.base_path = "/spiffs",
-		.partition_label = _PARTITION_NAME,
+		.partition_label = partitionName.data(),
 		.max_files = 3,
 		.format_if_mount_failed = true
 	};
@@ -33,7 +36,7 @@ void fs::init()
 	ESP_ERROR_CHECK(esp_vfs_spiffs_register(&conf));
 
 	size_t total = 0, used = 0;
-    ESP_ERROR_CHECK(esp_spiffs_info(_PARTITION_NAME, &total, &used));
+    ESP_ERROR_CHECK(esp_spiffs_info(partitionName.data(), &total, &used));
 
 	FB_DEBUG_LOG_I_TAG("SPIFS total bytes %u, used %u", total, used);
 
@@ -41,10 +44,15 @@ void fs::init()
 
 void fs::deinit()
 {
-	ESP_ERROR_CHECK(esp_vfs_spiffs_unregister(_PARTITION_NAME));
+	ESP_ERROR_CHECK(esp_vfs_spiffs_unregister(getSpiffName().data()));
 }
 
-const char* fs::getSpiffName()
+std::string fs::getSpiffName()
 {
-	return _PARTITION_NAME;
+	std::string result = _PARTITION_NAME;
+	if(settings::getSpiffId() != 0){
+		result += std::to_string(settings::getSpiffId());
+	}
+
+	return result;
 }

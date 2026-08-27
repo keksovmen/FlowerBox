@@ -579,17 +579,24 @@ bool Engine::StateProcess::_processBranching(Engine& context)
 		return false;
 	}
 
-	int arg1 = std::atoi(argword.value().c_str());
+	std::string_view arg1 = argword.value();
 	std::string_view op = context._argBuffer[1];
-	int arg2 = std::atoi(context._argBuffer[2]);
+	std::string_view arg2 = context._argBuffer[2];
+	if(arg2.starts_with("\"")){
+		arg2 = arg2.substr(1);
+	}
+
+	if(arg2.ends_with("\"")){
+		arg2 = arg2.substr(0, arg2.length() - 1);
+	}
 
 	if(op == "=="){
 		context._isValidBranch = arg1 == arg2;
-		std::printf("Compared result %d == %d = %d\n", arg1, arg2, context._isValidBranch);
+		std::printf("Compared result %.*s == %.*s = %d\n", arg1.length(), arg1.cbegin(), arg2.length(), arg2.cbegin(), context._isValidBranch);
 
 	}else if(op == "!="){
 		context._isValidBranch = arg1 != arg2;
-		std::printf("Compared result %d != %d = %d\n", arg1, arg2, context._isValidBranch);
+		std::printf("Compared result %.*s != %.*s = %d\n", arg1.length(), arg1.cbegin(), arg2.length(), arg2.cbegin(), context._isValidBranch);
 
 	}else{
 		std::printf("Unexpected operator: %s\n", op.begin());

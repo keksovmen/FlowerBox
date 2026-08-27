@@ -3,6 +3,7 @@
 #include "fb_debug.hpp"
 #include "fb_file_system.hpp"
 #include "fb_globals.hpp"
+#include "fb_settings.hpp"
 
 #include "esp_ota_ops.h"
 #include "esp_partition.h"
@@ -23,6 +24,7 @@ static const char* TAG = "fb_update";
 static esp_ota_handle_t _otaHndl = 0;
 static const esp_partition_t* _partition = NULL;
 static size_t _dst = 0;
+static bool _spiffUpdateStatusFlag = false;
 
 
 
@@ -111,26 +113,37 @@ bool update::beginSpiff()
 {
 	assert(!_partition);
 
-	fs::deinit();
-
-    // 2. Find the partition by name
-    _partition = esp_partition_find_first(
+    // Find the partition by subtype
+    auto iter = esp_partition_find(
         ESP_PARTITION_TYPE_DATA, 
         ESP_PARTITION_SUBTYPE_DATA_SPIFFS, 
-        fs::getSpiffName()
+        NULL
     );
 
+	if(!settings::getSpiffId()){
+		iter = esp_partition_next(iter);
+	}
+
+	if(iter == NULL){
+		FB_DEBUG_LOG_E_TAG("SPIFFS partition is not found!");
+		return false;
+	}
+
+	_partition = esp_partition_get(iter);
+	FB_DEBUG_LOG_I_TAG("Partion name to be written: %s", _partition->label);
+
     if (!_partition){
-		FB_DEBUG_LOG_E_TAG("SPIFFS partition is not found!")
+		FB_DEBUG_LOG_E_TAG("SPIFFS partition is not found!");
 		return false;
 	}
     // 3. Erase the entire partition (must be done before writing)
     if(esp_partition_erase_range(_partition, 0, _partition->size) != ESP_OK){
-		FB_DEBUG_LOG_E_TAG("SPIFFS failed to be erased!")
+		FB_DEBUG_LOG_E_TAG("SPIFFS failed to be erased!");
 		return false;
 	}
 
 	_dst = 0;
+	_spiffUpdateStatusFlag = true;
 
 	return true;
 }
@@ -138,7 +151,9 @@ bool update::beginSpiff()
 bool update::writeSequentialSpiff(const char* data, int size)
 {
 	if(!esp_partition_write(_partition, _dst, data, size) == ESP_OK){
-		FB_DEBUG_LOG_E_TAG("SPIFFS failed to be written!")
+		FB_DEBUG_LOG_E_TAG("SPIFFS failed to be written!");
+		//we failed need to mark it as failure
+		_spiffUpdateStatusFlag = false;
 		return false;
 	}
 
@@ -149,6 +164,15 @@ bool update::writeSequentialSpiff(const char* data, int size)
 bool update::endSpiff()
 {
 	_partition = NULL;
+
+	fs::deinit();
+
+	if(_spiffUpdateStatusFlag){
+		//change spiff partition id
+		settings::setSpiffId(settings::getSpiffId() ? 0 : 1);
+
+		_spiffUpdateStatusFlag = false;
+	}
 
 	fs::init();
 

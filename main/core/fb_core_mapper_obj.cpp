@@ -99,4 +99,16 @@ void fb::project::util::createAndRegisterDefaultBoxProperties()
 
 	getBox().addProperty(std::unique_ptr<box::PropertyIface>(wifiPassProperty));
 	getBox().addPropertyDependency(wifiPassProperty->getId());
+
+
+	auto* spiffId = new box::PropertyInt("Spiff partition ID", "Change spiff partition ID in case of wrong update",
+		box::Tid::PROPERTY_GENERAL,
+		[](int val){
+			settings::setSpiffId(val);
+			return true;
+		}, settings::getSpiffId(), 0, 1
+	);
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(spiffId));
+	getBox().addPropertyDependency(spiffId->getId());
 }

@@ -11,8 +11,10 @@
 #define _DEFAULT_STA_SSID CONFIG_EXAMPLE_WIFI_SSID
 #define _DEFAULT_STA_PASS CONFIG_EXAMPLE_WIFI_PASSWORD
 #define _DEFAULT_URL_SNTP CONFIG_SNTP_TIME_SERVER
+#define _DEFAULT_SPIFF_ID 0
 
 #define _PARTION_NET "net"
+#define _PARTION_SPIFF "spiff"
 
 #define _KEY_WIFI_MODE "wifi_mode"
 #define _KEY_WIFI_AP_SSID "ap_ssid"
@@ -20,6 +22,7 @@
 #define _KEY_WIFI_STA_SSID "sta_ssid"
 #define _KEY_WIFI_STA_PASS "sta_pass"
 #define _KEY_URL_SNTP "url_sntp"
+#define _KEY_SPIFF_ID "s_id"
 
 
 
@@ -221,6 +224,11 @@ bool settings::isWifiProvided()
 		_storage->hasKey(_PARTION_NET, _KEY_WIFI_AP_SSID)));
 }
 
+int settings::getSpiffId()
+{
+	return getIntOrDefault(_PARTION_SPIFF, _KEY_SPIFF_ID, _DEFAULT_SPIFF_ID);
+}
+
 void settings::setApSsid(const std::string& val)
 {
 	setStr(_PARTION_NET, _KEY_WIFI_AP_SSID, val);
@@ -244,6 +252,11 @@ void settings::setStaPass(const std::string& val)
 void settings::setWifiMode(WifiMode val)
 {
 	setInt(_PARTION_NET, _KEY_WIFI_MODE, static_cast<int>(val));
+}
+
+void settings::setSpiffId(int id)
+{
+	setInt(_PARTION_SPIFF, _KEY_SPIFF_ID, id);
 }
 
 void settings::clearWifi()
