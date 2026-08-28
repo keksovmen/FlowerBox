@@ -14,6 +14,7 @@
 
 #define _PATH_PREFIX "/spiffs/"
 #define _HTML_PATH "/html/"
+#define _INDEX_PATH "/"
 
 #define _TEMPLATE_KEYWORD_ARRAY_SIZE "count"
 #define _TEMPLATE_KEYWORD_ARRAY_NAME "name"
@@ -192,6 +193,16 @@ static esp_err_t _fileCb(httpd_req_t *r)
 	return err;
 }
 
+static esp_err_t _indexCb(httpd_req_t *r)
+{
+	FB_DEBUG_ENTER_I_TAG();
+	
+	const std::string file = _composeFileName(static_cast<const char*>(r->user_ctx), "index.html");
+	const char* fileName = file.c_str();
+	FB_DEBUG_LOG_I_TAG("uri: %s\n\tfile name: %s", r->uri, fileName);
+	return _staticHandler(r, fileName);
+}
+
 static void _menu_cb(templates::Engine& engine, const std::unordered_map<std::string, std::string>& query)
 {
 	engine.addArgStr(global::getFlowerBox()->getName(), _TEMPLATE_KEYWORD_ARRAY_LABEL);
@@ -281,6 +292,7 @@ static void _properties_cb(templates::Engine& engine, const std::unordered_map<s
 void server::registerServerHtml(Builder& builder)
 {
     builder.addEndpoint(Endpoint{_HTML_PATH "*", EndpointMethod::GET, reinterpret_cast<void*>(const_cast<char*>(_PATH_PREFIX)), &_fileCb});
+    builder.addEndpoint(Endpoint{_INDEX_PATH, EndpointMethod::GET, reinterpret_cast<void*>(const_cast<char*>(_PATH_PREFIX)), &_indexCb});
 	htmlAddFileHandler("main_menu.html", &_menu_cb);
 	htmlAddFileHandler("sensors.html", &_sensors_cb);
 	htmlAddFileHandler("switches.html", &_switches_cb);
