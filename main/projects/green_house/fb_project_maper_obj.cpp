@@ -215,6 +215,44 @@ static void _init_fan_switch()
 
 	getBox().addProperty(std::unique_ptr<box::PropertyIface>(deltaHumProperty));
 	_boxFanSwitch.addPropertyDependency(deltaHumProperty->getId());
+
+
+	auto* deltaHumForPeriodProperty = new box::PropertyFloat("Delta humidity",
+		"Delta humidity over time period for auto turning off when outside is same as inside",
+		box::Tid::PROPERTY_GENERAL,
+		[](float val){
+			getHwFanSwitch().setDeltaHumidityForPeriod(val);
+			//TODO: maybe put store in to swith iface somehow
+			//maybe chain of responsibility or composite
+			settings::setFanDeltaHum(val);
+
+			return true;
+		},
+		getHwFanSwitch().getDeltaHumidityForPeriod(),
+		-255.0f, 255.0f
+	);
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(deltaHumForPeriodProperty));
+	_boxFanSwitch.addPropertyDependency(deltaHumForPeriodProperty->getId());
+
+
+	auto* deltaPeriodProperty = new box::PropertyFloat("Delta period sec",
+		"Delta period in seconds for auto humidity balancing",
+		box::Tid::PROPERTY_GENERAL,
+		[](float val){
+			getHwFanSwitch().setDeltaPeriod(val);
+			//TODO: maybe put store in to swith iface somehow
+			//maybe chain of responsibility or composite
+			settings::setFanDeltaPeriod(val);
+
+			return true;
+		},
+		getHwFanSwitch().getDeltaPeriod(),
+		0.0f, 86400.0f
+	);
+
+	getBox().addProperty(std::unique_ptr<box::PropertyIface>(deltaPeriodProperty));
+	_boxFanSwitch.addPropertyDependency(deltaPeriodProperty->getId());
 }
 
 

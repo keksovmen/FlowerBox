@@ -18,6 +18,8 @@
 #define _KEY_FAN_LOW_HUMIDITY "f_low_h"
 #define _KEY_FAN_HIGH_HUMIDITY "f_high_h"
 #define _KEY_FAN_DAY_NIGHT_DELTA_HUMIDITY "f_delta"
+#define _KEY_FAN_DELTA_HUMIDITY "f_h_del"
+#define _KEY_FAN_DELTA_PERIOD "f_per"
 
 #define _KEY_HEATER_LOW_TEMP "h_low_t"
 #define _KEY_HEATER_HIGH_TEMP "h_high_t"
@@ -68,6 +70,16 @@ void settings::setFanHighHum(float value)
 void settings::setFanDayNightDelta(float value)
 {
 	settings::setFloat(_PARTITION, _KEY_FAN_DAY_NIGHT_DELTA_HUMIDITY, value);
+}
+
+void settings::setFanDeltaHum(float value)
+{
+	settings::setFloat(_PARTITION, _KEY_FAN_DELTA_HUMIDITY, value);
+}
+
+void settings::setFanDeltaPeriod(float value)
+{
+	settings::setFloat(_PARTITION, _KEY_FAN_DELTA_PERIOD, value);
 }
 
 void settings::setHeaterLowTemp(float value)
@@ -125,6 +137,16 @@ float settings::getFanHighHum()
 float settings::getFanDayNightDelta()
 {
 	return settings::getFloatOrDefault(_PARTITION, _KEY_FAN_DAY_NIGHT_DELTA_HUMIDITY, -10.0f);
+}
+
+float settings::getFanDeltaHum()
+{
+	return settings::getFloatOrDefault(_PARTITION, _KEY_FAN_DELTA_HUMIDITY, -0.1f);
+}
+
+float settings::getFanDeltaPeriod()
+{
+	return settings::getFloatOrDefault(_PARTITION, _KEY_FAN_DELTA_PERIOD, 60.0f);
 }
 
 float settings::getHeaterLowTemp()

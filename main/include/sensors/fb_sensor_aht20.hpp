@@ -32,6 +32,7 @@ namespace fb
 
 				float getTemperature() const;
 				float getHumidity() const;
+				float getDeltaHumidity() const;
 			
 			private:
 				i2c_master_bus_handle_t _bus = nullptr;
@@ -39,6 +40,7 @@ namespace fb
 
 				float _temperature = InvalidValue;
 				float _humidity = InvalidValue;
+				float _deltaHum = 0;
 
 
 

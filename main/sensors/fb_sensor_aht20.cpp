@@ -65,6 +65,11 @@ float SensorAht20::getHumidity() const
 	return _humidity;
 }
 
+float SensorAht20::getDeltaHumidity() const
+{
+	return _deltaHum;
+}
+
 bool SensorAht20::_doInit()
 {
 	return i2c_master_probe(_bus, AHT20_ADDRRES, 500) == ESP_OK;
@@ -87,6 +92,7 @@ SensorIface::UpdateResult SensorAht20::_doUpdate()
 		FB_DEBUG_LOG_I_OBJ("Value changed temp: %.2f -> %.2f, hum: %.2f -> %.2f", _temperature, temp, _humidity, hum);
 
 		_temperature = temp;
+		_deltaHum = hum - _humidity;
 		_humidity = hum;
 		result = SensorIface::UpdateResult::VALUE_CHANGED;
 	}

@@ -50,7 +50,7 @@ bool RangeSwitch::checkValues()
 	}
 
 	if(_isColling()){
-		//охлождаемся, ждем когда температура упадет ниже минимума, тогда включаемся
+		//охлаждаемся, ждем когда температура упадет ниже минимума, тогда включаемся
 		_setColling(_getSensorValue() > _getTargetLowValue());
 	}else{
 		//нагреваемся, ждем когда температура вырастет чуть выше максимума
@@ -337,6 +337,26 @@ float FanSwitch::getDeltaTemp() const
 	return _tempSwitch.getDelta();
 }
 
+void FanSwitch::setDeltaHumidityForPeriod(float delta)
+{
+	_deltaHumidityForPeriod = delta;	
+}
+
+float FanSwitch::getDeltaHumidityForPeriod() const
+{
+	return _deltaHumidityForPeriod;
+}
+
+void FanSwitch::setDeltaPeriod(int delta)
+{
+	_deltaPeriod = delta;
+}
+
+int FanSwitch::getDeltaPeriod() const
+{
+	return _deltaPeriod;
+}
+
 
 bool FanSwitch::_condition(SwitchIface* me)
 {
@@ -349,6 +369,24 @@ bool FanSwitch::_condition(SwitchIface* me)
 	bool tempSwitch = self->_tempSwitch.checkValues();
 	if(tempSwitch && (isImpossible || isNotReasonable)){
 		tempSwitch = false;
+	}
+
+	//if delta is too small change to cooling
+	//but collect delta per minute not instant
+	if(self->_innerSensor->getDeltaHumidity() < -0.1f){
+		//set hum switch to cooling
+		self->_humSwitch._setColling(false);
+	}
+	if((clock::currentTimeStamp() - self->_prevTime) > self->getDeltaPeriod()){
+		self->_prevTime = clock::currentTimeStamp();
+		float currentHum = self->_innerSensor->getHumidity();
+		float delta = currentHum - self->_previousHum;
+		ESP_LOGI(self->getName(), "Delta hum: %.3f for %d sec", delta, self->getDeltaPeriod());
+		if(delta < 0 && delta > self->getDeltaHumidityForPeriod()){
+			//set hum switch to cooling
+			self->_humSwitch._setColling(false);
+		}
+		self->_previousHum = currentHum;
 	}
 
 	return self->_humSwitch.checkValues() || tempSwitch;

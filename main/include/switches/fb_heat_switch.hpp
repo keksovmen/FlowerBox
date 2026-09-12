@@ -12,11 +12,19 @@ namespace fb
 {
 	namespace switches
 	{
+		class FanSwitch;
+
+
+
 		class RangeSwitch : public SwitchIface
 		{
 			public:
 				using ReadCb = std::function<float()>;
 				using ActionCb = std::function<void(bool)>;
+
+
+
+				friend class FanSwitch;
 
 
 
@@ -159,6 +167,12 @@ namespace fb
 
 				void setDeltaTemp(float delta);
 				float getDeltaTemp() const;
+
+				void setDeltaHumidityForPeriod(float delta);
+				float getDeltaHumidityForPeriod() const;
+
+				void setDeltaPeriod(int delta);
+				int getDeltaPeriod() const;
 			
 			private:
 				const sensor::SensorAht20* _innerSensor;
@@ -169,6 +183,10 @@ namespace fb
 				DayNightRangeSwitch _humSwitch;
 
 				int _speed = 100;
+				float _previousHum = 0;
+				clock::Timestamp _prevTime = 0;
+				int _deltaPeriod = 60;
+				float _deltaHumidityForPeriod = -0.1f;
 
 
 

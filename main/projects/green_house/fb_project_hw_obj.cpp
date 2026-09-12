@@ -56,6 +56,8 @@ static void _init_from_settings()
 	_switchFan.setDayEndTime(settings::getLightEndTime());
 	_switchFan.setDeltaHumidity(settings::getFanDayNightDelta());
 	_switchFan.setDeltaTemp(settings::getHeaterDayNightDelta());
+	_switchFan.setDeltaHumidityForPeriod(settings::getFanDeltaHum());
+	_switchFan.setDeltaPeriod(settings::getFanDeltaPeriod());
 
 	_switchHeating.setLowValue(settings::getHeaterLowTemp());
 	_switchHeating.setHighValue(settings::getHeaterHighTemp());

@@ -137,7 +137,9 @@ PropertyFloat::PropertyFloat(
 	: PropertyBase(name, description, tid, action, value),
 	_minValue(minValue), _maxValue(maxValue)
 {
-
+	setValueType("float");
+	setMinValueStr(std::to_string(_minValue));
+	setMaxValueStr(std::to_string(_maxValue));
 }
 
 PropertyFloat::PropertyFloat(Tid tid, ActionSet action, float value)
@@ -145,7 +147,9 @@ PropertyFloat::PropertyFloat(Tid tid, ActionSet action, float value)
 	_minValue(std::atof(tidToMinValue(tid))),
 	_maxValue(std::atof(tidToMaxValue(tid)))
 {
-	
+	setValueType("float");
+	setMinValueStr(std::to_string(_minValue));
+	setMaxValueStr(std::to_string(_maxValue));
 }
 
 std::pair<bool, float> PropertyFloat::_strToValue(const std::string& str) const
