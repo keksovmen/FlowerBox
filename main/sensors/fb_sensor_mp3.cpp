@@ -2,6 +2,8 @@
 
 #include "DFRobotDFPlayerMini.h"
 
+#include "driver/gpio.h"
+
 
 
 using namespace fb;
@@ -26,6 +28,12 @@ Mp3Sensor::Mp3Sensor(int port, int rxPin, int txPin)
 {
 
 }
+
+Mp3Sensor::Mp3Sensor(int port, int rxPin, int txPin, int busyPin) : Mp3Sensor(port, rxPin, txPin)
+{
+	_busyPin = busyPin;
+}
+
 
 const char* Mp3Sensor::getName() const
 {
@@ -68,7 +76,7 @@ bool Mp3Sensor::setVolume(int volume)
 		return false;
 	}
 
-	if(volume < 0 || volume > 30){
+	if(volume < MIN_VOLUME || volume > MAX_VOLUME){
 		return false;
 	}
 
@@ -116,8 +124,35 @@ bool Mp3Sensor::isLooping() const
 	return _loopFlag;
 }
 
+bool Mp3Sensor::isPlaying() const
+{
+
+	return (_busyPin == _UNDEFINED_PIN) ? false : (gpio_get_level(static_cast<gpio_num_t>(_busyPin)) == 0);
+}
+
 bool Mp3Sensor::_doInit()
 {
+	//wait for board boot
+	if((uint64_t) clock::boardTimeMs() < 3000llu){
+		return false;
+	}
+
+	if(_busyPin != _UNDEFINED_PIN){
+		gpio_config_t cfg = {
+			.pin_bit_mask = 1llu << _busyPin,
+			.mode = GPIO_MODE_INPUT,
+			.pull_up_en = GPIO_PULLUP_DISABLE,
+			.pull_down_en = GPIO_PULLDOWN_DISABLE,
+			.intr_type = GPIO_INTR_DISABLE,
+		};
+		gpio_config(&cfg);
+	}
+
+	if(!_player.writePlaybackCD()){
+		FB_DEBUG_LOG_E_OBJ("Failed to set playback CD");
+		return false;
+	}
+
 	const auto files = _player.readTotalFiles();
 	if(!files){
 		FB_DEBUG_LOG_E_OBJ("Failed to read total files");
@@ -133,7 +168,7 @@ bool Mp3Sensor::_doInit()
 
 	_volume = volume.value();
 
-	_player.writeSetLoopFile();
+	// _player.writeSetLoopFile();
 
 	return true;
 }

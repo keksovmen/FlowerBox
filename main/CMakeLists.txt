@@ -11,8 +11,8 @@
 # set(_PROJECT CIPHER_BOX_V2)
 # set(_PROJECT RFIDS)
 # set(_PROJECT WASHER)
-set(_PROJECT INPUT_MATRIX)
-
+# set(_PROJECT INPUT_MATRIX)
+set(_PROJECT AUDIO_MULTI)
 
 
 message(STATUS "Selected project: " ${_PROJECT})
@@ -135,6 +135,18 @@ elseif(${_PROJECT} STREQUAL "INPUT_MATRIX")
 
 	set(_ADD_INCLUDES
 		"include/projects/input_matrix"
+		)
+elseif(${_PROJECT} STREQUAL "AUDIO_MULTI")
+	file(GLOB _ADD_SRC
+		"projects/audio_multi/*.cpp"
+		"sensors/fb_sensor_mp3.cpp"
+		"df_player/fb_df_player.cpp"
+		"fb_uart.cpp"
+		)
+
+	set(_ADD_INCLUDES
+		"include/projects/audio_multi"
+		"include/df_player"
 		)
 endif()
 

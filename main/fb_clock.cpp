@@ -15,6 +15,7 @@
 	#include "esp_netif_sntp.h"
 #endif
 #include "esp_sntp.h"
+#include "esp_timer.h"
 #include "lwip/ip_addr.h"
 
 
@@ -205,4 +206,9 @@ void clock::setCurrentTime(uint32_t timeSec)
 	tv.tv_sec = timeSec;
 	
 	settimeofday(&tv, nullptr);
+}
+
+Timestamp clock::boardTimeMs()
+{
+	return esp_timer_get_time() / 1000;
 }

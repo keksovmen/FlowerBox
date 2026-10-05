@@ -15,7 +15,13 @@ namespace fb
 		class Mp3Sensor : public SensorIface
 		{
 			public:
+				static constexpr int MIN_VOLUME = 0;
+				static constexpr int MAX_VOLUME = 30;
+
+
+
 				Mp3Sensor(int port, int rxPin, int txPin);
+				Mp3Sensor(int port, int rxPin, int txPin, int busyPin);
 
 				virtual const char* getName() const override;
 
@@ -27,16 +33,22 @@ namespace fb
 				int getFilesCount() const;
 				int getVolume() const;
 				bool isLooping() const;
+				bool isPlaying() const;
 
 			private:
+				static constexpr int _UNDEFINED_PIN = -1;
+
+
+
 				interfaces::Uart _uart;
 				player::DfPlayer _player;
 
 				
-
+				int _busyPin = _UNDEFINED_PIN;
 				int _filesCount = 0;
 				int _volume = 15;
 				bool _loopFlag = true;
+				bool _initFlag = false;
 
 
 

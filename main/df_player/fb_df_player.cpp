@@ -110,13 +110,13 @@ const char* DfPlayer::getName() const
 std::optional<int> DfPlayer::readTotalFiles()
 {
 	Packet r(Cmd::GET_SD_FILE_COUNT);
-	if(!_writeCb(r.calculateCRC().getRaw())){
+	if(!_write(r.calculateCRC().getRaw())){
 		FB_DEBUG_LOG_E_OBJ("readTotalFiles() failed to send request");
 		return {};
 	}
 
 	Packet::Buffer buff;
-	if(!_readCb(buff, 1000)){
+	if(!_read(buff, 1000)){
 		FB_DEBUG_LOG_E_OBJ("readTotalFiles() failed read responce");
 		return {};
 	}
@@ -135,13 +135,13 @@ std::optional<int> DfPlayer::readTotalFiles()
 std::optional<int> DfPlayer::readVolume()
 {
 	Packet r(Cmd::GET_VOLUME);
-	if(!_writeCb(r.calculateCRC().getRaw())){
+	if(!_write(r.calculateCRC().getRaw())){
 		FB_DEBUG_LOG_E_OBJ("readVolume() failed to send request");
 		return {};
 	}
 
 	Packet::Buffer buff;
-	if(!_readCb(buff, 1000)){
+	if(!_read(buff, 1000)){
 		FB_DEBUG_LOG_E_OBJ("readVolume() failed read responce");
 		return {};
 	}
@@ -167,9 +167,7 @@ bool DfPlayer::writeVolume(int volume)
 	}
 
 	Packet p(Cmd::SET_VOLUME, volume);
-	_writeCb(p.calculateCRC().getRaw());
-
-	return true;
+	return _write(p.calculateCRC().getRaw());
 }
 
 bool DfPlayer::writePlay(int fileId)
@@ -182,23 +180,19 @@ bool DfPlayer::writePlay(int fileId)
 	}
 
 	Packet p(Cmd::PLAY_TRACK, fileId);
-	_writeCb(p.calculateCRC().getRaw());
-
-	return true;
+	return _write(p.calculateCRC().getRaw());
 }
 
 bool DfPlayer::writeStop()
 {
 	Packet p(Cmd::STOP_AUDIO);
-	_writeCb(p.calculateCRC().getRaw());
-
-	return true;
+	return _write(p.calculateCRC().getRaw());
 }
 
 bool DfPlayer::writeSetLoopFile()
 {
 	Packet p(Cmd::SET_LOOP_MODE, 0);
-	_writeCb(p.calculateCRC().getRaw());
+	_write(p.calculateCRC().getRaw());
 
 	vTaskDelay(pdMS_TO_TICKS(800));
 	writeStop();
@@ -209,7 +203,7 @@ bool DfPlayer::writeSetLoopFile()
 bool DfPlayer::writeSetLoopFolder()
 {
 	Packet p(Cmd::SET_LOOP_MODE, 1);
-	_writeCb(p.calculateCRC().getRaw());
+	_write(p.calculateCRC().getRaw());
 
 	vTaskDelay(pdMS_TO_TICKS(300));
 	writeStop();
@@ -220,7 +214,7 @@ bool DfPlayer::writeSetLoopFolder()
 bool DfPlayer::writeDisableLoop()
 {
 	Packet p(Cmd::SET_LOOP_MODE, 2);
-	_writeCb(p.calculateCRC().getRaw());
+	_write(p.calculateCRC().getRaw());
 
 	vTaskDelay(pdMS_TO_TICKS(1000));
 	writeStop();
@@ -231,7 +225,32 @@ bool DfPlayer::writeDisableLoop()
 bool DfPlayer::writeReset()
 {
 	Packet p(Cmd::RESET);
-	_writeCb(p.calculateCRC().getRaw());
+	return _write(p.calculateCRC().getRaw());
+}
 
-	return true;
+bool DfPlayer::writePlaybackCD()
+{
+	Packet p(Cmd::SET_PLAYBACK_MODE, 0x02);
+	return _write(p.calculateCRC().getRaw());
+}
+
+bool DfPlayer::_write(std::span<uint8_t> data)
+{
+	_handleTimeDelay();
+	return std::invoke(_writeCb, data);
+}
+
+bool DfPlayer::_read(std::span<uint8_t> out, int timeoutMs)
+{
+	_handleTimeDelay();
+	return std::invoke(_readCb, out, timeoutMs);
+}
+
+void DfPlayer::_handleTimeDelay()
+{
+	auto difference = clock::boardTimeMs() - _lastCmdMs;
+	if(difference < _DELAY_BETWEEN_CMD_MS){
+		vTaskDelay(pdMS_TO_TICKS(_DELAY_BETWEEN_CMD_MS - difference));
+	}
+	_lastCmdMs = clock::boardTimeMs();
 }

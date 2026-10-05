@@ -49,5 +49,7 @@ namespace fb
 
 		Timestamp currentTimeStamp();
 		void setCurrentTime(uint32_t timeSec);
+
+		Timestamp boardTimeMs();
 	}
 }

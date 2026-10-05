@@ -1,0 +1,27 @@
+# settings.yml
+project: audio_multi
+name: AudioMultiplexer
+version: 0.0.1
+settings:
+  - name: MqttId
+    type: int
+    default: 0
+    key: l_mqtt_id
+    min: 0
+    max: 255
+  - name: Ip
+    type: std::string
+    default: 192.168.0.111
+    key: mq_ip
+  - name: Port
+    type: int
+    default: 8081
+    key: mq_port
+    min: 0
+    max: 65535
+  - name: Volume
+    type: int
+    default: 10
+    key: df_vol
+    min: 0
+    max: 30

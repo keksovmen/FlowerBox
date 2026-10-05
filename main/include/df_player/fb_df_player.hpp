@@ -7,6 +7,7 @@
 #include <optional>
 #include <span>
 
+#include "fb_clock.hpp"
 #include "fb_debug.hpp"
 
 
@@ -17,13 +18,14 @@ namespace fb
 	{
 		enum class Cmd : uint8_t
 		{
-			SET_VOLUME = 0x06,
-			STOP_AUDIO = 0x16,
 			PLAY_TRACK = 0x03,
+			SET_VOLUME = 0x06,
+			SET_LOOP_MODE = 0x08,
+			SET_PLAYBACK_MODE = 0x09,
+			RESET = 0x0C,
+			STOP_AUDIO = 0x16,
 			GET_VOLUME = 0x43,
 			GET_SD_FILE_COUNT = 0x48,
-			SET_LOOP_MODE = 0x08,
-			RESET = 0x0C,
 		};
 
 
@@ -107,11 +109,25 @@ namespace fb
 				bool writeSetLoopFile();
 				bool writeSetLoopFolder();
 				bool writeDisableLoop();
+				//do not use it is not working correctly due to firmware of dfplayer
 				bool writeReset();
+				bool writePlaybackCD();
 
 			private:
+				static constexpr int _DELAY_BETWEEN_CMD_MS = 150;
+
+
+
 				const ReadCb _readCb;
 				const WriteCb _writeCb;
+				clock::Timestamp _lastCmdMs = 0;
+
+
+
+				//proxy to handle delay between commands for reliability
+				bool _write(std::span<uint8_t> data);
+				bool _read(std::span<uint8_t> out, int timeoutMs);
+				void _handleTimeDelay();
 		};
 	}
 }
