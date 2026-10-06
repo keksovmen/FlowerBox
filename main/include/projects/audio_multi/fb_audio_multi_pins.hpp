@@ -11,5 +11,7 @@ namespace fb
 		static constexpr int PIN_MP3_BUSY = 2;
 
 		static constexpr int PINS_MULTIPLEX[] = {6, 5, 4};
+
+		static constexpr int PIN_KEYBOARD_RESET = 9;
 	}
 }

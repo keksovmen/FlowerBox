@@ -1,12 +1,13 @@
 #include "fb_audio_multi_hw_obj.hpp"
 
-#include "fb_globals.hpp"
-#include "fb_keyboard_handler.hpp"
 #include "fb_audio_multi_pins.hpp"
 #include "fb_audio_multi_settings.hpp"
-#include "fb_sensor_mp3.hpp"
-#include "fb_mqtt_client.hpp"
+#include "fb_globals.hpp"
 #include "fb_json_util.hpp"
+#include "fb_keyboard_handler.hpp"
+#include "fb_mqtt_client.hpp"
+#include "fb_sensor_keyboard.hpp"
+#include "fb_sensor_mp3.hpp"
 
 #include "driver/gpio.h"
 #include "cJSON.h"
@@ -43,6 +44,7 @@ static sensor::SensorStorage _sensorStorage;
 static keyboard::KeyboardHandler _keyboardHandler;
 
 static sensor::Mp3Sensor _mp3Sensor(_MP3_UART_PORT, pins::PIN_MP3_RX, pins::PIN_MP3_TX);
+static sensor::KeyboardSensor<1> _keyboardSensor({std::pair{pins::PIN_KEYBOARD_RESET, h::ButtonVK::VK_0}});
 static periph::MqttClient _mqtt;
 
 
@@ -117,6 +119,7 @@ static void _init_from_settings()
 
 void project::initHwObjs()
 {
+	_sensorService.addSensor(&_keyboardSensor);
 	_sensorService.addSensor(&_mp3Sensor);
 
 	for(int pin : pins::PINS_MULTIPLEX){
