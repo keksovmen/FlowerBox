@@ -132,11 +132,6 @@ bool Mp3Sensor::isPlaying() const
 
 bool Mp3Sensor::_doInit()
 {
-	//wait for board boot
-	if((uint64_t) clock::boardTimeMs() < 3000llu){
-		return false;
-	}
-
 	if(_busyPin != _UNDEFINED_PIN){
 		gpio_config_t cfg = {
 			.pin_bit_mask = 1llu << _busyPin,
@@ -148,17 +143,38 @@ bool Mp3Sensor::_doInit()
 		gpio_config(&cfg);
 	}
 
+	//wait for board boot
+	if((uint64_t) clock::boardTimeMs() < 3000llu){
+		return false;
+	}
+
 	if(!_player.writePlaybackCD()){
 		FB_DEBUG_LOG_E_OBJ("Failed to set playback CD");
 		return false;
 	}
+	
+	//wait for filesystem mount
+	vTaskDelay(pdMS_TO_TICKS(1000));
+	
+	for(int i = 0; i < 5; i++){
+		const auto files = _player.readTotalFiles();
+		if(!files){
+			FB_DEBUG_LOG_E_OBJ("Failed to read total files");
+			return false;
+		}
 
-	const auto files = _player.readTotalFiles();
-	if(!files){
-		FB_DEBUG_LOG_E_OBJ("Failed to read total files");
-		return false;
+		if(files.value() == 0){
+			FB_DEBUG_LOG_E_OBJ("No files on a disk, possible error during initialization!");
+			return false;
+		}
+
+		if(_filesCount != files.value()){
+			FB_DEBUG_LOG_W_OBJ("Still counting files");
+			vTaskDelay(pdMS_TO_TICKS(500));
+		}
+
+		_filesCount = files.value();
 	}
-	_filesCount = files.value();
 
 	const auto volume = _player.readVolume();
 	if(!volume){

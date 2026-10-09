@@ -45,7 +45,7 @@ namespace fb
 
 				
 				int _busyPin = _UNDEFINED_PIN;
-				int _filesCount = 0;
+				int _filesCount = -1;
 				int _volume = 15;
 				bool _loopFlag = true;
 				bool _initFlag = false;

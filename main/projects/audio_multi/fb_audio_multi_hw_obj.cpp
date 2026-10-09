@@ -9,8 +9,9 @@
 #include "fb_sensor_keyboard.hpp"
 #include "fb_sensor_mp3.hpp"
 
-#include "driver/gpio.h"
+#include "esp_random.h"
 #include "cJSON.h"
+#include "driver/gpio.h"
 
 
 
@@ -19,6 +20,8 @@
 #define _MQTT_PLAY_PATH ("/audio_multi/" + std::to_string(settings::getMqttId()) + "/play")
 #define _MQTT_STOP_PATH ("/audio_multi/" + std::to_string(settings::getMqttId()) + "/stop")
 #define _MQTT_VOLUME_PATH ("/audio_multi/" + std::to_string(settings::getMqttId()) + "/volume")
+
+#define _RANDOM_TRACK_ID -2
 
 
 
@@ -80,8 +83,17 @@ static void _mqtt_data_handler(std::string_view topic, std::string_view data)
 
 
 		_mp3Sensor.setVolume(settings::getVolume());
-		_enableChannel(channelId);
-		_mp3Sensor.play(trackId);
+		if(channelId == _RANDOM_TRACK_ID){
+			_enableChannel(esp_random() % (sizeof(_CHANNEL_MAP) / sizeof(_CHANNEL_MAP[0])));
+		}else{
+			_enableChannel(channelId);
+		}
+
+		if(trackId == _RANDOM_TRACK_ID){
+			_mp3Sensor.play(esp_random() % _mp3Sensor.getFilesCount());
+		}else{
+			_mp3Sensor.play(trackId);
+		}
 
 	}else if(topic == _MQTT_STOP_PATH){
 		_mp3Sensor.stop();

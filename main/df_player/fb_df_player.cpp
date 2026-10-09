@@ -237,7 +237,11 @@ bool DfPlayer::writePlaybackCD()
 bool DfPlayer::_write(std::span<uint8_t> data)
 {
 	_handleTimeDelay();
-	return std::invoke(_writeCb, data);
+	const bool result = std::invoke(_writeCb, data);
+	if(!result){
+		FB_DEBUG_LOG_E_OBJ("Failed to write data through uart!");
+	}
+	return result;
 }
 
 bool DfPlayer::_read(std::span<uint8_t> out, int timeoutMs)
