@@ -1,5 +1,7 @@
 #include "fb_cipher_box_hw_obj.hpp"
 
+#include <algorithm>
+
 #include "fb_cipher_box_pins.hpp"
 #include "fb_cipher_box_settings.hpp"
 #include "fb_expander_matrix.hpp"
@@ -108,12 +110,16 @@ static void _monitorTask(void* arg)
 	bool changedFlag = false;
 
 	for(;;){
-		auto state = _matrix.readPins();
 		if(_i2cErrorFlag){
 			vTaskDelay(pdMS_TO_TICKS(100));
 			FB_DEBUG_LOG_W_TAG("Trying to revive CH32");
 			_initExpander();
 			_i2cErrorFlag = false;
+			continue;
+		}
+
+		auto state = _matrix.readPins();
+		if(_i2cErrorFlag){
 			continue;
 		}
 
@@ -134,6 +140,14 @@ static void _monitorTask(void* arg)
 					timeStates[i].sended = true;
 				}
 			}
+		}
+
+		//check if the whole array became 0
+		if(std::all_of(state.begin(), state.end(), [](int v){return v == 0;}))
+		{
+			_i2cErrorFlag = true;
+			FB_DEBUG_LOG_W_TAG("Unexpected full 0 array!");
+			continue;
 		}
 
 		prevState = std::move(state);
